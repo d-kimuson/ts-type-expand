@@ -6,6 +6,10 @@
     "lib": ["es6"],
     "sourceMap": true,
     "rootDir": "src",
+    "baseUrl": "src",
+    "paths": {
+      "~/*": ["*"]
+    },
     "strict": true /* enable all strict type-checking options */,
     "moduleResolution": "node",
     "noEmit": true,
@@ -15,5 +19,5 @@
     // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
     // "noUnusedParameters": true,  /* Report errors on unused parameters. */
   },
-  "exclude": ["node_modules", ".vscode-test"]
+  "exclude": ["node_modules", ".vscode-test", "example"]
 }
