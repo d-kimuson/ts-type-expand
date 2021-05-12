@@ -11,8 +11,6 @@ import {
 import type { MyType, BaseType, PropType } from "./types/typescript"
 import { loadTsConfig } from "~/utils/tsConfig"
 
-const ignoreTypeStrings = ["string", "number", "boolean", "undefined", "null"]
-
 type SupportedNode =
   | ts.TypeAliasDeclaration
   | ts.VariableDeclaration
@@ -227,12 +225,16 @@ export class CompilerHandler {
   private convertBaseType(type: MyType, name?: string): BaseType {
     const union = type?.types ?? []
     const typeText = this.checker.typeToString(type)
+
     return {
       name,
       typeText,
-      props: ignoreTypeStrings.includes(typeText)
-        ? []
-        : this.getTypeOfProperties(type),
+      props:
+        ["string", "number", "boolean", "undefined", "null"].includes(
+          typeText
+        ) || typeText.endsWith("[]")
+          ? []
+          : this.getTypeOfProperties(type),
       union: union.map((t) => this.convertBaseType(t)),
     }
   }
