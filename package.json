@@ -36,7 +36,8 @@
     "fix:prettier": "prettier '**/*.{ts,js,json,md}' --write",
     "pretest": "yarn run compile && yarn run lint",
     "test:vscode": "node ./out/test/runTest.js",
-    "test:jest": "jest"
+    "test:jest": "jest",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
@@ -55,7 +56,8 @@
     "prettier": "^2.2.1",
     "ts-jest": "^26.5.6",
     "ts-node": "^9.1.1",
-    "vscode-test": "^1.5.0"
+    "vscode-test": "^1.5.0",
+    "husky": "^6.0.0"
   },
   "dependencies": {
     "typescript": "^4.2.4"
