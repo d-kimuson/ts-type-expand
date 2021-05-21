@@ -5,7 +5,7 @@
     "outDir": "out",
     "lib": ["es6"],
     "sourceMap": true,
-    "rootDir": "src",
+    "rootDir": "./",
     "baseUrl": "src",
     "paths": {
       "~/*": ["*"]
@@ -15,5 +15,5 @@
     "noEmit": false,
     "skipLibCheck": true
   },
-  "exclude": ["node_modules", ".vscode-test", "example", "tests"]
+  "exclude": ["node_modules", ".vscode-test", "example"]
 }
