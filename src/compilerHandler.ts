@@ -5,7 +5,9 @@ import {
   getNameOfDeclaration,
   SyntaxKind,
   isPropertyName,
+  isIdentifier,
   isVariableStatement,
+  getPositionOfLineAndCharacter,
 } from "typescript"
 
 import type { MyType, BaseType, PropType } from "./types/typescript"
@@ -51,12 +53,24 @@ export class CompilerHandler {
     this.checker = this.program.getTypeChecker()
   }
 
-  public getTypeFromPos(filePath: string, pos: number): BaseType | undefined {
+  public getTypeFromLineAndCharacter(
+    filePath: string,
+    lineNumber: number,
+    character: number
+  ): BaseType | undefined {
     const sourceFile = this.program.getSourceFile(filePath)
     if (!sourceFile) {
       throw new Error(`File not found: ${filePath}`)
     }
 
+    const pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
+    return this.getTypeFromPos(sourceFile, pos)
+  }
+
+  private getTypeFromPos(
+    sourceFile: ts.SourceFile,
+    pos: number
+  ): BaseType | undefined {
     const result = this.getNodeFromPos(sourceFile, pos)
     if (!result) {
       return undefined
@@ -135,8 +149,8 @@ export class CompilerHandler {
 
   // entry function for converting node to type
   private getTypeFromNode(node: ts.Node): BaseType | undefined {
-    if (isDefinitionNode(node)) {
-      return this.getTypeFromDefinition(node)
+    if (isIdentifier(node) && isDefinitionNode(node.parent)) {
+      return this.getTypeFromDefinition(node.parent)
     }
     if (isPropertyName(node)) {
       return this.getTypeFromProperty(node)
