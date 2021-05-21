@@ -78,6 +78,10 @@ export class CompilerHandler {
 
     const { leafNode } = result
 
+    if (isIdentifier(leafNode)) {
+      this.getTypeFromNode(leafNode.parent)
+    }
+
     return this.getTypeFromNode(leafNode)
   }
 
@@ -149,8 +153,8 @@ export class CompilerHandler {
 
   // entry function for converting node to type
   private getTypeFromNode(node: ts.Node): BaseType | undefined {
-    if (isIdentifier(node) && isDefinitionNode(node.parent)) {
-      return this.getTypeFromDefinition(node.parent)
+    if (isDefinitionNode(node)) {
+      return this.getTypeFromDefinition(node)
     }
     if (isPropertyName(node)) {
       return this.getTypeFromProperty(node)

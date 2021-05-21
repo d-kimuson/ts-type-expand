@@ -1,30 +1,53 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode"
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext): void {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "ts-type-expand" is now active!')
+import { TypeExpandProvider } from "~/vscode/TypeExpandProvider"
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  const disposable = vscode.commands.registerCommand(
-    "ts-type-expand.helloWorld",
-    () => {
-      // The code you place here will be executed every time your command is executed
-
-      // Display a message box to the user
-      vscode.window.showInformationMessage("Hello World from ts-type-expand!")
-    }
-  )
-
-  context.subscriptions.push(disposable)
+function getCurrentFilePath(): string | undefined {
+  return vscode.window.activeTextEditor?.document.uri.fsPath
 }
 
-// this method is called when your extension is deactivated
+function getActiveWorkspace(): vscode.WorkspaceFolder | undefined {
+  const currentFilePath = getCurrentFilePath()
+  return (vscode.workspace.workspaceFolders || []).find((workspaceFolder) =>
+    currentFilePath?.startsWith(workspaceFolder.uri.fsPath)
+  )
+}
+
+export function activate(context: vscode.ExtensionContext): void {
+  console.log('Congratulations, "ts-type-expand" is now active!')
+
+  const workspace = getActiveWorkspace()
+  if (!workspace) {
+    vscode.window.showErrorMessage("Workspace is not activated")
+    return
+  }
+
+  const typeExpandProvider = new TypeExpandProvider(
+    workspace.uri.path,
+    getCurrentFilePath()
+  )
+
+  const disposes = [
+    vscode.commands.registerCommand("ts-type-expand.activate", () => {
+      typeExpandProvider.refresh()
+    }),
+    vscode.window.registerTreeDataProvider("typeExpand", typeExpandProvider),
+    vscode.window.createTreeView("typeExpand", {
+      treeDataProvider: typeExpandProvider,
+    }),
+    vscode.window.onDidChangeTextEditorSelection((e) => {
+      typeExpandProvider.updateSelection(e.textEditor.selection)
+    }),
+    vscode.window.onDidChangeActiveTextEditor(() => {
+      typeExpandProvider.updateActiveFile(getCurrentFilePath())
+    }),
+    // TODO: Support change workspace
+  ]
+
+  disposes.forEach((dispose) => {
+    context.subscriptions.push(dispose)
+  })
+}
+
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export function deactivate(): void {}
