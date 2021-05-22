@@ -4,6 +4,11 @@
   "description": "expand type for typescript",
   "version": "0.0.1",
   "license": "MIT",
+  "publisher": "kimuson",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/d-kimuson/ts-type-expand"
+  },
   "engines": {
     "vscode": "^1.55.0"
   },
