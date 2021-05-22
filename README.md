@@ -6,20 +6,21 @@ Install from [ts-type-expand - Visual Studio Marketplace](https://marketplace.vi
 
 ## Support Statement
 
-|   Statements    | Support |
-| :-------------: | :-----: |
-|    TypeAlias    |    △    |
-|    Interface    |    ✓    |
-|    Function     |    ✓    |
-| Allow Function  |    ✓    |
-|     Object      |    ✓    |
-| Object Property |    ✓    |
-|      Class      |    ✓    |
-|  Class Method   |    ✓    |
-| Class Property  |    ✓    |
-|    Variable     |    ✓    |
-|     Import      |    ✓    |
-|  TypeReference  |    ✓    |
+|    Statements    | Support |
+| :--------------: | :-----: |
+|    TypeAlias     |    △    |
+|    Interface     |    ✓    |
+|     Function     |    ✓    |
+|  Allow Function  |    ✓    |
+|      Object      |    ✓    |
+| Object Property  |    ✓    |
+| Index Signatures |    ☓    |
+|      Class       |    ✓    |
+|   Class Method   |    ✓    |
+|  Class Property  |    ✓    |
+|     Variable     |    ✓    |
+|      Import      |    ✓    |
+|  TypeReference   |    ✓    |
 
 ## Support Types
 
@@ -30,12 +31,13 @@ Install from [ts-type-expand - Visual Studio Marketplace](https://marketplace.vi
 |             Union Type              |    ✓    |
 |          Intersection Type          |    ☓    |
 |              Function               |    △    |
-|           Keyof `<Type>`            |    ☓    |
-|           Typeof `<Type>`           |    ☓    |
-|        Indexed Access Types         |    ☓    |
+|              Generics               |    ✓    |
+|           Keyof `<Type>`            |    ✓    |
+|           Typeof `<Type>`           |    ✓    |
+|        Indexed Access Types         |    ✓    |
 |          Conditional Types          |    ✓    |
 |            Mapped Types             |    ✓    |
-|       Template Literal Types        |    ☓    |
+|       Template Literal Types        |    ✓    |
 
 ## Configure
 

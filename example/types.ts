@@ -17,6 +17,8 @@ export type Foo = {
   expanded?: PartialUser
 }
 
+export type Intersected = User & Foo
+
 export type GetUser = (userId: string) => User
 
 export interface Article {
