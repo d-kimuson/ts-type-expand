@@ -11,13 +11,13 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:ts-type-expand.activate"
+    "onView:typeExpand"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "ts-type-expand.activate",
+        "command": "ts-type-expand.refresh",
         "title": "Activate ts-type-expand"
       }
     ],
@@ -25,7 +25,7 @@
       "explorer": [
         {
           "id": "typeExpand",
-          "name": "Type Expand"
+          "name": "TS Type Expand"
         }
       ]
     }

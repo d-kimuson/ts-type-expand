@@ -14,42 +14,46 @@ function getActiveWorkspace(): vscode.WorkspaceFolder | undefined {
 }
 
 export function activate(context: vscode.ExtensionContext): void {
-  vscode.window.showInformationMessage(
-    'Congratulations, "ts-type-expand" is now active!'
-  )
-
   const workspace = getActiveWorkspace()
   if (!workspace) {
     vscode.window.showErrorMessage("Workspace is not activated")
     return
   }
 
-  const typeExpandProvider = new TypeExpandProvider(
-    workspace.uri.path,
-    getCurrentFilePath()
-  )
+  try {
+    const typeExpandProvider = new TypeExpandProvider(
+      workspace.uri.fsPath,
+      getCurrentFilePath()
+    )
 
-  const disposes = [
-    vscode.commands.registerCommand("ts-type-expand.activate", () => {
-      typeExpandProvider.refresh()
-    }),
-    vscode.window.registerTreeDataProvider("typeExpand", typeExpandProvider),
-    vscode.window.createTreeView("typeExpand", {
-      treeDataProvider: typeExpandProvider,
-    }),
-    vscode.window.onDidChangeTextEditorSelection((e) => {
-      typeExpandProvider.updateSelection(e.textEditor.selection)
-    }),
-    vscode.window.onDidChangeActiveTextEditor(() => {
-      typeExpandProvider.updateActiveFile(getCurrentFilePath())
-    }),
-    // TODO: Support change workspace
-  ]
+    const disposes = [
+      vscode.commands.registerCommand("ts-type-expand.refresh", () => {
+        typeExpandProvider.refresh()
+      }),
+      vscode.window.registerTreeDataProvider("typeExpand", typeExpandProvider),
+      vscode.window.createTreeView("typeExpand", {
+        treeDataProvider: typeExpandProvider,
+      }),
+      vscode.window.onDidChangeTextEditorSelection((e) => {
+        typeExpandProvider.updateSelection(e.textEditor.selection)
+      }),
+      vscode.window.onDidChangeActiveTextEditor(() => {
+        typeExpandProvider.updateActiveFile(getCurrentFilePath())
+      }),
+      // TODO: Support change workspace
+    ]
 
-  disposes.forEach((dispose) => {
-    context.subscriptions.push(dispose)
-  })
+    disposes.forEach((dispose) => {
+      context.subscriptions.push(dispose)
+    })
+
+    console.log("ts-type-expand is now active!")
+  } catch (error) {
+    vscode.window.showErrorMessage(error)
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-export function deactivate(): void {}
+export function deactivate(): void {
+  console.log("ts-type-expand is deactivated")
+}
