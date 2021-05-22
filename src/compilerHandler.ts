@@ -7,6 +7,7 @@ import {
   isPropertyName,
   isPropertySignature,
   isIdentifier,
+  isVariableDeclaration,
   isVariableStatement,
   getPositionOfLineAndCharacter,
 } from "typescript"
@@ -63,7 +64,6 @@ export class CompilerHandler {
     if (!sourceFile) {
       throw new Error(`File not found: ${filePath}`)
     }
-
     const pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
     const nodes = this.getNodeFromPos(sourceFile, pos)
     return nodes && isIdentifier(nodes.leafNode)
@@ -79,7 +79,7 @@ export class CompilerHandler {
       return this.getTypeFromNode(identiferNode)
     }
 
-    // declare
+    // declare identifer
     return this.getTypeFromNode(identiferNode.parent)
   }
 
@@ -104,7 +104,7 @@ export class CompilerHandler {
       if (isVariableStatement(node)) {
         types.push({
           node: node,
-          type: this.getTypeFromVariable(node),
+          type: this.getTypeFromVariableStatement(node),
         })
         return
       }
@@ -157,6 +157,9 @@ export class CompilerHandler {
     if (isPropertyName(node)) {
       return this.getTypeFromProperty(node)
     }
+    if (isVariableDeclaration(node)) {
+      return this.getTypeFromVariable(node)
+    }
 
     return undefined
   }
@@ -168,7 +171,14 @@ export class CompilerHandler {
     )
   }
 
-  private getTypeFromVariable(node: ts.VariableStatement): BaseType {
+  private getTypeFromVariable(node: ts.VariableDeclaration): BaseType {
+    return this.convertBaseType(
+      this.checker.getTypeAtLocation(node),
+      getNameOfDeclaration(node)?.getText()
+    )
+  }
+
+  private getTypeFromVariableStatement(node: ts.VariableStatement): BaseType {
     const typeNode = node.declarationList.declarations[0]
     return this.convertBaseType(
       this.checker.getTypeAtLocation(typeNode),
