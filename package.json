@@ -46,7 +46,7 @@
     "fix:eslint": "yarn lint:eslint --fix",
     "fix:prettier": "prettier '**/*.{ts,js,json,md}' --write",
     "pretest": "yarn run compile && yarn run lint",
-    "test:vscode": "node ./out/test/runTest.js",
+    "test:vscode": "node ./out/test/vscode/runTest.js",
     "test:jest": "jest",
     "prepare": "husky install"
   },

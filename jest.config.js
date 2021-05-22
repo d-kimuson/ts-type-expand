@@ -4,10 +4,10 @@ const { compilerOptions } = require("./tsconfig.json")
 
 module.exports = {
   roots: ["<rootDir>"],
-  testMatch: ["<rootDir>/tests/**/?(*.)+(spec|test).+(ts)"],
+  testMatch: ["<rootDir>/src/test/jest/**/?(*.)+(spec|test).+(ts)"],
   globals: {
     "ts-jest": {
-      tsconfig: "tests/tsconfig.json",
+      tsconfig: "src/test/jest/tsconfig.json",
     },
   },
   preset: "ts-jest",

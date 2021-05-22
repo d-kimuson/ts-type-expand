@@ -2,7 +2,7 @@ import * as path from "path"
 
 import { CompilerHandler } from "~/CompilerHandler"
 
-const exampleDir = path.resolve(__dirname, "../example")
+const exampleDir = path.resolve(__dirname, "../../../example")
 const handler = new CompilerHandler(
   path.resolve(exampleDir, "tsconfig.json"),
   exampleDir

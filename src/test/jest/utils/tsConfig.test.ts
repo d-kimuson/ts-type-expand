@@ -3,7 +3,7 @@ import * as path from "path"
 
 import { loadTsConfig } from "~/utils/tsConfig"
 
-const exampleDir = path.resolve(__dirname, "../../example")
+const exampleDir = path.resolve(__dirname, "../../../../example")
 
 test("load example tsconfig", () => {
   const tsConfig = loadTsConfig(
