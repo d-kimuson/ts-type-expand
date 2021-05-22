@@ -103,11 +103,13 @@ export class CompilerHandler {
   private updateProgram() {
     const maybeProgram = this.watchConf?.getProgram().getProgram()
     if (!maybeProgram) {
+      console.warn("program is not found")
       return
     }
 
     this.program = maybeProgram
     this.checker = this.program.getTypeChecker()
+    console.log("program & checker config is updated!")
   }
 
   public getTypeFromLineAndCharacter(
