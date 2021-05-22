@@ -22,6 +22,8 @@ type SupportedNode =
   | ts.FunctionDeclaration
   | ts.ClassDeclaration
   | ts.InterfaceDeclaration
+  | ts.PropertyDeclaration
+  | ts.MethodDeclaration
 
 const isSupportedNode = (node: ts.Node): node is SupportedNode =>
   [
@@ -30,6 +32,8 @@ const isSupportedNode = (node: ts.Node): node is SupportedNode =>
     SyntaxKind.FunctionDeclaration,
     SyntaxKind.ClassDeclaration,
     SyntaxKind.InterfaceDeclaration,
+    SyntaxKind.PropertyDeclaration,
+    SyntaxKind.MethodDeclaration,
   ].includes(node.kind)
 
 type DefinitionNode =
@@ -37,6 +41,8 @@ type DefinitionNode =
   | ts.InterfaceDeclaration
   | ts.FunctionDeclaration
   | ts.ClassDeclaration
+  | ts.PropertyDeclaration
+  | ts.MethodDeclaration
 
 const isDefinitionNode = (node: ts.Node): node is DefinitionNode =>
   [
@@ -44,6 +50,8 @@ const isDefinitionNode = (node: ts.Node): node is DefinitionNode =>
     SyntaxKind.FunctionDeclaration,
     SyntaxKind.ClassDeclaration,
     SyntaxKind.InterfaceDeclaration,
+    SyntaxKind.PropertyDeclaration,
+    SyntaxKind.MethodDeclaration,
   ].includes(node.kind)
 
 const isTypeKeyword = (node: ts.Node): boolean =>
