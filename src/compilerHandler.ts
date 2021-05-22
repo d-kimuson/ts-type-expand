@@ -5,6 +5,7 @@ import {
   getNameOfDeclaration,
   SyntaxKind,
   isPropertyName,
+  isPropertySignature,
   isIdentifier,
   isVariableStatement,
   getPositionOfLineAndCharacter,
@@ -64,25 +65,22 @@ export class CompilerHandler {
     }
 
     const pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
-    return this.getTypeFromPos(sourceFile, pos)
+    const nodes = this.getNodeFromPos(sourceFile, pos)
+    return nodes && isIdentifier(nodes.leafNode)
+      ? this.getTypeFromIdentifer(nodes.leafNode)
+      : undefined
   }
 
-  private getTypeFromPos(
-    sourceFile: ts.SourceFile,
-    pos: number
+  private getTypeFromIdentifer(
+    identiferNode: ts.Identifier
   ): BaseType | undefined {
-    const result = this.getNodeFromPos(sourceFile, pos)
-    if (!result) {
-      return undefined
+    // property identifer
+    if (isPropertySignature(identiferNode.parent)) {
+      return this.getTypeFromNode(identiferNode)
     }
 
-    const { leafNode } = result
-
-    if (isIdentifier(leafNode)) {
-      this.getTypeFromNode(leafNode.parent)
-    }
-
-    return this.getTypeFromNode(leafNode)
+    // declare
+    return this.getTypeFromNode(identiferNode.parent)
   }
 
   public getDeclaredTypesFromFile(
