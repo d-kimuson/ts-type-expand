@@ -13,6 +13,8 @@ function getActiveWorkspace(): vscode.WorkspaceFolder | undefined {
   )
 }
 
+let typeExpandProvider: TypeExpandProvider
+
 export function activate(context: vscode.ExtensionContext): void {
   const workspace = getActiveWorkspace()
   if (!workspace) {
@@ -21,7 +23,7 @@ export function activate(context: vscode.ExtensionContext): void {
   }
 
   try {
-    const typeExpandProvider = new TypeExpandProvider(
+    typeExpandProvider = new TypeExpandProvider(
       workspace.uri.fsPath,
       getCurrentFilePath()
     )
@@ -55,5 +57,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export function deactivate(): void {
+  typeExpandProvider.close()
   console.log("ts-type-expand is deactivated")
 }

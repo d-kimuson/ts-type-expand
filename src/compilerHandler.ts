@@ -15,6 +15,7 @@ import {
 
 import type { MyType, BaseType, PropType } from "./types/typescript"
 import { loadTsConfig } from "~/utils/tsConfig"
+import { watchCompiler } from "~/watchCompiler"
 
 type SupportedNode =
   | ts.TypeAliasDeclaration
@@ -77,10 +78,35 @@ const isTypeKeyword = (node: ts.Node): boolean =>
 export class CompilerHandler {
   private program: ts.Program
   private checker: ts.TypeChecker
+  private watchConf?: ts.WatchOfConfigFile<ts.SemanticDiagnosticsBuilderProgram>
 
-  constructor(tsConfigPath: string, basePath: string) {
+  constructor(private tsConfigPath: string, basePath: string) {
     const tsConfig = loadTsConfig(tsConfigPath, basePath)
     this.program = createProgram(tsConfig.fileNames, tsConfig.options)
+    this.checker = this.program.getTypeChecker()
+  }
+
+  public startWatch(): void {
+    this.watchConf = watchCompiler(
+      this.tsConfigPath, // eslint-disable-next-line @typescript-eslint/no-empty-function
+      () => {},
+      () => {
+        this.updateProgram()
+      }
+    )
+  }
+
+  public closeWatch(): void {
+    this.watchConf?.close()
+  }
+
+  private updateProgram() {
+    const maybeProgram = this.watchConf?.getProgram().getProgram()
+    if (!maybeProgram) {
+      return
+    }
+
+    this.program = maybeProgram
     this.checker = this.program.getTypeChecker()
   }
 

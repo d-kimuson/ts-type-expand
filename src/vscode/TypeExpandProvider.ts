@@ -18,6 +18,7 @@ export class TypeExpandProvider
       path.resolve(workspaceRoot, "tsconfig.json"),
       workspaceRoot
     )
+    this.compilerHandler.startWatch()
   }
 
   getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
@@ -81,6 +82,10 @@ export class TypeExpandProvider
 
   refresh(): void {
     this._onDidChangeTreeData.fire()
+  }
+
+  close(): void {
+    this.compilerHandler.closeWatch()
   }
 }
 
