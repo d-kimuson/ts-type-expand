@@ -1,6 +1,47 @@
 # ts-type-expand for VSCode
 
-Expand type of selected token type on TypeScript.
+VSCode extension that allows you to expand TypeScript type definitions.
+
+Install from [ts-type-expand - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=kimuson.ts-type-expand) !
+
+## Support Statement
+
+|   Statements    | Support |
+| :-------------: | :-----: |
+|    TypeAlias    |    △    |
+|    Interface    |    ✓    |
+|    Function     |    ✓    |
+| Allow Function  |    ✓    |
+|     Object      |    ✓    |
+| Object Property |    ✓    |
+|      Class      |    ✓    |
+|  Class Method   |    ✓    |
+| Class Property  |    ✓    |
+|    Variable     |    ✓    |
+|     Import      |    ✓    |
+|  TypeReference  |    ✓    |
+
+## Support Types
+
+|                Types                | Support |
+| :---------------------------------: | :-----: |
+| Baisc Types(string, number, ...etc) |    ✓    |
+|                Array                |    △    |
+|             Union Type              |    ✓    |
+|          Intersection Type          |    ☓    |
+|              Function               |    △    |
+|           Keyof `<Type>`            |    ☓    |
+|           Typeof `<Type>`           |    ☓    |
+|        Indexed Access Types         |    ☓    |
+|          Conditional Types          |    ✓    |
+|            Mapped Types             |    ✓    |
+|       Template Literal Types        |    ☓    |
+
+## Configure
+
+|              key              |          value           |
+| :---------------------------: | :----------------------: |
+| `ts-type-expand.tsconfigPath` | Path for `tsconfig.json` |
 
 ## Start dev
 
