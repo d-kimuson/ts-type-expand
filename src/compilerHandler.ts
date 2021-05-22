@@ -9,6 +9,7 @@ import {
   isIdentifier,
   isVariableDeclaration,
   isVariableStatement,
+  isTypeReferenceNode,
   getPositionOfLineAndCharacter,
 } from "typescript"
 
@@ -45,6 +46,22 @@ const isDefinitionNode = (node: ts.Node): node is DefinitionNode =>
     SyntaxKind.InterfaceDeclaration,
   ].includes(node.kind)
 
+const isTypeKeyword = (node: ts.Node): boolean =>
+  [
+    SyntaxKind.AnyKeyword,
+    SyntaxKind.BigIntKeyword,
+    SyntaxKind.BooleanKeyword,
+    SyntaxKind.IntrinsicKeyword,
+    SyntaxKind.NeverKeyword,
+    SyntaxKind.NumberKeyword,
+    SyntaxKind.ObjectKeyword,
+    SyntaxKind.StringKeyword,
+    SyntaxKind.SymbolKeyword,
+    SyntaxKind.UndefinedKeyword,
+    SyntaxKind.UnknownKeyword,
+    SyntaxKind.VoidKeyword,
+  ].includes(node.kind)
+
 export class CompilerHandler {
   private program: ts.Program
   private checker: ts.TypeChecker
@@ -66,7 +83,16 @@ export class CompilerHandler {
     }
     const pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
     const nodes = this.getNodeFromPos(sourceFile, pos)
-    return nodes && isIdentifier(nodes.leafNode)
+
+    if (!nodes) {
+      return undefined
+    }
+
+    if (isTypeKeyword(nodes.leafNode)) {
+      return this.getTypeFromTypeKeywordNode(nodes.leafNode)
+    }
+
+    return isIdentifier(nodes.leafNode)
       ? this.getTypeFromIdentifer(nodes.leafNode)
       : undefined
   }
@@ -160,6 +186,9 @@ export class CompilerHandler {
     if (isVariableDeclaration(node)) {
       return this.getTypeFromVariable(node)
     }
+    if (isTypeReferenceNode(node)) {
+      return this.getTypeFromTypeReference(node)
+    }
 
     return undefined
   }
@@ -169,6 +198,22 @@ export class CompilerHandler {
       this.checker.getTypeAtLocation(node),
       getNameOfDeclaration(node)?.getText()
     )
+  }
+
+  private getTypeFromTypeReference(node: ts.TypeReferenceNode): BaseType {
+    return this.convertBaseType(
+      this.checker.getTypeFromTypeNode(node),
+      node.typeName.getText()
+    )
+  }
+
+  private getTypeFromTypeKeywordNode(node: ts.Node): BaseType {
+    return {
+      name: undefined,
+      typeText: node.getText(),
+      props: [],
+      union: [],
+    }
   }
 
   private getTypeFromVariable(node: ts.VariableDeclaration): BaseType {
