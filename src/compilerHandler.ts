@@ -10,6 +10,7 @@ import {
   isVariableDeclaration,
   isVariableStatement,
   isTypeReferenceNode,
+  isImportSpecifier,
   getPositionOfLineAndCharacter,
 } from "typescript"
 
@@ -25,7 +26,6 @@ type SupportedNode =
   | ts.InterfaceDeclaration
   | ts.PropertyDeclaration
   | ts.MethodDeclaration
-  | ts.ImportSpecifier
 
 const isSupportedNode = (node: ts.Node): node is SupportedNode =>
   [
@@ -36,7 +36,6 @@ const isSupportedNode = (node: ts.Node): node is SupportedNode =>
     SyntaxKind.InterfaceDeclaration,
     SyntaxKind.PropertyDeclaration,
     SyntaxKind.MethodDeclaration,
-    SyntaxKind.ImportSpecifier,
   ].includes(node.kind)
 
 type DefinitionNode =
@@ -220,6 +219,9 @@ export class CompilerHandler {
     if (isDefinitionNode(node)) {
       return this.getTypeFromDefinition(node)
     }
+    if (isImportSpecifier(node)) {
+      return this.getTypeFromImportSpecifier(node)
+    }
     if (isPropertyName(node)) {
       return this.getTypeFromProperty(node)
     }
@@ -234,6 +236,13 @@ export class CompilerHandler {
   }
 
   private getTypeFromDefinition(node: DefinitionNode): BaseType {
+    return this.convertBaseType(
+      this.checker.getTypeAtLocation(node),
+      getNameOfDeclaration(node)?.getText()
+    )
+  }
+
+  private getTypeFromImportSpecifier(node: ts.ImportSpecifier): BaseType {
     return {
       name: getNameOfDeclaration(node)?.getText(),
       typeText: this.typeToString(this.checker.getTypeAtLocation(node)),
@@ -366,6 +375,7 @@ export class CompilerHandler {
   }
 
   private getTypeOfMembers(node: DefinitionNode): PropType[] {
+    // Not support Generics
     const props: PropType[] = []
     this.checker
       .getTypeAtLocation(node)
