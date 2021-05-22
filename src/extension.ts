@@ -14,7 +14,9 @@ function getActiveWorkspace(): vscode.WorkspaceFolder | undefined {
 }
 
 export function activate(context: vscode.ExtensionContext): void {
-  console.log('Congratulations, "ts-type-expand" is now active!')
+  vscode.window.showInformationMessage(
+    'Congratulations, "ts-type-expand" is now active!'
+  )
 
   const workspace = getActiveWorkspace()
   if (!workspace) {

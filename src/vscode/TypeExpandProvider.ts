@@ -92,7 +92,8 @@ class ExpandableTypeItem extends vscode.TreeItem {
         ? vscode.TreeItemCollapsibleState.None
         : vscode.TreeItemCollapsibleState.Collapsed
     )
-    this.tooltip = `${this.label}-tooltip`
+
+    this.tooltip = this.isUnion() ? "Union Type" : "Properties"
   }
 
   getChildrenItems(): ExpandableTypeItem[] {

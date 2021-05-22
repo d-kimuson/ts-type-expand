@@ -24,6 +24,7 @@ type SupportedNode =
   | ts.InterfaceDeclaration
   | ts.PropertyDeclaration
   | ts.MethodDeclaration
+  | ts.ImportSpecifier
 
 const isSupportedNode = (node: ts.Node): node is SupportedNode =>
   [
@@ -34,6 +35,7 @@ const isSupportedNode = (node: ts.Node): node is SupportedNode =>
     SyntaxKind.InterfaceDeclaration,
     SyntaxKind.PropertyDeclaration,
     SyntaxKind.MethodDeclaration,
+    SyntaxKind.ImportSpecifier,
   ].includes(node.kind)
 
 type DefinitionNode =
@@ -43,6 +45,7 @@ type DefinitionNode =
   | ts.ClassDeclaration
   | ts.PropertyDeclaration
   | ts.MethodDeclaration
+  | ts.ImportSpecifier
 
 const isDefinitionNode = (node: ts.Node): node is DefinitionNode =>
   [
@@ -52,6 +55,7 @@ const isDefinitionNode = (node: ts.Node): node is DefinitionNode =>
     SyntaxKind.InterfaceDeclaration,
     SyntaxKind.PropertyDeclaration,
     SyntaxKind.MethodDeclaration,
+    SyntaxKind.ImportSpecifier,
   ].includes(node.kind)
 
 const isTypeKeyword = (node: ts.Node): boolean =>
@@ -202,10 +206,12 @@ export class CompilerHandler {
   }
 
   private getTypeFromDefinition(node: DefinitionNode): BaseType {
-    return this.convertBaseType(
-      this.checker.getTypeAtLocation(node),
-      getNameOfDeclaration(node)?.getText()
-    )
+    return {
+      name: getNameOfDeclaration(node)?.getText(),
+      typeText: this.typeToString(this.checker.getTypeAtLocation(node)),
+      props: this.getTypeOfMembers(node),
+      union: [],
+    }
   }
 
   private getTypeFromTypeReference(node: ts.TypeReferenceNode): BaseType {
@@ -303,7 +309,7 @@ export class CompilerHandler {
 
   private convertBaseType(type: MyType, name?: string): BaseType {
     const union = type?.types ?? []
-    const typeText = this.checker.typeToString(type)
+    const typeText = this.typeToString(type)
 
     return {
       name,
@@ -319,6 +325,7 @@ export class CompilerHandler {
   }
 
   private getTypeOfProperties(type: ts.Type): PropType[] {
+    // Not support `typeof <ClassName>`
     const propSymbols = this.checker.getPropertiesOfType(type)
     return propSymbols.map((propSymbol) => {
       const propType = this.convertTypeFromSymbol(propSymbol)
@@ -328,5 +335,28 @@ export class CompilerHandler {
         ...this.convertBaseType(propType),
       }
     })
+  }
+
+  private getTypeOfMembers(node: DefinitionNode): PropType[] {
+    const props: PropType[] = []
+    this.checker
+      .getTypeAtLocation(node)
+      .symbol.members?.forEach((memberSymbol) => {
+        if (memberSymbol.escapedName === "__constructor") {
+          return
+        }
+
+        const propType = this.convertTypeFromSymbol(memberSymbol)
+        props.push({
+          propName: memberSymbol.escapedName,
+          ...this.convertBaseType(propType),
+        })
+      })
+
+    return props
+  }
+
+  private typeToString(type: ts.Type) {
+    return this.checker.typeToString(type).replace("typeof ", "")
   }
 }
