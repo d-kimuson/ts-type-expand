@@ -1,4 +1,5 @@
 import * as vscode from "vscode"
+import * as path from "path"
 
 import { TypeExpandProvider } from "~/vscode/TypeExpandProvider"
 
@@ -13,6 +14,18 @@ function getActiveWorkspace(): vscode.WorkspaceFolder | undefined {
   )
 }
 
+function getConfig<T>(key: string): T | undefined {
+  return vscode.workspace.getConfiguration("ts-type-expand").get<T>(key)
+}
+
+function getTsconfigPath(): string {
+  const tsconfigPath = getConfig<string>("tsconfigPath") ?? "tsconfig.json"
+  const workspace = getActiveWorkspace()
+  return !tsconfigPath.startsWith("/") && workspace
+    ? path.resolve(workspace.uri.fsPath, tsconfigPath)
+    : tsconfigPath
+}
+
 let typeExpandProvider: TypeExpandProvider
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -25,7 +38,8 @@ export function activate(context: vscode.ExtensionContext): void {
   try {
     typeExpandProvider = new TypeExpandProvider(
       workspace.uri.fsPath,
-      getCurrentFilePath()
+      getCurrentFilePath(),
+      getTsconfigPath()
     )
 
     const disposes = [

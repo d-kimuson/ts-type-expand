@@ -12,10 +12,11 @@ export class TypeExpandProvider
 
   constructor(
     private workspaceRoot: string,
-    private activeFilePath: string | undefined
+    private activeFilePath: string | undefined,
+    tsconfigPath?: string
   ) {
     this.compilerHandler = new CompilerHandler(
-      path.resolve(workspaceRoot, "tsconfig.json"),
+      tsconfigPath ?? path.resolve(workspaceRoot, "tsconfig.json"),
       workspaceRoot
     )
     this.compilerHandler.startWatch()

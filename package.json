@@ -15,6 +15,17 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Ts Type Expand",
+      "type": "object",
+      "properties": {
+        "ts-type-expand.tsconfigPath": {
+          "type": "string",
+          "default": "tsconfig.json",
+          "description": "Path to tsconfig.json"
+        }
+      }
+    },
     "commands": [
       {
         "command": "ts-type-expand.refresh",
