@@ -219,6 +219,24 @@ export class CompilerHandler {
     return types
   }
 
+  // WARN: Only for debug & tests
+  public expandTypeRecursively<T extends BaseType>(type: T): void {
+    const f = (t: BaseType): void => {
+      if (t.union.length === 0) {
+        t.union.forEach((unionType) => f(unionType))
+      }
+
+      const propType = t.typeForProps
+      if (typeof propType !== "undefined") {
+        t.props = this.getTypeOfProperties(propType)
+      }
+
+      t.props.map((prop) => f(prop))
+    }
+
+    f(type)
+  }
+
   private getNodeFromPos(
     sourceFile: ts.SourceFile,
     pos: number

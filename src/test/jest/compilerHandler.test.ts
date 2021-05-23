@@ -10,6 +10,13 @@ test("example/types", () => {
   const types = handler.getDeclaredTypesFromFile(
     path.resolve(exampleDir, "types.ts")
   )
+  types.forEach((t) => {
+    // expand types for test
+    // recursive type is not supported
+    if (t.type) {
+      handler.expandTypeRecursively(t.type)
+    }
+  })
 
   // User
   expect(types[0].type).toStrictEqual({

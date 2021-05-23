@@ -12,8 +12,8 @@ export const getUser = (userId: string): User => {
   return user
 }
 
-export const getUser2 = function(userId: string): User {
-  return user;
+export const getUser2 = function (userId: string): User {
+  return user
 }
 
 export const userRepository = new UserRepository([user])
