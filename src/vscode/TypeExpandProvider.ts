@@ -100,7 +100,9 @@ function getLabel(type: BaseType | PropType): string {
     ? isExpandable
       ? type.propName
       : `${type.propName}: ${type.typeText}`
-    : type.typeText
+    : isExpandable
+    ? type.name ?? type.typeText
+    : `${type.name}: ${type.typeText}`
 }
 
 class ExpandableTypeItem extends vscode.TreeItem {

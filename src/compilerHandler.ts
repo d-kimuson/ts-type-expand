@@ -389,7 +389,9 @@ export class CompilerHandler {
       props:
         ["string", "number", "boolean", "undefined", "null"].includes(
           typeText
-        ) || typeText.endsWith("[]")
+        ) ||
+        typeText.endsWith("[]") ||
+        (typeText.startsWith('"') && typeText.endsWith('"'))
           ? []
           : this.getTypeOfProperties(type),
       union: [],
