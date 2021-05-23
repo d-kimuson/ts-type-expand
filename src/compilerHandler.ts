@@ -379,7 +379,7 @@ export class CompilerHandler {
       const propType = this.convertTypeFromSymbol(propSymbol)
 
       return {
-        propName: propSymbol.escapedName,
+        propName: String(propSymbol.escapedName),
         ...this.convertBaseType(propType),
       }
     })
@@ -397,7 +397,7 @@ export class CompilerHandler {
 
         const propType = this.convertTypeFromSymbol(memberSymbol)
         props.push({
-          propName: memberSymbol.escapedName,
+          propName: String(memberSymbol.escapedName),
           ...this.convertBaseType(propType),
         })
       })

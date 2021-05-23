@@ -1,4 +1,4 @@
-import type { Type, __String } from "typescript"
+import type { Type } from "typescript"
 
 export type MyType = Type & {
   types?: MyType[] // doesn't exist public type def
@@ -13,5 +13,5 @@ export type BaseType = {
 }
 
 export type PropType = BaseType & {
-  propName: __String
+  propName: string
 }

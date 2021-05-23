@@ -90,16 +90,32 @@ export class TypeExpandProvider
   }
 }
 
+function getKindText(type: BaseType | PropType): string {
+  return type.union.length === 0 ? "Properties" : "Union"
+}
+
+function getLabel(type: BaseType | PropType): string {
+  const isExpandable = type.props.length !== 0 || type.union.length !== 0
+
+  return "propName" in type
+    ? isExpandable
+      ? type.propName
+      : `${type.propName}: ${type.typeText}`
+    : type.typeText
+}
+
 class ExpandableTypeItem extends vscode.TreeItem {
   constructor(private type: BaseType | PropType) {
     super(
-      "propName" in type ? `${type.propName}: ${type.typeText}` : type.typeText,
+      getLabel(type),
       type.props.length === 0 && type.union.length === 0
         ? vscode.TreeItemCollapsibleState.None
         : vscode.TreeItemCollapsibleState.Collapsed
     )
 
-    this.tooltip = this.isUnion() ? "Union Type" : "Properties"
+    if (type.props.length !== 0 || type.union.length !== 0) {
+      this.tooltip = this.description = getKindText(this.type)
+    }
   }
 
   getChildrenItems(): ExpandableTypeItem[] {
