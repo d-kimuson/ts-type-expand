@@ -1,7 +1,7 @@
 import * as vscode from "vscode"
 import * as path from "path"
 
-import type { BaseType, PropType } from "~/types/typescript"
+import type { BaseType, FunctionType, PropType } from "~/types/typescript"
 import { CompilerHandler } from "~/CompilerHandler"
 
 export class TypeExpandProvider
@@ -90,19 +90,35 @@ export class TypeExpandProvider
   }
 }
 
-function getKindText(type: BaseType | PropType): string {
-  return type.union.length === 0 ? "Properties" : "Union"
+type OurType = BaseType | PropType | FunctionType
+type Kind = "Union" | "Properties" | "Function" | "Arg" | "Return" | undefined
+
+function getKindText(type: OurType): Kind {
+  if ("functionName" in type) {
+    return "Function"
+  }
+
+  if (type.union.length !== 0) {
+    return "Union"
+  }
+
+  if (type.props.length !== 0 || typeof type.typeForProps !== "undefined") {
+    return "Properties"
+  }
+
+  return undefined
 }
 
-function isExpandable(type: BaseType | PropType): boolean {
+function isExpandable(type: OurType): boolean {
   return (
     type.union.length !== 0 ||
     type.props.length !== 0 ||
-    typeof type.typeForProps !== "undefined"
+    typeof type.typeForProps !== "undefined" ||
+    "functionName" in type
   )
 }
 
-function getLabel(type: BaseType | PropType): string {
+function getLabel(type: OurType): string {
   return "propName" in type
     ? isExpandable(type)
       ? type.propName
@@ -115,7 +131,7 @@ function getLabel(type: BaseType | PropType): string {
 class ExpandableTypeItem extends vscode.TreeItem {
   private static compilerHandler: CompilerHandler
 
-  constructor(private type: BaseType | PropType) {
+  constructor(private type: OurType, kind?: Kind) {
     super(
       getLabel(type),
       isExpandable(type)
@@ -123,9 +139,7 @@ class ExpandableTypeItem extends vscode.TreeItem {
         : vscode.TreeItemCollapsibleState.None
     )
 
-    if (isExpandable(type)) {
-      this.tooltip = this.description = getKindText(this.type)
-    }
+    this.tooltip = this.description = kind ?? getKindText(this.type)
   }
 
   static initialize(compilerHandler: CompilerHandler) {
@@ -133,6 +147,15 @@ class ExpandableTypeItem extends vscode.TreeItem {
   }
 
   getChildrenItems(): ExpandableTypeItem[] {
+    if ("functionName" in this.type) {
+      return [
+        ...this.type.args.map(
+          (argType) => new ExpandableTypeItem(argType, "Arg")
+        ),
+        new ExpandableTypeItem(this.type.returnType, "Return"),
+      ]
+    }
+
     return this.isUnion()
       ? this.getUnionTypes().map(
           (unionType) => new ExpandableTypeItem(unionType)

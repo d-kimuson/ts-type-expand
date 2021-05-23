@@ -11,21 +11,34 @@ import {
   isVariableStatement,
   isTypeReferenceNode,
   isImportSpecifier,
+  isFunctionDeclaration,
+  isArrowFunction,
+  isFunctionExpression,
+  isMethodDeclaration,
   getPositionOfLineAndCharacter,
 } from "typescript"
 
-import type { MyType, BaseType, PropType } from "./types/typescript"
+import type {
+  MyType,
+  MyNode,
+  BaseType,
+  PropType,
+  FunctionType,
+} from "./types/typescript"
 import { loadTsConfig } from "~/utils/tsConfig"
 import { watchCompiler } from "~/watchCompiler"
 
-type SupportedNode =
-  | ts.TypeAliasDeclaration
-  | ts.VariableDeclaration
-  | ts.FunctionDeclaration
-  | ts.ClassDeclaration
-  | ts.InterfaceDeclaration
-  | ts.PropertyDeclaration
-  | ts.MethodDeclaration
+type SupportedNode = MyNode &
+  (
+    | ts.TypeAliasDeclaration
+    | ts.VariableDeclaration
+    | ts.FunctionDeclaration
+    | ts.ClassDeclaration
+    | ts.InterfaceDeclaration
+    | ts.PropertyDeclaration
+    | ts.MethodDeclaration
+    | ts.ImportSpecifier
+  )
 
 const isSupportedNode = (node: ts.Node): node is SupportedNode =>
   [
@@ -36,24 +49,23 @@ const isSupportedNode = (node: ts.Node): node is SupportedNode =>
     SyntaxKind.InterfaceDeclaration,
     SyntaxKind.PropertyDeclaration,
     SyntaxKind.MethodDeclaration,
+    SyntaxKind.ImportSpecifier,
   ].includes(node.kind)
 
-type DefinitionNode =
-  | ts.TypeAliasDeclaration
-  | ts.InterfaceDeclaration
-  | ts.FunctionDeclaration
-  | ts.ClassDeclaration
-  | ts.PropertyDeclaration
-  | ts.MethodDeclaration
+type DefinitionNode = MyNode &
+  (
+    | ts.TypeAliasDeclaration
+    | ts.InterfaceDeclaration
+    | ts.ClassDeclaration
+    | ts.PropertyDeclaration
+  )
 
 const isDefinitionNode = (node: ts.Node): node is DefinitionNode =>
   [
     SyntaxKind.TypeAliasDeclaration,
-    SyntaxKind.FunctionDeclaration,
     SyntaxKind.ClassDeclaration,
     SyntaxKind.InterfaceDeclaration,
     SyntaxKind.PropertyDeclaration,
-    SyntaxKind.MethodDeclaration,
   ].includes(node.kind)
 
 const isTypeKeyword = (node: ts.Node): boolean =>
@@ -161,11 +173,13 @@ export class CompilerHandler {
   ): BaseType | undefined {
     // property identifer
     if (isPropertySignature(identiferNode.parent)) {
-      return this.getTypeFromNode(identiferNode)
+      return this.getTypeFromProperty(identiferNode)
     }
 
-    // declare identifer
-    return this.getTypeFromNode(identiferNode.parent)
+    if (isSupportedNode(identiferNode.parent)) {
+      // declare identifer
+      return this.getTypeFromNode(identiferNode.parent)
+    }
   }
 
   public getDeclaredTypesFromFile(
@@ -184,7 +198,7 @@ export class CompilerHandler {
     const types: { node: ts.Node; type: BaseType | undefined }[] = []
 
     forEachChild(sourceFile, (node) => {
-      if (!isSupportedNode) {
+      if (!isSupportedNode(node)) {
         return
       }
 
@@ -237,12 +251,17 @@ export class CompilerHandler {
   }
 
   // entry function for converting node to type
-  private getTypeFromNode(node: ts.Node): BaseType | undefined {
-    if (isDefinitionNode(node)) {
-      return this.getTypeFromDefinition(node)
-    }
+  private getTypeFromNode(node: SupportedNode): BaseType | undefined {
     if (isImportSpecifier(node)) {
       return this.getTypeFromImportSpecifier(node)
+    }
+    if (isFunctionDeclaration(node) || isMethodDeclaration(node)) {
+      return this.getTypeFromFunctionDeclare(
+        node as MyNode & (ts.FunctionDeclaration | ts.MethodDeclaration)
+      )
+    }
+    if (isDefinitionNode(node)) {
+      return this.getTypeFromDefinition(node)
     }
     if (isPropertyName(node)) {
       return this.getTypeFromProperty(node)
@@ -262,6 +281,12 @@ export class CompilerHandler {
       this.checker.getTypeAtLocation(node),
       getNameOfDeclaration(node)?.getText()
     )
+  }
+
+  private getTypeFromFunctionDeclare(
+    node: MyNode & (ts.FunctionDeclaration | ts.MethodDeclaration)
+  ): FunctionType {
+    return this.getTypeOfFunction(node)
   }
 
   private getTypeFromImportSpecifier(node: ts.ImportSpecifier): BaseType {
@@ -292,6 +317,19 @@ export class CompilerHandler {
   }
 
   private getTypeFromVariable(node: ts.VariableDeclaration): BaseType {
+    const initializer = node.initializer
+    // Allow Function
+    if (
+      initializer &&
+      (isArrowFunction(initializer) || isFunctionExpression(initializer))
+    ) {
+      return this.getTypeOfFunction(
+        initializer,
+        getNameOfDeclaration(node)?.getText()
+      )
+    }
+
+    // Others
     return this.convertBaseType(
       this.checker.getTypeAtLocation(node),
       getNameOfDeclaration(node)?.getText()
@@ -400,6 +438,45 @@ export class CompilerHandler {
     }
   }
 
+  private getTypeOfFunction(
+    node: MyNode & ts.Declaration,
+    functionName?: string
+  ) {
+    // Args Type
+    const args: BaseType[] = []
+    const convertBaseType = (type: MyType, name?: string): BaseType => {
+      return this.convertBaseType(type, name)
+    }
+
+    node?.locals?.forEach((symbol, key) => {
+      const argType = this.convertTypeFromSymbol(symbol)
+      args.push({
+        ...convertBaseType(argType),
+        name: key,
+      })
+    })
+
+    // Return Type
+    const returnType = node.type
+      ? this.convertBaseType(this.checker.getTypeAtLocation(node.type))
+      : {
+          typeText: "void",
+          props: [],
+          union: [],
+          typeForProps: undefined,
+        }
+
+    // Function Name
+    const name = functionName ?? getNameOfDeclaration(node)?.getText()
+
+    return {
+      ...this.convertBaseType(this.checker.getTypeAtLocation(node), name),
+      functionName: name ?? "",
+      args,
+      returnType: returnType,
+    }
+  }
+
   public getTypeOfProperties(type: ts.Type): PropType[] {
     // Not support `typeof <ClassName>`
     const propSymbols = this.checker.getPropertiesOfType(type)
@@ -416,6 +493,12 @@ export class CompilerHandler {
   private getTypeOfMembers(node: ts.ImportSpecifier): PropType[] {
     // Not support Generics
     const props: PropType[] = []
+    const getTypeOfFunction = (
+      node: MyNode & ts.Declaration,
+      functionName?: string
+    ) => {
+      return this.getTypeOfFunction(node, functionName)
+    }
     this.checker
       .getTypeAtLocation(node)
       .symbol.members?.forEach((memberSymbol) => {
@@ -423,9 +506,20 @@ export class CompilerHandler {
           return
         }
 
+        const propName = String(memberSymbol.escapedName)
+
+        const declare = memberSymbol.declarations[0]
+        if (isMethodDeclaration(declare)) {
+          props.push({
+            ...getTypeOfFunction(declare),
+            propName,
+          })
+          return
+        }
+
         const propType = this.convertTypeFromSymbol(memberSymbol)
         props.push({
-          propName: String(memberSymbol.escapedName),
+          propName,
           ...this.convertBaseType(propType),
         })
       })

@@ -1,7 +1,13 @@
-import type { Type } from "typescript"
+import type * as ts from "typescript"
 
-export type MyType = Type & {
-  types?: MyType[] // doesn't exist public type def
+// doesn't exist public type def
+export type MyType = ts.Type & {
+  types?: MyType[]
+}
+
+export type MyNode = ts.Node & {
+  type?: ts.TypeNode
+  locals?: Map<string, ts.Symbol>
 }
 
 export type BaseType = {
@@ -14,4 +20,10 @@ export type BaseType = {
 
 export type PropType = BaseType & {
   propName: string
+}
+
+export type FunctionType = BaseType & {
+  functionName: string
+  args: BaseType[]
+  returnType: BaseType
 }
