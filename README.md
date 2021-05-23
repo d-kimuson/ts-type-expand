@@ -29,7 +29,7 @@ Install from [ts-type-expand - Visual Studio Marketplace](https://marketplace.vi
 | Baisc Types(string, number, ...etc) |    ✓    |
 |                Array                |    △    |
 |             Union Type              |    ✓    |
-|          Intersection Type          |    ☓    |
+|          Intersection Type          |    ✓    |
 |              Function               |    △    |
 |              Generics               |    ✓    |
 |           Keyof `<Type>`            |    ✓    |

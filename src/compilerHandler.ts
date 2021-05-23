@@ -348,6 +348,17 @@ export class CompilerHandler {
     const union = type?.types ?? []
     const typeText = this.typeToString(type)
 
+    // Union Type
+    if (type.isUnion()) {
+      return {
+        name,
+        typeText,
+        props: [],
+        union: union.map((t) => this.convertBaseType(t)),
+      }
+    }
+
+    // Basic (expand properties)
     return {
       name,
       typeText,
@@ -357,7 +368,7 @@ export class CompilerHandler {
         ) || typeText.endsWith("[]")
           ? []
           : this.getTypeOfProperties(type),
-      union: union.map((t) => this.convertBaseType(t)),
+      union: [],
     }
   }
 
