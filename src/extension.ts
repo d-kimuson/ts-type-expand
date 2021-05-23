@@ -8,10 +8,13 @@ function getCurrentFilePath(): string | undefined {
 }
 
 function getActiveWorkspace(): vscode.WorkspaceFolder | undefined {
-  const currentFilePath = getCurrentFilePath()
-  return (vscode.workspace.workspaceFolders || []).find((workspaceFolder) =>
-    currentFilePath?.startsWith(workspaceFolder.uri.fsPath)
-  )
+  const workspaces = vscode.workspace.workspaceFolders || []
+
+  return workspaces.length === 1
+    ? workspaces[0]
+    : workspaces.find((workspaceFolder) =>
+        getCurrentFilePath()?.startsWith(workspaceFolder.uri.fsPath)
+      )
 }
 
 function getConfig<T>(key: string): T | undefined {
