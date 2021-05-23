@@ -17,12 +17,21 @@ function getActiveWorkspace(): vscode.WorkspaceFolder | undefined {
       )
 }
 
-function getConfig<T>(key: string): T | undefined {
-  return vscode.workspace.getConfiguration("ts-type-expand").get<T>(key)
+// TODO: refactor
+function getConfig<T>(key: string): T {
+  const jsonConfig = vscode.workspace
+    .getConfiguration("ts-type-expand")
+    .get<string>(key) as string
+
+  try {
+    return JSON.parse(jsonConfig) as T
+  } catch {
+    return (jsonConfig as unknown) as T
+  }
 }
 
 function getTsconfigPath(): string {
-  const tsconfigPath = getConfig<string>("tsconfigPath") ?? "tsconfig.json"
+  const tsconfigPath = getConfig<string>("tsconfigPath")
   const workspace = getActiveWorkspace()
   return !tsconfigPath.startsWith("/") && workspace
     ? path.resolve(workspace.uri.fsPath, tsconfigPath)
@@ -42,7 +51,8 @@ export function activate(context: vscode.ExtensionContext): void {
     typeExpandProvider = new TypeExpandProvider(
       workspace.uri.fsPath,
       getCurrentFilePath(),
-      getTsconfigPath()
+      getTsconfigPath(),
+      getConfig<boolean>("compactOptionalType")
     )
 
     const disposes = [

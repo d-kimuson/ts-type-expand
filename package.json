@@ -28,6 +28,11 @@
           "type": "string",
           "default": "tsconfig.json",
           "description": "Path to tsconfig.json"
+        },
+        "ts-type-expand.compactOptionalType": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Fold optional type"
         }
       }
     },

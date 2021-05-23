@@ -152,7 +152,12 @@ export class CompilerHandler {
     if (!sourceFile) {
       throw new Error(`File not found: ${filePath}`)
     }
-    const pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
+    let pos: number
+    try {
+      pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
+    } catch (error) {
+      return undefined
+    }
     const nodes = this.getNodeFromPos(sourceFile, pos)
 
     if (!nodes) {

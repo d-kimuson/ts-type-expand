@@ -49,3 +49,7 @@ export type Picked = Pick<User, "id"> & User
 export type RecursiveType = {
   child: RecursiveType
 }
+
+export type RecursiveArrayType = {
+  childs: RecursiveType[]
+}

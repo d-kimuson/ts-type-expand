@@ -13,13 +13,14 @@ export class TypeExpandProvider
   constructor(
     private workspaceRoot: string,
     private activeFilePath: string | undefined,
-    tsconfigPath?: string
+    tsconfigPath: string,
+    compactOptionalType: boolean
   ) {
     this.compilerHandler = new CompilerHandler(
       tsconfigPath ?? path.resolve(workspaceRoot, "tsconfig.json")
     )
     this.compilerHandler.startWatch()
-    ExpandableTypeItem.initialize(this.compilerHandler)
+    ExpandableTypeItem.initialize(this.compilerHandler, compactOptionalType)
   }
 
   getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
@@ -91,7 +92,7 @@ export class TypeExpandProvider
 }
 
 type OurType = BaseType | PropType | FunctionType
-type Kind = "Union" | "Properties" | "Function" | "Arg" | "Return" | undefined
+type Kind = "Union" | "Properties" | "Function" | undefined
 
 function getKindText(type: OurType): Kind {
   if ("functionName" in type) {
@@ -109,6 +110,35 @@ function getKindText(type: OurType): Kind {
   return undefined
 }
 
+function convertOptionalType(type: PropType): PropType {
+  const others = type.union.filter((t) => t.typeText !== "undefined")
+
+  if (others.length === type.union.length) {
+    return type
+  }
+
+  if (others.length === 1) {
+    return {
+      ...type,
+      propName: type.propName + "?",
+      typeText: type.typeText.replace(" | undefined", ""),
+      union: [],
+      props: others[0].props,
+      typeForProps: others[0].typeForProps,
+    }
+  }
+
+  return {
+    ...type,
+    propName: type.propName + "?",
+    union: others,
+  }
+}
+
+function isUnion(type: BaseType): boolean {
+  return type.union.length !== 0
+}
+
 function isExpandable(type: OurType): boolean {
   return (
     type.union.length !== 0 ||
@@ -119,19 +149,26 @@ function isExpandable(type: OurType): boolean {
 }
 
 function getLabel(type: OurType): string {
-  return "propName" in type
-    ? isExpandable(type)
-      ? type.propName
-      : `${type.propName}: ${type.typeText}`
-    : isExpandable(type)
-    ? type.name ?? type.typeText
-    : `${type.name}: ${type.typeText}`
+  if ("propName" in type) {
+    if (isExpandable(type)) {
+      return type.propName
+    }
+
+    return type.propName ? `${type.propName}: ${type.typeText}` : type.typeText
+  }
+
+  if (isExpandable(type)) {
+    return type.name ?? type.typeText
+  }
+
+  return type.name ? `${type.name}: ${type.typeText}` : type.typeText
 }
 
 class ExpandableTypeItem extends vscode.TreeItem {
   private static compilerHandler: CompilerHandler
+  private static compactOptionalType: boolean
 
-  constructor(private type: OurType, kind?: Kind) {
+  constructor(private type: OurType, desc?: string) {
     super(
       getLabel(type),
       isExpandable(type)
@@ -139,28 +176,41 @@ class ExpandableTypeItem extends vscode.TreeItem {
         : vscode.TreeItemCollapsibleState.None
     )
 
-    this.tooltip = this.description = kind ?? getKindText(this.type)
+    const kind = getKindText(this.type)
+    this.description = [desc, kind]
+      .filter((temp) => typeof temp !== "undefined")
+      .join(" ")
   }
 
-  static initialize(compilerHandler: CompilerHandler) {
+  static initialize(
+    compilerHandler: CompilerHandler,
+    compactOptionalType: boolean
+  ) {
     ExpandableTypeItem.compilerHandler = compilerHandler
+    ExpandableTypeItem.compactOptionalType = compactOptionalType
   }
 
   getChildrenItems(): ExpandableTypeItem[] {
     if ("functionName" in this.type) {
       return [
         ...this.type.args.map(
-          (argType) => new ExpandableTypeItem(argType, "Arg")
+          (argType, index) => new ExpandableTypeItem(argType, `Arg${index + 1}`)
         ),
         new ExpandableTypeItem(this.type.returnType, "Return"),
       ]
     }
 
-    return this.isUnion()
+    return isUnion(this.type)
       ? this.getUnionTypes().map(
           (unionType) => new ExpandableTypeItem(unionType)
         )
-      : this.getPropTypes().map((propType) => new ExpandableTypeItem(propType))
+      : this.getPropTypes().map((propType) => {
+          return new ExpandableTypeItem(
+            ExpandableTypeItem.compactOptionalType
+              ? convertOptionalType(propType)
+              : propType
+          )
+        })
   }
 
   getPropTypes(): PropType[] {
