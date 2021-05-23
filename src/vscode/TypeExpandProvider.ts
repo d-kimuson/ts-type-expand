@@ -16,8 +16,7 @@ export class TypeExpandProvider
     tsconfigPath?: string
   ) {
     this.compilerHandler = new CompilerHandler(
-      tsconfigPath ?? path.resolve(workspaceRoot, "tsconfig.json"),
-      workspaceRoot
+      tsconfigPath ?? path.resolve(workspaceRoot, "tsconfig.json")
     )
     this.compilerHandler.startWatch()
   }

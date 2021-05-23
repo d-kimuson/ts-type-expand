@@ -3,10 +3,8 @@ import * as path from "path"
 import { CompilerHandler } from "~/CompilerHandler"
 
 const exampleDir = path.resolve(__dirname, "../../../example")
-const handler = new CompilerHandler(
-  path.resolve(exampleDir, "tsconfig.json"),
-  exampleDir
-)
+const handler = new CompilerHandler(path.resolve(exampleDir, "tsconfig.json"))
+handler.initializeWithoutWatch(exampleDir)
 
 test("example/types", () => {
   const types = handler.getDeclaredTypesFromFile(

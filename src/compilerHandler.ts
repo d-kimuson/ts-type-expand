@@ -79,10 +79,11 @@ export class CompilerHandler {
   private checker: ts.TypeChecker
   private watchConf?: ts.WatchOfConfigFile<ts.SemanticDiagnosticsBuilderProgram>
 
-  constructor(private tsConfigPath: string, basePath: string) {
-    const tsConfig = loadTsConfig(tsConfigPath, basePath)
-    this.program = createProgram(tsConfig.fileNames, tsConfig.options)
-    this.checker = this.program.getTypeChecker()
+  constructor(private tsConfigPath: string) {
+    // following properties are not initalized by constructor
+    // but they are not possible to be undefined after startWatch()
+    this.program = (undefined as unknown) as ts.Program
+    this.checker = (undefined as unknown) as ts.TypeChecker
   }
 
   public startWatch(): void {
@@ -90,16 +91,28 @@ export class CompilerHandler {
       this.tsConfigPath, // eslint-disable-next-line @typescript-eslint/no-empty-function
       () => {},
       () => {
-        this.updateProgram()
+        this.updateProgramByWatch()
       }
     )
+
+    // Initialize Program & Checker
+    this.updateProgramByWatch()
   }
 
   public closeWatch(): void {
     this.watchConf?.close()
   }
 
-  private updateProgram() {
+  private checkProgram() {
+    // Should be called all public method
+    if (typeof this.program === "undefined") {
+      throw new Error(
+        "Program should not be undefined (you must run startWatch before using or initializeWithoutWatch)"
+      )
+    }
+  }
+
+  private updateProgramByWatch() {
     const maybeProgram = this.watchConf?.getProgram().getProgram()
     if (!maybeProgram) {
       console.warn("program is not found")
@@ -111,11 +124,20 @@ export class CompilerHandler {
     console.log("program & checker config is updated!")
   }
 
+  // Initialize Program For Cli Usage
+  public initializeWithoutWatch(basePath: string): void {
+    const tsConfig = loadTsConfig(this.tsConfigPath, basePath)
+    this.program = createProgram(tsConfig.fileNames, tsConfig.options)
+    this.checker = this.program.getTypeChecker()
+  }
+
   public getTypeFromLineAndCharacter(
     filePath: string,
     lineNumber: number,
     character: number
   ): BaseType | undefined {
+    this.checkProgram()
+
     const sourceFile = this.program.getSourceFile(filePath)
     if (!sourceFile) {
       throw new Error(`File not found: ${filePath}`)
@@ -154,6 +176,8 @@ export class CompilerHandler {
     node: ts.Node
     type: BaseType | undefined
   }[] {
+    this.checkProgram()
+
     const sourceFile = this.program.getSourceFile(filePath)
     if (!sourceFile) {
       throw new Error(`File not found: ${filePath}`)
