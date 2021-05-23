@@ -2,7 +2,7 @@
   "name": "ts-type-expand",
   "displayName": "ts-type-expand",
   "description": "expand type for typescript",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "publisher": "kimuson",
   "repository": {
