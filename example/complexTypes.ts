@@ -42,3 +42,10 @@ export type FalseCond = Conditional<string | null>
 type World = "world"
 type Greeting = `hello ${World}` // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let greet: Greeting
+
+// type Pick<T, K extends keyof T> = { [P in K]: T[P]; }
+export type Picked = Pick<User, "id"> & User
+
+export type RecursiveType = {
+  child: RecursiveType
+}

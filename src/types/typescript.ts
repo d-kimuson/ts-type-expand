@@ -8,8 +8,8 @@ export type BaseType = {
   name?: string
   typeText: string
   props: PropType[]
-
   union: BaseType[] // for union type
+  typeForProps: MyType | undefined // only properties are expandable
 }
 
 export type PropType = BaseType & {

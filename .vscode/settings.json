@@ -9,6 +9,9 @@
   },
   "eslint.validate": ["javascript", "typescript"],
   "eslint.alwaysShowStatus": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
   // prettier
   "prettier.configPath": "./.prettierrc.js",
   "[markdown]": {

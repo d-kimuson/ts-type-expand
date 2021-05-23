@@ -19,6 +19,7 @@ export class TypeExpandProvider
       tsconfigPath ?? path.resolve(workspaceRoot, "tsconfig.json")
     )
     this.compilerHandler.startWatch()
+    ExpandableTypeItem.initialize(this.compilerHandler)
   }
 
   getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
@@ -93,30 +94,42 @@ function getKindText(type: BaseType | PropType): string {
   return type.union.length === 0 ? "Properties" : "Union"
 }
 
-function getLabel(type: BaseType | PropType): string {
-  const isExpandable = type.props.length !== 0 || type.union.length !== 0
+function isExpandable(type: BaseType | PropType): boolean {
+  return (
+    type.union.length !== 0 ||
+    type.props.length !== 0 ||
+    typeof type.typeForProps !== "undefined"
+  )
+}
 
+function getLabel(type: BaseType | PropType): string {
   return "propName" in type
-    ? isExpandable
+    ? isExpandable(type)
       ? type.propName
       : `${type.propName}: ${type.typeText}`
-    : isExpandable
+    : isExpandable(type)
     ? type.name ?? type.typeText
     : `${type.name}: ${type.typeText}`
 }
 
 class ExpandableTypeItem extends vscode.TreeItem {
+  private static compilerHandler: CompilerHandler
+
   constructor(private type: BaseType | PropType) {
     super(
       getLabel(type),
-      type.props.length === 0 && type.union.length === 0
-        ? vscode.TreeItemCollapsibleState.None
-        : vscode.TreeItemCollapsibleState.Collapsed
+      isExpandable(type)
+        ? vscode.TreeItemCollapsibleState.Collapsed
+        : vscode.TreeItemCollapsibleState.None
     )
 
-    if (type.props.length !== 0 || type.union.length !== 0) {
+    if (isExpandable(type)) {
       this.tooltip = this.description = getKindText(this.type)
     }
+  }
+
+  static initialize(compilerHandler: CompilerHandler) {
+    ExpandableTypeItem.compilerHandler = compilerHandler
   }
 
   getChildrenItems(): ExpandableTypeItem[] {
@@ -128,7 +141,13 @@ class ExpandableTypeItem extends vscode.TreeItem {
   }
 
   getPropTypes(): PropType[] {
-    return this.type.props
+    return this.type.props.length !== 0
+      ? this.type.props
+      : this.type.typeForProps
+      ? ExpandableTypeItem.compilerHandler.getTypeOfProperties(
+          this.type.typeForProps
+        )
+      : []
   }
 
   getUnionTypes(): BaseType[] {

@@ -45,7 +45,6 @@ type DefinitionNode =
   | ts.ClassDeclaration
   | ts.PropertyDeclaration
   | ts.MethodDeclaration
-  | ts.ImportSpecifier
 
 const isDefinitionNode = (node: ts.Node): node is DefinitionNode =>
   [
@@ -55,7 +54,6 @@ const isDefinitionNode = (node: ts.Node): node is DefinitionNode =>
     SyntaxKind.InterfaceDeclaration,
     SyntaxKind.PropertyDeclaration,
     SyntaxKind.MethodDeclaration,
-    SyntaxKind.ImportSpecifier,
   ].includes(node.kind)
 
 const isTypeKeyword = (node: ts.Node): boolean =>
@@ -271,6 +269,7 @@ export class CompilerHandler {
       name: getNameOfDeclaration(node)?.getText(),
       typeText: this.typeToString(this.checker.getTypeAtLocation(node)),
       props: this.getTypeOfMembers(node),
+      typeForProps: undefined,
       union: [],
     }
   }
@@ -288,6 +287,7 @@ export class CompilerHandler {
       typeText: node.getText(),
       props: [],
       union: [],
+      typeForProps: undefined,
     }
   }
 
@@ -378,6 +378,7 @@ export class CompilerHandler {
         name,
         typeText,
         props: [],
+        typeForProps: undefined,
         union: union.map((t) => this.convertBaseType(t)),
       }
     }
@@ -386,19 +387,20 @@ export class CompilerHandler {
     return {
       name,
       typeText,
-      props:
+      props: [],
+      typeForProps:
         ["string", "number", "boolean", "undefined", "null"].includes(
           typeText
         ) ||
         typeText.endsWith("[]") ||
         (typeText.startsWith('"') && typeText.endsWith('"'))
-          ? []
-          : this.getTypeOfProperties(type),
+          ? undefined
+          : type,
       union: [],
     }
   }
 
-  private getTypeOfProperties(type: ts.Type): PropType[] {
+  public getTypeOfProperties(type: ts.Type): PropType[] {
     // Not support `typeof <ClassName>`
     const propSymbols = this.checker.getPropertiesOfType(type)
     return propSymbols.map((propSymbol) => {
@@ -411,7 +413,7 @@ export class CompilerHandler {
     })
   }
 
-  private getTypeOfMembers(node: DefinitionNode): PropType[] {
+  private getTypeOfMembers(node: ts.ImportSpecifier): PropType[] {
     // Not support Generics
     const props: PropType[] = []
     this.checker
