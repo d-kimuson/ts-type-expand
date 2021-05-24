@@ -15,6 +15,7 @@ import {
   isArrowFunction,
   isFunctionExpression,
   isMethodDeclaration,
+  isTypeAliasDeclaration,
   getPositionOfLineAndCharacter,
 } from "typescript"
 
@@ -283,6 +284,15 @@ export class CompilerHandler {
         node as MyNode & (ts.FunctionDeclaration | ts.MethodDeclaration)
       )
     }
+    if (isTypeAliasDeclaration(node)) {
+      const typeNode = node.type as ts.TypeNode & ts.Declaration & MyNode
+      const maybeFuncType = this.getTypeOfFunction(typeNode)
+
+      if (typeNode.type) {
+        return maybeFuncType
+      }
+    }
+
     if (isDefinitionNode(node)) {
       return this.getTypeFromDefinition(node)
     }
@@ -450,7 +460,7 @@ export class CompilerHandler {
       typeText,
       props: [],
       typeForProps:
-        ["string", "number", "boolean", "undefined", "null"].includes(
+        ["string", "number", "boolean", "undefined", "null", "void"].includes(
           typeText
         ) ||
         typeText.endsWith("[]") ||

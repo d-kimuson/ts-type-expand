@@ -20,6 +20,7 @@ export type Foo = {
 export type Intersected = User & Foo
 
 export type GetUser = (userId: string) => User
+export type Xoo = () => void
 
 export interface Article {
   user: User

@@ -8,7 +8,7 @@ Install from [ts-type-expand - Visual Studio Marketplace](https://marketplace.vi
 
 |    Statements    | Support |
 | :--------------: | :-----: |
-|    TypeAlias     |    △    |
+|    TypeAlias     |    ✓    |
 |    Interface     |    ✓    |
 |     Function     |    ✓    |
 |  Allow Function  |    ✓    |
