@@ -286,10 +286,9 @@ export class CompilerHandler {
     }
     if (isTypeAliasDeclaration(node)) {
       const typeNode = node.type as ts.TypeNode & ts.Declaration & MyNode
-      const maybeFuncType = this.getTypeOfFunction(typeNode)
 
-      if (typeNode.type) {
-        return maybeFuncType
+      if (typeNode.type && typeNode.locals) {
+        return this.getTypeOfFunction(typeNode)
       }
     }
 
@@ -444,7 +443,7 @@ export class CompilerHandler {
     const typeText = this.typeToString(type)
 
     // Union Type
-    if (type.isUnion()) {
+    if (type.isUnion() && typeText !== "boolean") {
       return {
         name,
         typeText,
@@ -460,9 +459,18 @@ export class CompilerHandler {
       typeText,
       props: [],
       typeForProps:
-        ["string", "number", "boolean", "undefined", "null", "void"].includes(
-          typeText
-        ) ||
+        [
+          "string",
+          "number",
+          "boolean",
+          "undefined",
+          "null",
+          "void",
+          "true",
+          "false",
+          "object",
+          "any",
+        ].includes(typeText) ||
         typeText.endsWith("[]") ||
         (typeText.startsWith('"') && typeText.endsWith('"'))
           ? undefined

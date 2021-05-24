@@ -103,11 +103,7 @@ function getKindText(type: OurType): Kind {
     return "Union"
   }
 
-  if (type.props.length !== 0 || typeof type.typeForProps !== "undefined") {
-    return "Properties"
-  }
-
-  return undefined
+  return isExpandable(type) ? "Properties" : undefined
 }
 
 function convertOptionalType(type: PropType): PropType {
@@ -143,21 +139,24 @@ function isExpandable(type: OurType): boolean {
   return (
     type.union.length !== 0 ||
     type.props.length !== 0 ||
-    typeof type.typeForProps !== "undefined" ||
+    (typeof type.typeForProps !== "undefined" &&
+      ExpandableTypeItem.compilerHandler.getTypeOfProperties(type.typeForProps)
+        .length !== 0) ||
     "functionName" in type
   )
 }
 
 function getLabel(type: OurType): string {
+  const isExpand = isExpandable(type)
   if ("propName" in type) {
-    if (isExpandable(type)) {
+    if (isExpand) {
       return type.propName
     }
 
     return type.propName ? `${type.propName}: ${type.typeText}` : type.typeText
   }
 
-  if (isExpandable(type)) {
+  if (isExpand) {
     return type.name ?? type.typeText
   }
 
@@ -165,7 +164,7 @@ function getLabel(type: OurType): string {
 }
 
 class ExpandableTypeItem extends vscode.TreeItem {
-  private static compilerHandler: CompilerHandler
+  public static compilerHandler: CompilerHandler
   private static compactOptionalType: boolean
 
   constructor(private type: OurType, desc?: string) {
