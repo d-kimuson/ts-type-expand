@@ -69,7 +69,8 @@
     "pretest": "yarn run compile && yarn run lint",
     "test:vscode": "node ./out/test/vscode/runTest.js",
     "test:jest": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "deploy": "./bin/deploy.sh"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
