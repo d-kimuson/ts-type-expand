@@ -14,7 +14,7 @@ Install from [ts-type-expand - Visual Studio Marketplace](https://marketplace.vi
 |  Allow Function  |    ✓    |
 |      Object      |    ✓    |
 | Object Property  |    ✓    |
-| Index Signatures |    ☓    |
+| Index Signatures |    ✓    |
 |      Class       |    ✓    |
 |   Class Method   |    ✓    |
 |  Class Property  |    ✓    |
@@ -41,9 +41,10 @@ Install from [ts-type-expand - Visual Studio Marketplace](https://marketplace.vi
 
 ## Configure
 
-|              key              |          value           |
-| :---------------------------: | :----------------------: |
-| `ts-type-expand.tsconfigPath` | Path for `tsconfig.json` |
+|                 key                  |                value                 | default       |
+| :----------------------------------: | :----------------------------------: | ------------- |
+|    `ts-type-expand.tsconfigPath`     |       Path for `tsconfig.json`       | tsconfig.json |
+| `ts-type-expand.compactOptionalType` | display `T?` for type T \| undefined | true          |
 
 ## Start dev
 
