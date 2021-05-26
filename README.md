@@ -1,9 +1,12 @@
+
 # ts-type-expand for VSCode
 
 VSCode extension that allows you to expand TypeScript type definitions.
 
 - Displays the type information of the selected node
 - This is especially useful for hard-to-read types, such as those automatically generated from GraphQL schemas.
+
+![](https://user-images.githubusercontent.com/37296661/119652128-b18edd80-be60-11eb-87b7-aca155ac1210.gif)
 
 ## Installation
 
