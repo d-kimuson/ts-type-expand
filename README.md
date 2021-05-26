@@ -36,12 +36,14 @@ The following are the destination nodes that support type expansion. More nodes 
 | TypeAlias declaration |    ✓    |
 | Interface declaration |    ✓    |
 | Varibale declaration  |    ✓    |
-|  Varibale statement   |    ☓    |
+|  Varibale statement   |    ✓    |
 |   Class declaration   |    ✓    |
 | Function declaration  |    ✓    |
-|     Function call     |    ☓    |
-|   Function argument   |    ☓    |
+|     Function call     |    ✓    |
+|   Function argument   |    ✓    |
 |  Method declaration   |    ✓    |
+|   Enum Declaration    |    ☓    |
+|    Enum statement     |    ☓    |
 
 ### Types
 
