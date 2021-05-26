@@ -12,6 +12,7 @@ export const getUser = (userId: string): User => {
   return user
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getUser2 = function (userId: string): User {
   return user
 }

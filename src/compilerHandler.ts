@@ -179,6 +179,7 @@ export class CompilerHandler {
   private getTypeFromIdentifer(
     identiferNode: ts.Identifier
   ): BaseType | undefined {
+    // TODO: Integrate into SupportedNode implementation
     // property identifer
     if (isPropertySignature(identiferNode.parent)) {
       return this.getTypeFromProperty(identiferNode)
@@ -188,6 +189,11 @@ export class CompilerHandler {
       // declare identifer
       return this.getTypeFromNode(identiferNode.parent)
     }
+
+    return this.convertBaseType(
+      this.checker.getTypeAtLocation(identiferNode),
+      identiferNode.getText()
+    )
   }
 
   public getDeclaredTypesFromFile(
