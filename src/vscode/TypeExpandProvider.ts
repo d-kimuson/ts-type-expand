@@ -14,13 +14,18 @@ export class TypeExpandProvider
     private workspaceRoot: string,
     private activeFilePath: string | undefined,
     tsconfigPath: string,
-    compactOptionalType: boolean
+    compactOptionalType: boolean,
+    compactPropertyLength: number
   ) {
     this.compilerHandler = new CompilerHandler(
       tsconfigPath ?? path.resolve(workspaceRoot, "tsconfig.json")
     )
     this.compilerHandler.startWatch()
-    ExpandableTypeItem.initialize(this.compilerHandler, compactOptionalType)
+    ExpandableTypeItem.initialize(
+      this.compilerHandler,
+      compactOptionalType,
+      compactPropertyLength
+    )
   }
 
   getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
@@ -146,6 +151,8 @@ function isExpandable(type: OurType): boolean {
   )
 }
 
+const COMPACT_TEXT = "{...}"
+
 function getLabel(type: OurType): string {
   const isExpand = isExpandable(type)
   if ("propName" in type) {
@@ -157,7 +164,12 @@ function getLabel(type: OurType): string {
   }
 
   if (isExpand) {
-    return type.name ?? type.typeText
+    return (
+      type.name ??
+      (type.typeText.length > ExpandableTypeItem.compactPropertyLength
+        ? COMPACT_TEXT
+        : type.typeText)
+    )
   }
 
   return type.name ? `${type.name}: ${type.typeText}` : type.typeText
@@ -166,6 +178,7 @@ function getLabel(type: OurType): string {
 class ExpandableTypeItem extends vscode.TreeItem {
   public static compilerHandler: CompilerHandler
   private static compactOptionalType: boolean
+  public static compactPropertyLength: number
 
   constructor(private type: OurType, desc?: string) {
     super(
@@ -179,14 +192,17 @@ class ExpandableTypeItem extends vscode.TreeItem {
     this.description = [desc, kind]
       .filter((temp) => typeof temp !== "undefined")
       .join(" ")
+    this.tooltip = this.label === COMPACT_TEXT ? type.typeText : undefined
   }
 
   static initialize(
     compilerHandler: CompilerHandler,
-    compactOptionalType: boolean
+    compactOptionalType: boolean,
+    compactPropertyLength: number
   ) {
     ExpandableTypeItem.compilerHandler = compilerHandler
     ExpandableTypeItem.compactOptionalType = compactOptionalType
+    ExpandableTypeItem.compactPropertyLength = compactPropertyLength
   }
 
   getChildrenItems(): ExpandableTypeItem[] {

@@ -52,10 +52,11 @@ Types are calculated by the [CompilerAPI](https://github.com/Microsoft/TypeScrip
 
 ## Configure
 
-|                 key                  |                value                 | default       |
-| :----------------------------------: | :----------------------------------: | ------------- |
-|    `ts-type-expand.tsconfigPath`     |       Path for `tsconfig.json`       | tsconfig.json |
-| `ts-type-expand.compactOptionalType` | display `T?` for type T \| undefined | true          |
+| key                                    | value                                                                                                   | default       |
+| :------------------------------------- | :------------------------------------------------------------------------------------------------------ | ------------- |
+| `ts-type-expand.tsconfigPath`          | Path for `tsconfig.json`                                                                                | tsconfig.json |
+| `ts-type-expand.compactOptionalType`   | display `T?` for type T \| undefined                                                                    | true          |
+| `ts-type-expand.compactPropertyLength` | Omit when the type can be expanded and the number of characters of the type is longer than this length. | 10            |
 
 ## License
 

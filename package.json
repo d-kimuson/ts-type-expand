@@ -38,8 +38,13 @@
         },
         "ts-type-expand.compactOptionalType": {
           "type": "boolean",
-          "default": "true",
+          "default": true,
           "description": "Fold optional type"
+        },
+        "ts-type-expand.compactPropertyLength": {
+          "type": "number",
+          "default": 10,
+          "description": "Display {...} if property type text is longer than this length"
         }
       }
     },

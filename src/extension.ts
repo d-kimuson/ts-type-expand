@@ -17,17 +17,14 @@ function getActiveWorkspace(): vscode.WorkspaceFolder | undefined {
       )
 }
 
-// TODO: refactor
 function getConfig<T>(key: string): T {
-  const jsonConfig = vscode.workspace
-    .getConfiguration("ts-type-expand")
-    .get<string>(key) as string
+  const conf = vscode.workspace.getConfiguration("ts-type-expand").get<T>(key)
 
-  try {
-    return JSON.parse(jsonConfig) as T
-  } catch {
-    return (jsonConfig as unknown) as T
+  if (!conf) {
+    throw new Error(`Make sure ${key} option has default value`)
   }
+
+  return conf
 }
 
 function getTsconfigPath(): string {
@@ -52,7 +49,8 @@ export function activate(context: vscode.ExtensionContext): void {
       workspace.uri.fsPath,
       getCurrentFilePath(),
       getTsconfigPath(),
-      getConfig<boolean>("compactOptionalType")
+      getConfig<boolean>("compactOptionalType"),
+      getConfig<number>("compactPropertyLength")
     )
 
     const disposes = [
