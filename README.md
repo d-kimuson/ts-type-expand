@@ -1,4 +1,3 @@
-
 # ts-type-expand for VSCode
 
 VSCode extension that allows you to expand TypeScript type definitions.
