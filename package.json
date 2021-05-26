@@ -1,7 +1,7 @@
 {
   "name": "ts-type-expand",
   "displayName": "ts-type-expand",
-  "description": "expand type for typescript",
+  "description": "vscode extension for expand type of typescript",
   "version": "0.0.6",
   "license": "MIT",
   "publisher": "kimuson",
@@ -9,11 +9,18 @@
     "type": "git",
     "url": "https://github.com/d-kimuson/ts-type-expand"
   },
+  "keywords": [
+    "typescript",
+    "ts",
+    "compilerAPI",
+    "expand",
+    "tree"
+  ],
   "engines": {
     "vscode": "^1.55.0"
   },
   "categories": [
-    "Other"
+    "Programming Languages"
   ],
   "activationEvents": [
     "onView:typeExpand"
