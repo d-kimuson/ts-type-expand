@@ -169,9 +169,11 @@ export class CompilerHandler {
       return this.getTypeFromTypeKeywordNode(nodes.leafNode)
     }
 
-    return isIdentifier(nodes.leafNode)
-      ? this.getTypeFromIdentifer(nodes.leafNode)
-      : undefined
+    if (isIdentifier(nodes.leafNode)) {
+      return this.getTypeFromIdentifer(nodes.leafNode)
+    }
+
+    return undefined
   }
 
   private getTypeFromIdentifer(
@@ -381,53 +383,14 @@ export class CompilerHandler {
       throw new Error("This node is not PropertyName")
     }
 
-    let parentNode: ts.Node = node
-    const propNames: string[] = []
+    const symbol = this.checker.getSymbolAtLocation(node)
 
-    const addPropName = (propName: ts.__String | undefined) => {
-      if (!propName) {
-        return
-      }
-      propNames.push(String(propName))
-    }
-
-    addPropName(this.checker.getSymbolAtLocation(parentNode)?.escapedName)
-
-    // Back to definition node
-    while (!isDefinitionNode(parentNode)) {
-      parentNode = parentNode.parent
-
-      if (isPropertyName(parentNode)) {
-        addPropName(this.checker.getSymbolAtLocation(parentNode)?.escapedName)
-      }
-    }
-
-    // Get type of definition node
-    const parent = this.getTypeFromNode(parentNode)
-    if (typeof parent === "undefined") {
-      return undefined
-    }
-
-    // property type
-    return propNames.reduce((s, propName) => {
-      const found = s.props.find((prop) => String(prop.propName) === propName)
-      if (found) {
-        return found
-      }
-
-      // if not found => find property type from union
-      const propFromUnion = s.union
-        .map((type) =>
-          type.props.find((prop) => String(prop.propName) === propName)
+    return typeof symbol !== "undefined"
+      ? this.convertBaseType(
+          this.checker.getTypeOfSymbolAtLocation(symbol, node),
+          String(symbol.escapedName)
         )
-        .filter((maybeProp): maybeProp is PropType => maybeProp !== undefined)
-        .pop()
-      if (propFromUnion) {
-        return propFromUnion
-      }
-
-      throw new Error("Property not found") // Not reachable
-    }, parent)
+      : undefined
   }
 
   // Util
