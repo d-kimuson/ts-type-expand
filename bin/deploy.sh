@@ -2,8 +2,9 @@
 
 cd $(git rev-parse --show-toplevel)
 
-printf "version? >> ";read new_version
 current_version=$(cat package.json | grep version | cut -f 4 -d '"')
+echo "current version is ${current_version}"
+printf "which version to update ? >> ";read new_version
 
 if [[ $current_version = $new_version ]]; then
     echo "$new_version is same to current version"
