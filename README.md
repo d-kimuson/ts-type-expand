@@ -24,8 +24,7 @@ The following types can be expanded
 - Properties
 - Candidate types for union type
 - Arguments and return values of functions or methods
-
-It is not possible to expand `User` from an array type such as `User[]` (we hope to support this in the future).
+- Array expand (`T` for `Array<T>`)
 
 ### Selection
 
