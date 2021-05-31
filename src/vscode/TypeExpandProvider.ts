@@ -1,8 +1,14 @@
 import * as vscode from "vscode"
 import * as path from "path"
 
-import type { BaseType, FunctionType, PropType } from "~/types/typescript"
+import type { BaseType, PropType, Type } from "~/types/typescript"
 import { CompilerHandler } from "~/CompilerHandler"
+
+export type TypeExpandProviderOptions = {
+  compactOptionalType: boolean
+  compactPropertyLength: number
+  directExpandArray: boolean
+}
 
 export class TypeExpandProvider
   implements vscode.TreeDataProvider<ExpandableTypeItem> {
@@ -14,18 +20,13 @@ export class TypeExpandProvider
     private workspaceRoot: string,
     private activeFilePath: string | undefined,
     tsconfigPath: string,
-    compactOptionalType: boolean,
-    compactPropertyLength: number
+    options: TypeExpandProviderOptions
   ) {
     this.compilerHandler = new CompilerHandler(
       tsconfigPath ?? path.resolve(workspaceRoot, "tsconfig.json")
     )
     this.compilerHandler.startWatch()
-    ExpandableTypeItem.initialize(
-      this.compilerHandler,
-      compactOptionalType,
-      compactPropertyLength
-    )
+    ExpandableTypeItem.initialize(this.compilerHandler, options)
   }
 
   getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
@@ -96,16 +97,19 @@ export class TypeExpandProvider
   }
 }
 
-type OurType = BaseType | PropType | FunctionType
-type Kind = "Union" | "Properties" | "Function" | undefined
+type Kind = "Union" | "Properties" | "Function" | "Array" | undefined
 
-function getKindText(type: OurType): Kind {
+function getKindText(type: Type): Kind {
   if ("functionName" in type) {
     return "Function"
   }
 
   if (type.union.length !== 0) {
     return "Union"
+  }
+
+  if ("arrayName" in type) {
+    return "Array"
   }
 
   return isExpandable(type) ? "Properties" : undefined
@@ -140,20 +144,21 @@ function isUnion(type: BaseType): boolean {
   return type.union.length !== 0
 }
 
-function isExpandable(type: OurType): boolean {
+function isExpandable(type: Type): boolean {
   return (
     type.union.length !== 0 ||
     type.props.length !== 0 ||
     (typeof type.typeForProps !== "undefined" &&
       ExpandableTypeItem.compilerHandler.getTypeOfProperties(type.typeForProps)
         .length !== 0) ||
-    "functionName" in type
+    "functionName" in type ||
+    "arrayName" in type
   )
 }
 
 const COMPACT_TEXT = "{...}"
 
-function getLabel(type: OurType): string {
+function getLabel(type: Type): string {
   const isExpand = isExpandable(type)
   if ("propName" in type) {
     if (isExpand) {
@@ -166,7 +171,7 @@ function getLabel(type: OurType): string {
   if (isExpand) {
     return (
       type.name ??
-      (type.typeText.length > ExpandableTypeItem.compactPropertyLength
+      (type.typeText.length > ExpandableTypeItem.options.compactPropertyLength
         ? COMPACT_TEXT
         : type.typeText)
     )
@@ -177,10 +182,9 @@ function getLabel(type: OurType): string {
 
 class ExpandableTypeItem extends vscode.TreeItem {
   public static compilerHandler: CompilerHandler
-  private static compactOptionalType: boolean
-  public static compactPropertyLength: number
+  public static options: TypeExpandProviderOptions
 
-  constructor(private type: OurType, desc?: string) {
+  constructor(private type: Type, desc?: string) {
     super(
       getLabel(type),
       isExpandable(type)
@@ -189,7 +193,13 @@ class ExpandableTypeItem extends vscode.TreeItem {
     )
 
     const kind = getKindText(this.type)
-    this.description = [desc, kind]
+    this.description = [
+      desc,
+      kind,
+      "arrayName" in this.type && ExpandableTypeItem.options.directExpandArray
+        ? getKindText(this.type.childType)
+        : undefined,
+    ]
       .filter((temp) => typeof temp !== "undefined")
       .join(" ")
     this.tooltip = this.label === COMPACT_TEXT ? type.typeText : undefined
@@ -197,12 +207,10 @@ class ExpandableTypeItem extends vscode.TreeItem {
 
   static initialize(
     compilerHandler: CompilerHandler,
-    compactOptionalType: boolean,
-    compactPropertyLength: number
+    options: TypeExpandProviderOptions
   ) {
     ExpandableTypeItem.compilerHandler = compilerHandler
-    ExpandableTypeItem.compactOptionalType = compactOptionalType
-    ExpandableTypeItem.compactPropertyLength = compactPropertyLength
+    ExpandableTypeItem.options = options
   }
 
   getChildrenItems(): ExpandableTypeItem[] {
@@ -215,13 +223,21 @@ class ExpandableTypeItem extends vscode.TreeItem {
       ]
     }
 
+    if ("arrayName" in this.type) {
+      const childItem = new ExpandableTypeItem(this.type.childType)
+
+      return ExpandableTypeItem.options.directExpandArray
+        ? childItem.getChildrenItems()
+        : [childItem]
+    }
+
     return isUnion(this.type)
       ? this.getUnionTypes().map(
           (unionType) => new ExpandableTypeItem(unionType)
         )
       : this.getPropTypes().map((propType) => {
           return new ExpandableTypeItem(
-            ExpandableTypeItem.compactOptionalType
+            ExpandableTypeItem.options.compactOptionalType
               ? convertOptionalType(propType)
               : propType
           )

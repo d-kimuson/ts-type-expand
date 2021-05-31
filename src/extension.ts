@@ -49,8 +49,11 @@ export function activate(context: vscode.ExtensionContext): void {
       workspace.uri.fsPath,
       getCurrentFilePath(),
       getTsconfigPath(),
-      getConfig<boolean>("compactOptionalType"),
-      getConfig<number>("compactPropertyLength")
+      {
+        compactOptionalType: getConfig<boolean>("compactOptionalType"),
+        compactPropertyLength: getConfig<number>("compactPropertyLength"),
+        directExpandArray: getConfig<boolean>("directExpandArray"),
+      }
     )
 
     const disposes = [

@@ -25,6 +25,7 @@ import type {
   BaseType,
   PropType,
   FunctionType,
+  Type,
 } from "./types/typescript"
 import { loadTsConfig } from "~/utils/tsConfig"
 import { watchCompiler } from "~/watchCompiler"
@@ -407,9 +408,29 @@ export class CompilerHandler {
     ) as MyType
   }
 
-  private convertBaseType(type: MyType, name?: string): BaseType {
+  private convertBaseType(type: MyType, name?: string): Type {
     const union = type?.types ?? []
     const typeText = this.typeToString(type)
+
+    // ArrayType
+    if (
+      typeText.endsWith("[]") &&
+      type.resolvedTypeArguments &&
+      type.resolvedTypeArguments.length === 1
+    ) {
+      const arrayName = typeText.slice(0, typeText.length - 2)
+      const childType = this.convertBaseType(type.resolvedTypeArguments[0])
+
+      return {
+        name,
+        typeText,
+        props: [],
+        typeForProps: undefined,
+        union: [],
+        arrayName,
+        childType,
+      }
+    }
 
     // Union Type
     if (type.isUnion() && typeText !== "boolean") {
@@ -440,7 +461,6 @@ export class CompilerHandler {
           "object",
           "any",
         ].includes(typeText) ||
-        typeText.endsWith("[]") ||
         (typeText.startsWith('"') && typeText.endsWith('"'))
           ? undefined
           : type,

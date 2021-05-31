@@ -45,6 +45,11 @@
           "type": "number",
           "default": 10,
           "description": "Display {...} if property type text is longer than this length"
+        },
+        "ts-type-expand.directExpandArray": {
+          "type": "boolean",
+          "default": true,
+          "description": "Directly expand T for Array[T]"
         }
       }
     },
