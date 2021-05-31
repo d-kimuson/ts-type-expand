@@ -56,11 +56,14 @@ Types are calculated by the [CompilerAPI](https://github.com/Microsoft/TypeScrip
 
 ## Configure
 
-| key                                    | value                                                                                                   | default       |
-| :------------------------------------- | :------------------------------------------------------------------------------------------------------ | ------------- |
-| `ts-type-expand.tsconfigPath`          | Path for `tsconfig.json`                                                                                | tsconfig.json |
-| `ts-type-expand.compactOptionalType`   | display `T?` for type T \| undefined                                                                    | true          |
-| `ts-type-expand.compactPropertyLength` | Omit when the type can be expanded and the number of characters of the type is longer than this length. | 10            |
+Configure `ts-type-expand.*` to your vscode config to customize.
+
+| key                     | value                                                                                                   | default       |
+| :---------------------- | :------------------------------------------------------------------------------------------------------ | ------------- |
+| `tsconfigPath`          | Path for `tsconfig.json`                                                                                | tsconfig.json |
+| `compactOptionalType`   | display `T?` for type T \| undefined                                                                    | true          |
+| `compactPropertyLength` | Omit when the type can be expanded and the number of characters of the type is longer than this length. | 10            |
+| `directExpandArray`     | Directly expand T for Array\<T\>                                                                        | true          |
 
 ## License
 
