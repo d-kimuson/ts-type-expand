@@ -42,8 +42,8 @@ The following are the destination nodes that support type expansion. More nodes 
 |     Function call     |    ✓    |
 |   Function argument   |    ✓    |
 |  Method declaration   |    ✓    |
-|   Enum Declaration    |    ☓    |
-|    Enum statement     |    ☓    |
+|   Enum Declaration    |    ✓    |
+|    Enum statement     |    ✓    |
 
 ### Types
 
