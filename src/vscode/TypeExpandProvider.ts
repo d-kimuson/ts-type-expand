@@ -97,9 +97,13 @@ export class TypeExpandProvider
   }
 }
 
-type Kind = "Union" | "Properties" | "Function" | "Array" | undefined
+type Kind = "Union" | "Properties" | "Function" | "Array" | "Enum" | undefined
 
 function getKindText(type: Type): Kind {
+  if ("__typename" in type && type.__typename === "EnumType") {
+    return "Enum"
+  }
+
   if ("functionName" in type) {
     return "Function"
   }
@@ -152,7 +156,8 @@ function isExpandable(type: Type): boolean {
       ExpandableTypeItem.compilerHandler.getTypeOfProperties(type.typeForProps)
         .length !== 0) ||
     "functionName" in type ||
-    "arrayName" in type
+    "arrayName" in type ||
+    ("__typename" in type && type.__typename === "EnumType")
   )
 }
 
@@ -166,6 +171,10 @@ function getLabel(type: Type): string {
     }
 
     return type.propName ? `${type.propName}: ${type.typeText}` : type.typeText
+  }
+
+  if ("__typename" in type && type.__typename === "EnumMemberType") {
+    return `${type.typeText} (${type.value})`
   }
 
   if (isExpand) {
@@ -229,6 +238,12 @@ class ExpandableTypeItem extends vscode.TreeItem {
       return ExpandableTypeItem.options.directExpandArray
         ? childItem.getChildrenItems()
         : [childItem]
+    }
+
+    if ("__typename" in this.type && this.type.__typename === "EnumType") {
+      return this.type.members.map((member) => {
+        return new ExpandableTypeItem(member)
+      })
     }
 
     return isUnion(this.type)
