@@ -41,8 +41,8 @@ The following are the destination nodes that support type expansion. More nodes 
 |     Function call     |    ✓    |
 |   Function argument   |    ✓    |
 |  Method declaration   |    ✓    |
-|   Enum Declaration    |    ☓    |
-|    Enum statement     |    ☓    |
+|   Enum Declaration    |    ✓    |
+|    Enum statement     |    ✓    |
 
 ### Types
 
@@ -63,6 +63,14 @@ Configure `ts-type-expand.*` to your vscode config to customize.
 | `compactOptionalType`   | display `T?` for type T \| undefined                                                                    | true          |
 | `compactPropertyLength` | Omit when the type can be expanded and the number of characters of the type is longer than this length. | 10            |
 | `directExpandArray`     | Directly expand T for Array\<T\>                                                                        | true          |
+
+In order for these settings to take effect, you need to run `ts-type-expand.restart` or reload the VSCode after making the changes.
+
+## Commands
+
+| command                  | effect                                     |
+| :----------------------- | :----------------------------------------- |
+| `ts-type-expand.restart` | Update configuration and restart extension |
 
 ## License
 
