@@ -7,6 +7,7 @@ import {
   isPropertyName,
   isPropertySignature,
   isIdentifier,
+  isEnumDeclaration,
   isVariableDeclaration,
   isVariableStatement,
   isTypeReferenceNode,
@@ -26,6 +27,8 @@ import type {
   PropType,
   FunctionType,
   Type,
+  EnumMemberType,
+  EnumType,
 } from "./types/typescript"
 import { loadTsConfig } from "~/utils/tsConfig"
 import { watchCompiler } from "~/watchCompiler"
@@ -40,6 +43,8 @@ type SupportedNode = MyNode &
     | ts.PropertyDeclaration
     | ts.MethodDeclaration
     | ts.ImportSpecifier
+    | ts.EnumDeclaration
+    | ts.EnumMember
   )
 
 const isSupportedNode = (node: ts.Node): node is SupportedNode =>
@@ -52,6 +57,8 @@ const isSupportedNode = (node: ts.Node): node is SupportedNode =>
     SyntaxKind.PropertyDeclaration,
     SyntaxKind.MethodDeclaration,
     SyntaxKind.ImportSpecifier,
+    SyntaxKind.EnumDeclaration,
+    SyntaxKind.EnumMember,
   ].includes(node.kind)
 
 type DefinitionNode = MyNode &
@@ -282,6 +289,9 @@ export class CompilerHandler {
 
   // entry function for converting node to type
   private getTypeFromNode(node: SupportedNode): BaseType | undefined {
+    if (isEnumDeclaration(node)) {
+      return this.getTypeFromEnum(node)
+    }
     if (isImportSpecifier(node)) {
       return this.getTypeFromImportSpecifier(node)
     }
@@ -311,7 +321,37 @@ export class CompilerHandler {
       return this.getTypeFromTypeReference(node)
     }
 
-    return undefined
+    return this.convertBaseType(
+      this.checker.getTypeAtLocation(node),
+      getNameOfDeclaration(node)?.getText()
+    )
+  }
+
+  private getTypeFromEnumMember(node: ts.EnumMember): EnumMemberType {
+    const type = this.checker.getTypeAtLocation(node) as MyType
+
+    return {
+      ...this.convertBaseType(type, getNameOfDeclaration(node)?.getText()),
+      __typename: "EnumMemberType",
+      typeForProps: undefined,
+      value: type.value,
+    }
+  }
+
+  private getTypeFromEnum(node: ts.EnumDeclaration): EnumType {
+    const name = getNameOfDeclaration(node)?.getText() as string
+
+    return {
+      name,
+      typeText: name || "",
+      props: [],
+      typeForProps: undefined,
+      union: [],
+      __typename: "EnumType",
+      members: node.members.map((member) =>
+        this.getTypeFromEnumMember(member as ts.EnumMember)
+      ),
+    }
   }
 
   private getTypeFromDefinition(node: DefinitionNode): BaseType {
@@ -408,6 +448,19 @@ export class CompilerHandler {
   private convertBaseType(type: MyType, name?: string): Type {
     const union = type?.types ?? []
     const typeText = this.typeToString(type)
+
+    // EnumMember
+    if (typeof type?.value !== "undefined") {
+      return {
+        __typename: "EnumMemberType",
+        name,
+        typeText: typeText,
+        typeForProps: undefined,
+        props: [],
+        union: [],
+        value: type.value,
+      }
+    }
 
     // ArrayType
     if (

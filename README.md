@@ -22,9 +22,9 @@ If `tsconfig.json` is not directly under your workspace, specify the path with t
 The following types can be expanded
 
 - Properties
+- Array (`T` for `Array<T>`)
 - Candidate types for union type
 - Arguments and return values of functions or methods
-- Array expand (`T` for `Array<T>`)
 
 ### Selection
 
