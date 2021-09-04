@@ -94,8 +94,8 @@ export class CompilerHandler {
   constructor(private tsConfigPath: string) {
     // following properties are not initalized by constructor
     // but they are not possible to be undefined after startWatch()
-    this.program = (undefined as unknown) as ts.Program
-    this.checker = (undefined as unknown) as ts.TypeChecker
+    this.program = undefined as unknown as ts.Program
+    this.checker = undefined as unknown as ts.TypeChecker
   }
 
   public startWatch(): void {
@@ -197,9 +197,7 @@ export class CompilerHandler {
     )
   }
 
-  public getDeclaredTypesFromFile(
-    filePath: string
-  ): {
+  public getDeclaredTypesFromFile(filePath: string): {
     node: ts.Node
     type: BaseType | undefined
   }[] {
@@ -256,9 +254,8 @@ export class CompilerHandler {
     sourceFile: ts.SourceFile,
     pos: number
   ): { parentNode: ts.Node; leafNode: ts.Node } | undefined {
-    let result:
-      | { parentNode: ts.Node; leafNode: ts.Node }
-      | undefined = undefined
+    let result: { parentNode: ts.Node; leafNode: ts.Node } | undefined =
+      undefined
 
     const getValidChildNodeRecursively = (node: ts.Node): ts.Node => {
       const validChild = node

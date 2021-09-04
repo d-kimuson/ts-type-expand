@@ -12,7 +12,8 @@ export type TypeExpandProviderOptions = {
 }
 
 export class TypeExpandProvider
-  implements vscode.TreeDataProvider<ExpandableTypeItem> {
+  implements vscode.TreeDataProvider<ExpandableTypeItem>
+{
   private compilerHandler?: CompilerHandler
   private selection?: vscode.Range
   private selectedType?: BaseType
@@ -122,7 +123,7 @@ export class TypeExpandProvider
         this.refresh()
       }
     } catch (error) {
-      const typedError = (error as unknown) as Error
+      const typedError = error as unknown as Error
       vscode.window.showErrorMessage(typedError.message)
     }
   }
