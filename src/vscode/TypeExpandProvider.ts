@@ -63,6 +63,10 @@ export class TypeExpandProvider
     this.refresh()
   }
 
+  public isActive(): boolean {
+    return typeof this.compilerHandler !== "undefined"
+  }
+
   tsconfigAbsolutePath(): string {
     return (
       this.tsconfigPath ?? path.resolve(this.workspaceRoot, "tsconfig.json")
@@ -93,9 +97,21 @@ export class TypeExpandProvider
       return
     }
 
-    if (this.activeFilePath && this.selection !== selection) {
-      this.selection = selection
+    if (!this.activeFilePath) {
+      vscode.window.showWarningMessage(
+        "The file you are editing cannot be found."
+      )
+      return
+    }
 
+    if (this.selection === selection) {
+      // selected node has not changed.
+      return
+    }
+
+    this.selection = selection
+
+    try {
       this.selectedType = this.compilerHandler.getTypeFromLineAndCharacter(
         this.activeFilePath,
         this.selection?.start.line,
@@ -105,6 +121,9 @@ export class TypeExpandProvider
       if (this.selectedType) {
         this.refresh()
       }
+    } catch (error) {
+      const typedError = (error as unknown) as Error
+      vscode.window.showErrorMessage(typedError.message)
     }
   }
 

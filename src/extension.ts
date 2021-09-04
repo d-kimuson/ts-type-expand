@@ -69,6 +69,12 @@ export function activate(context: vscode.ExtensionContext): void {
           }
         )
         typeExpandProvider.restart()
+
+        if (typeExpandProvider.isActive()) {
+          vscode.window.showInformationMessage(
+            "ts-type-expand is successfully activated!"
+          )
+        }
       }),
       vscode.window.registerTreeDataProvider("typeExpand", typeExpandProvider),
       vscode.window.createTreeView("typeExpand", {
@@ -86,7 +92,11 @@ export function activate(context: vscode.ExtensionContext): void {
       context.subscriptions.push(dispose)
     })
 
-    console.log("ts-type-expand is now active!")
+    if (typeExpandProvider.isActive()) {
+      vscode.window.showInformationMessage(
+        "ts-type-expand is successfully activated!"
+      )
+    }
   } catch (error) {
     vscode.window.showErrorMessage(error)
   }
