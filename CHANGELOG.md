@@ -6,4 +6,22 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
-- Initial release
+## [0.0.9] - 2021-09-04
+
+### Added
+
+- added error messages after error occured
+
+### Changed
+
+- `ts-type-expand.refresh` renamed `ts-type-expand.restart`
+  - restart compilerAPI after command executed
+  - update configure after command executed
+- Upgrade typescript version to 4.4.2
+- Upgrade dependecy versions
+
+## [0.0.8] - 2021-05-31
+
+### Added
+
+- Support enum expansion
