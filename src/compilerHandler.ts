@@ -159,7 +159,11 @@ export class CompilerHandler {
 
     const sourceFile = this.program.getSourceFile(filePath)
     if (!sourceFile) {
-      throw new Error(`File not found: ${filePath}`)
+      if (filePath.endsWith(".ts") || filePath.endsWith(".tsx")) {
+        throw new Error(`File not found: ${filePath}`)
+      } else {
+        return undefined
+      }
     }
     let pos: number
     try {
