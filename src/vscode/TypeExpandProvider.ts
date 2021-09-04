@@ -1,5 +1,6 @@
 import * as vscode from "vscode"
 import * as path from "path"
+import * as fs from "fs"
 
 import type { BaseType, PropType, Type } from "~/types/typescript"
 import { CompilerHandler } from "~/CompilerHandler"
@@ -12,21 +13,60 @@ export type TypeExpandProviderOptions = {
 
 export class TypeExpandProvider
   implements vscode.TreeDataProvider<ExpandableTypeItem> {
-  private compilerHandler: CompilerHandler
+  private compilerHandler?: CompilerHandler
   private selection?: vscode.Range
   private selectedType?: BaseType
 
   constructor(
     private workspaceRoot: string,
     private activeFilePath: string | undefined,
+    private tsconfigPath: string,
+    private options: TypeExpandProviderOptions
+  ) {
+    this.start()
+  }
+
+  initilizeCompilerHandler(): CompilerHandler {
+    const compilerHandler = new CompilerHandler(this.tsconfigAbsolutePath())
+    compilerHandler.startWatch()
+    ExpandableTypeItem.initialize(compilerHandler, this.options)
+
+    return compilerHandler
+  }
+
+  public updateConfig(
+    workspaceRoot: string,
+    activeFilePath: string | undefined,
     tsconfigPath: string,
     options: TypeExpandProviderOptions
-  ) {
-    this.compilerHandler = new CompilerHandler(
-      tsconfigPath ?? path.resolve(workspaceRoot, "tsconfig.json")
+  ): void {
+    this.workspaceRoot = workspaceRoot
+    this.activeFilePath = activeFilePath
+    this.tsconfigPath = tsconfigPath
+    this.options = options
+  }
+
+  private start(): void {
+    if (!fs.existsSync(this.tsconfigAbsolutePath())) {
+      vscode.window.showErrorMessage(
+        "tsconfig.json doesn't exist.\n" +
+          "Please make sure that tsconfig.json is placed under the workspace or ts-type-expand.tsconfigPath is set correctly."
+      )
+      return
+    }
+    this.compilerHandler = this.initilizeCompilerHandler()
+  }
+
+  public restart(): void {
+    this.close()
+    this.start()
+    this.refresh()
+  }
+
+  tsconfigAbsolutePath(): string {
+    return (
+      this.tsconfigPath ?? path.resolve(this.workspaceRoot, "tsconfig.json")
     )
-    this.compilerHandler.startWatch()
-    ExpandableTypeItem.initialize(this.compilerHandler, options)
   }
 
   getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
@@ -49,6 +89,10 @@ export class TypeExpandProvider
   }
 
   updateSelection(selection: vscode.Selection): void {
+    if (typeof this.compilerHandler === "undefined") {
+      return
+    }
+
     if (this.activeFilePath && this.selection !== selection) {
       this.selection = selection
 
@@ -93,7 +137,7 @@ export class TypeExpandProvider
   }
 
   close(): void {
-    this.compilerHandler.closeWatch()
+    this.compilerHandler?.closeWatch()
   }
 }
 

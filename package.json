@@ -55,8 +55,8 @@
     },
     "commands": [
       {
-        "command": "ts-type-expand.refresh",
-        "title": "Refresh (ts-type-expand)"
+        "command": "ts-type-expand.restart",
+        "title": "Restart (ts-type-expand)"
       }
     ],
     "views": {

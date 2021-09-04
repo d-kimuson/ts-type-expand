@@ -57,8 +57,18 @@ export function activate(context: vscode.ExtensionContext): void {
     )
 
     const disposes = [
-      vscode.commands.registerCommand("ts-type-expand.refresh", () => {
-        typeExpandProvider.refresh()
+      vscode.commands.registerCommand("ts-type-expand.restart", () => {
+        typeExpandProvider.updateConfig(
+          workspace.uri.fsPath,
+          getCurrentFilePath(),
+          getTsconfigPath(),
+          {
+            compactOptionalType: getConfig<boolean>("compactOptionalType"),
+            compactPropertyLength: getConfig<number>("compactPropertyLength"),
+            directExpandArray: getConfig<boolean>("directExpandArray"),
+          }
+        )
+        typeExpandProvider.restart()
       }),
       vscode.window.registerTreeDataProvider("typeExpand", typeExpandProvider),
       vscode.window.createTreeView("typeExpand", {
@@ -70,7 +80,6 @@ export function activate(context: vscode.ExtensionContext): void {
       vscode.window.onDidChangeActiveTextEditor(() => {
         typeExpandProvider.updateActiveFile(getCurrentFilePath())
       }),
-      // TODO: Support change workspace
     ]
 
     disposes.forEach((dispose) => {
