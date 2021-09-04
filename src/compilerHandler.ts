@@ -538,8 +538,10 @@ export class CompilerHandler {
 
         const propName = String(memberSymbol.escapedName)
 
-        const declare = memberSymbol.declarations[0]
-        if (isMethodDeclaration(declare)) {
+        const declare = memberSymbol.declarations
+          ? memberSymbol.declarations[0]
+          : undefined
+        if (typeof declare !== "undefined" && isMethodDeclaration(declare)) {
           props.push({
             ...getTypeOfFunction(declare),
             propName,

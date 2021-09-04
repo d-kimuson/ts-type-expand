@@ -98,7 +98,8 @@ export function activate(context: vscode.ExtensionContext): void {
       )
     }
   } catch (error) {
-    vscode.window.showErrorMessage(error)
+    const typedError = error as Error
+    vscode.window.showErrorMessage(typedError.message)
   }
 }
 

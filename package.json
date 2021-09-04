@@ -90,28 +90,28 @@
     "deploy": "./bin/deploy.sh"
   },
   "devDependencies": {
-    "@types/glob": "^7.1.3",
+    "@types/glob": "^7.1.4",
     "@types/jest": "^27.0.1",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^12.11.7",
+    "@types/node": "^16.7.10",
     "@types/vscode": "^1.55.0",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "@typescript-eslint/parser": "^4.14.1",
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^8.3.0",
-    "glob": "^7.1.6",
+    "glob": "^7.1.7",
     "husky": "^6.0.0",
     "jest": "^27.1.0",
     "mocha": "^9.1.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
     "ts-jest": "^27.0.5",
-    "ts-node": "^9.1.1",
-    "tsconfig-paths": "^3.9.0",
+    "ts-node": "^10.2.1",
+    "tsconfig-paths": "^3.11.0",
     "vscode-test": "^1.6.1"
   },
   "dependencies": {
-    "tsc-alias": "^1.2.10",
-    "typescript": "^4.2.4"
+    "tsc-alias": "^1.3.9",
+    "typescript": "^4.4.2"
   }
 }
