@@ -13,7 +13,8 @@
     "strict": true,
     "moduleResolution": "node",
     "noEmit": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
   "exclude": ["node_modules", ".vscode-test", "example"]
 }

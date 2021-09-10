@@ -3,7 +3,7 @@ import * as path from "path"
 import * as fs from "fs"
 
 import type { BaseType, PropType, Type } from "~/types/typescript"
-import { CompilerHandler } from "~/CompilerHandler"
+import { CompilerHandler } from "~/compilerHandler"
 
 export type TypeExpandProviderOptions = {
   compactOptionalType: boolean
