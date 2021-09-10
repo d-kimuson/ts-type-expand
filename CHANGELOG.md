@@ -6,6 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.0.10] - 2021-09-10
+
+### Changed
+
+- Fixed problem with dependency resolution failing on case-sensitive machines.
+- Do not display an error when the file extension is not ts or tsx.
+
 ## [0.0.9] - 2021-09-04
 
 ### Added
