@@ -6,6 +6,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.0.12] - 2021-09-12
+
+### Added
+
+- Support for multiple workspaces
+
+### Changed
+
+- fixed bug that type expansion of function arguments #21
+
 ## [0.0.11] - 2021-09-10
 
 ### Changed
