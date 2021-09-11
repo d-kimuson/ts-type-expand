@@ -1,9 +1,9 @@
 import * as vscode from "vscode"
-import * as path from "path"
 import * as fs from "fs"
 
 import type { BaseType, PropType, Type } from "~/types/typescript"
 import { CompilerHandler } from "~/compilerHandler"
+import { getTsconfigPath, getActiveWorkspace } from "~/utils/vscode"
 
 export type TypeExpandProviderOptions = {
   compactOptionalType: boolean
@@ -11,67 +11,85 @@ export type TypeExpandProviderOptions = {
   directExpandArray: boolean
 }
 
-export class TypeExpandProvider
-  implements vscode.TreeDataProvider<ExpandableTypeItem>
-{
-  private compilerHandler?: CompilerHandler
-  private selection?: vscode.Range
-  private selectedType?: BaseType
+class CompilerHandlerStore {
+  // put undefined to prevent re-initialization once it has failed.
+  static compilerHandlerMap: Record<number, CompilerHandler | undefined> = {}
 
-  constructor(
-    private workspaceRoot: string,
-    private activeFilePath: string | undefined,
-    private tsconfigPath: string,
-    private options: TypeExpandProviderOptions
-  ) {
-    this.start()
+  static fetchHandler(): CompilerHandler | undefined {
+    const workspcae = getActiveWorkspace()
+
+    if (!workspcae) {
+      return undefined
+    }
+
+    if (workspcae.index in CompilerHandlerStore.compilerHandlerMap) {
+      return CompilerHandlerStore.compilerHandlerMap[workspcae.index]
+    }
+
+    const handler = CompilerHandlerStore.createHandler()
+    CompilerHandlerStore.compilerHandlerMap[workspcae.index] = handler
+    return handler
   }
 
-  initilizeCompilerHandler(): CompilerHandler {
-    const compilerHandler = new CompilerHandler(this.tsconfigAbsolutePath())
-    compilerHandler.startWatch()
-    ExpandableTypeItem.initialize(compilerHandler, this.options)
-
-    return compilerHandler
-  }
-
-  public updateConfig(
-    workspaceRoot: string,
-    activeFilePath: string | undefined,
-    tsconfigPath: string,
-    options: TypeExpandProviderOptions
-  ): void {
-    this.workspaceRoot = workspaceRoot
-    this.activeFilePath = activeFilePath
-    this.tsconfigPath = tsconfigPath
-    this.options = options
-  }
-
-  private start(): void {
-    if (!fs.existsSync(this.tsconfigAbsolutePath())) {
+  static createHandler(): CompilerHandler | undefined {
+    const tsconfigPath = getTsconfigPath()
+    if (!fs.existsSync(tsconfigPath)) {
       vscode.window.showErrorMessage(
         "tsconfig.json doesn't exist.\n" +
           "Please make sure that tsconfig.json is placed under the workspace or ts-type-expand.tsconfigPath is set correctly."
       )
+      return undefined
+    }
+
+    const handler = new CompilerHandler(tsconfigPath)
+    handler.startWatch()
+    return handler
+  }
+
+  static deleteHandler() {
+    const workspcae = getActiveWorkspace()
+    if (!workspcae) {
       return
     }
-    this.compilerHandler = this.initilizeCompilerHandler()
+    this.fetchHandler()?.closeWatch()
+    delete this.compilerHandlerMap[workspcae.index]
+  }
+
+  static deleteAll() {
+    Object.keys(this.compilerHandlerMap).forEach((key) => {
+      this.fetchHandler()?.closeWatch()
+      // @ts-expect-error
+      delete this.compilerHandlerMap[key]
+    })
+  }
+
+  static isActive() {
+    return CompilerHandlerStore.fetchHandler() !== undefined
+  }
+}
+
+export class TypeExpandProvider
+  implements vscode.TreeDataProvider<ExpandableTypeItem>
+{
+  private selection?: vscode.Range
+  private selectedType?: BaseType
+  private activeFilePath: string | undefined
+
+  constructor(options: TypeExpandProviderOptions) {
+    this.updateOptions(options)
+  }
+
+  public updateOptions(options: TypeExpandProviderOptions): void {
+    ExpandableTypeItem.updateOptions(options)
   }
 
   public restart(): void {
-    this.close()
-    this.start()
+    CompilerHandlerStore.deleteHandler()
     this.refresh()
   }
 
   public isActive(): boolean {
-    return typeof this.compilerHandler !== "undefined"
-  }
-
-  tsconfigAbsolutePath(): string {
-    return (
-      this.tsconfigPath ?? path.resolve(this.workspaceRoot, "tsconfig.json")
-    )
+    return CompilerHandlerStore.isActive()
   }
 
   getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
@@ -79,7 +97,7 @@ export class TypeExpandProvider
   }
 
   getChildren(element?: ExpandableTypeItem): Thenable<ExpandableTypeItem[]> {
-    if (!this.workspaceRoot) {
+    if (!this.isActive) {
       vscode.window.showInformationMessage("Empty workspace")
       return Promise.resolve([])
     }
@@ -94,7 +112,9 @@ export class TypeExpandProvider
   }
 
   updateSelection(selection: vscode.Selection): void {
-    if (typeof this.compilerHandler === "undefined") {
+    const compilerHandler = CompilerHandlerStore.fetchHandler()
+
+    if (typeof compilerHandler === "undefined") {
       return
     }
 
@@ -113,7 +133,7 @@ export class TypeExpandProvider
     this.selection = selection
 
     try {
-      this.selectedType = this.compilerHandler.getTypeFromLineAndCharacter(
+      this.selectedType = compilerHandler.getTypeFromLineAndCharacter(
         this.activeFilePath,
         this.selection?.start.line,
         this.selection?.start.character
@@ -130,12 +150,6 @@ export class TypeExpandProvider
 
   public updateActiveFile(activeFilePath: string | undefined): void {
     this.activeFilePath = activeFilePath
-    this.resetSelection()
-    this.refresh()
-  }
-
-  public updateWorkspaceRoot(workspaceRoot: string): void {
-    this.workspaceRoot = workspaceRoot
     this.resetSelection()
     this.refresh()
   }
@@ -157,7 +171,7 @@ export class TypeExpandProvider
   }
 
   close(): void {
-    this.compilerHandler?.closeWatch()
+    CompilerHandlerStore.deleteAll()
   }
 }
 
@@ -217,8 +231,9 @@ function isExpandable(type: Type): boolean {
     type.union.length !== 0 ||
     type.props.length !== 0 ||
     (typeof type.typeForProps !== "undefined" &&
-      ExpandableTypeItem.compilerHandler.getTypeOfProperties(type.typeForProps)
-        .length !== 0) ||
+      CompilerHandlerStore.fetchHandler()?.getTypeOfProperties(
+        type.typeForProps
+      ).length !== 0) ||
     "functionName" in type ||
     "arrayName" in type ||
     ("__typename" in type && type.__typename === "EnumType")
@@ -254,7 +269,7 @@ function getLabel(type: Type): string {
 }
 
 class ExpandableTypeItem extends vscode.TreeItem {
-  public static compilerHandler: CompilerHandler
+  // public static compilerHandler: CompilerHandler
   public static options: TypeExpandProviderOptions
 
   constructor(private type: Type, desc?: string) {
@@ -278,11 +293,7 @@ class ExpandableTypeItem extends vscode.TreeItem {
     this.tooltip = this.label === COMPACT_TEXT ? type.typeText : undefined
   }
 
-  static initialize(
-    compilerHandler: CompilerHandler,
-    options: TypeExpandProviderOptions
-  ) {
-    ExpandableTypeItem.compilerHandler = compilerHandler
+  static updateOptions(options: TypeExpandProviderOptions) {
     ExpandableTypeItem.options = options
   }
 
@@ -327,9 +338,9 @@ class ExpandableTypeItem extends vscode.TreeItem {
     return this.type.props.length !== 0
       ? this.type.props
       : this.type.typeForProps
-      ? ExpandableTypeItem.compilerHandler.getTypeOfProperties(
+      ? CompilerHandlerStore.fetchHandler()?.getTypeOfProperties(
           this.type.typeForProps
-        )
+        ) ?? []
       : []
   }
 
