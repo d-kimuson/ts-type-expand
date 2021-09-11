@@ -533,6 +533,16 @@ export class CompilerHandler {
     }
 
     node?.locals?.forEach((symbol, key) => {
+      const declarations = symbol.declarations ?? []
+      if (declarations.length === 0) {
+        return undefined
+      }
+
+      const declare = declarations[0]
+      if (declare.kind !== 162) {
+        return undefined
+      }
+
       const argType = this.convertTypeFromSymbol(symbol)
       args.push({
         ...convertBaseType(argType),
