@@ -104,7 +104,7 @@
     "@types/jest": "^27.0.1",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.7.10",
-    "@types/vscode": "1.55",
+    "@types/vscode": "1.60",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.30.0",
     "eslint": "^7.32.0",
