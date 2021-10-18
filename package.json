@@ -103,7 +103,7 @@
     "@types/glob": "^7.1.4",
     "@types/jest": "^27.0.2",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^16.11.0",
+    "@types/node": "^16.11.1",
     "@types/vscode": "1.61",    
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
