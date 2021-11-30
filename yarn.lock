@@ -4305,10 +4305,10 @@ ts-node@^10.4.0:
     make-error "^1.1.1"
     yn "3.1.1"
 
-tsc-alias@^1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/tsc-alias/-/tsc-alias-1.4.1.tgz#6a6075dd94267d9befdad1431f410bd0b8819805"
-  integrity sha512-nHTR8qvM/LiYI8Fx6UrzAQXRngAuE2PEK+n9uXmQY6fN+oLZhweNFkCLbyxKDmlLfYnclSuaR+dSuvRd7FUu8Q==
+tsc-alias@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/tsc-alias/-/tsc-alias-1.4.2.tgz#80bac036f8d163a34a734a6772a57291313e084f"
+  integrity sha512-6OyipS3p1E7679vk9c55zfQm9JtBAMK1MfgoKXucT4oyTL7TdFgQRcRT/urdWC9JaAtahr3aYqyEI22T82UFuA==
   dependencies:
     chokidar "^3.5.2"
     commander "^8.2.0"
