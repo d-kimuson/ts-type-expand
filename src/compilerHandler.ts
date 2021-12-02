@@ -99,7 +99,7 @@ export class CompilerHandler {
   private watchConf?: ts.WatchOfConfigFile<ts.SemanticDiagnosticsBuilderProgram>
 
   constructor(private tsConfigPath: string) {
-    // following properties are not initalized by constructor
+    // following properties are not initialized by constructor
     // but they are not possible to be undefined after startWatch()
     this.program = undefined as unknown as ts.Program
     this.checker = undefined as unknown as ts.TypeChecker
@@ -182,29 +182,29 @@ export class CompilerHandler {
     }
 
     if (isIdentifier(nodes.leafNode)) {
-      return this.getTypeFromIdentifer(nodes.leafNode)
+      return this.getTypeFromIdentifier(nodes.leafNode)
     }
 
     return undefined
   }
 
-  private getTypeFromIdentifer(
-    identiferNode: ts.Identifier
+  private getTypeFromIdentifier(
+    identifierNode: ts.Identifier
   ): BaseType | undefined {
     // TODO: Integrate into SupportedNode implementation
-    // property identifer
-    if (isPropertySignature(identiferNode.parent)) {
-      return this.getTypeFromProperty(identiferNode)
+    // property identifier
+    if (isPropertySignature(identifierNode.parent)) {
+      return this.getTypeFromProperty(identifierNode)
     }
 
-    if (isSupportedNode(identiferNode.parent)) {
-      // declare identifer
-      return this.getTypeFromNode(identiferNode.parent)
+    if (isSupportedNode(identifierNode.parent)) {
+      // declare identifier
+      return this.getTypeFromNode(identifierNode.parent)
     }
 
     return this.convertBaseType(
-      this.checker.getTypeAtLocation(identiferNode),
-      identiferNode.getText()
+      this.checker.getTypeAtLocation(identifierNode),
+      identifierNode.getText()
     )
   }
 
