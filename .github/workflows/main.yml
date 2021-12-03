@@ -40,4 +40,5 @@ jobs:
     - name: test
       run: |
         yarn test:jest
+        yarn compile
         yarn test:vscode
