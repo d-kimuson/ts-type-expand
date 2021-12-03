@@ -506,14 +506,18 @@ export class CompilerHandler {
         [
           "string",
           "number",
+          "bigint",
           "boolean",
           "undefined",
           "null",
           "void",
+          "never",
+          "boolean",
           "true",
           "false",
           "object",
           "any",
+          "Date",
         ].includes(typeText) ||
         (typeText.startsWith('"') && typeText.endsWith('"'))
           ? undefined
