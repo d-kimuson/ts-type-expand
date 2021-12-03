@@ -38,4 +38,6 @@ jobs:
         yarn lint
 
     - name: test
-      run: yarn test
+      run: |
+        yarn test:jest
+        yarn test:vscode
