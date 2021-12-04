@@ -1,5 +1,5 @@
-import * as vscode from "vscode"
-import * as path from "path"
+import vscode from "vscode"
+import path from "path"
 
 export function getCurrentFilePath(): string | undefined {
   return vscode.window.activeTextEditor?.document.uri.fsPath

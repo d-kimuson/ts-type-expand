@@ -1,5 +1,5 @@
-import * as vscode from "vscode"
-import * as fs from "fs"
+import vscode from "vscode"
+import fs from "fs"
 
 import type { BaseType, PropType, Type } from "~/types/typescript"
 import { CompilerHandler } from "~/compilerHandler"
