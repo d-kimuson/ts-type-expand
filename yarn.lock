@@ -1520,10 +1520,10 @@ commander@^8.3.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-8.3.0.tgz#4837ea1b2da67b9c616a67afbb0fafee567bca66"
   integrity sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==
 
-compiler-api-helper@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/compiler-api-helper/-/compiler-api-helper-0.0.1.tgz#9c7554610b35131128c89761b7f528ceae056561"
-  integrity sha512-36YSGAQ8bJKXBgEMJnT2Dz+Ch+CO1gvWqeP9p6BwZIJnsl4UTD4Gcqh46y9C7MovL8jK9bKnewALB5ozn3SmOw==
+compiler-api-helper@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/compiler-api-helper/-/compiler-api-helper-0.0.4.tgz#a7f523676de57b68c1a7d7837cc0b91959707b97"
+  integrity sha512-91GOuKa9V8oTlEHgCZZQp0nAbarW85zsKSXpv2Nw3ChdNTQG6pcNwxcJJWgL/4PArQYNx2GL3Tp+JJxl6rN4XQ==
   dependencies:
     ramda "^0.27.1"
     typescript "^4.5.2"

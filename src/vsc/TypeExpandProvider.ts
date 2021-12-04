@@ -1,9 +1,9 @@
 import vscode from "vscode"
 import fs from "fs"
 
-import type { BaseType, PropType, Type } from "~/types/typescript"
 import { CompilerHandler } from "~/compilerHandler"
 import { getTsconfigPath, getActiveWorkspace } from "~/utils/vscode"
+import { TypeObject } from "compiler-api-helper"
 
 export type TypeExpandProviderOptions = {
   compactOptionalType: boolean
@@ -72,7 +72,10 @@ export class TypeExpandProvider
   implements vscode.TreeDataProvider<ExpandableTypeItem>
 {
   private selection?: vscode.Range
-  private selectedType?: BaseType
+  private selectedType?: {
+    declareName?: string
+    type: TypeObject
+  }
   private activeFilePath: string | undefined
 
   constructor(options: TypeExpandProviderOptions) {
@@ -108,7 +111,11 @@ export class TypeExpandProvider
 
     return element
       ? Promise.resolve(element.getChildrenItems())
-      : Promise.resolve([new ExpandableTypeItem(this.selectedType)])
+      : Promise.resolve([
+          new ExpandableTypeItem(this.selectedType.type, {
+            aliasName: this.selectedType.declareName,
+          }),
+        ])
   }
 
   updateSelection(selection: vscode.Selection): void {
@@ -133,11 +140,18 @@ export class TypeExpandProvider
     this.selection = selection
 
     try {
-      this.selectedType = compilerHandler.getTypeFromLineAndCharacter(
+      const result = compilerHandler.getTypeFromLineAndCharacter(
         this.activeFilePath,
         this.selection?.start.line,
         this.selection?.start.character
       )
+      if (!result) {
+        return
+      }
+      this.selectedType = {
+        declareName: result[0],
+        type: result[1],
+      }
 
       if (this.selectedType) {
         this.refresh()
@@ -177,104 +191,102 @@ export class TypeExpandProvider
 
 type Kind = "Union" | "Properties" | "Function" | "Array" | "Enum" | undefined
 
-function getKindText(type: Type): Kind {
-  if ("__typename" in type && type.__typename === "EnumType") {
-    return "Enum"
-  }
-
-  if ("functionName" in type) {
-    return "Function"
-  }
-
-  if (type.union.length !== 0) {
+function getKindText(type: TypeObject): Kind {
+  if (type.__type === "UnionTO") {
     return "Union"
   }
-
-  if ("arrayName" in type) {
+  if (type.__type === "EnumTO") {
+    return "Enum"
+  }
+  if (type.__type === "CallableTO") {
+    return "Function"
+  }
+  if (type.__type === "ArrayTO") {
     return "Array"
   }
-
-  return isExpandable(type) ? "Properties" : undefined
-}
-
-function convertOptionalType(type: PropType): PropType {
-  const others = type.union.filter((t) => t.typeText !== "undefined")
-
-  if (others.length === type.union.length) {
-    return type
+  if (type.__type === "ObjectTO") {
+    return "Properties"
   }
-
-  if (others.length === 1) {
-    return {
-      ...type,
-      propName: type.propName + "?",
-      typeText: type.typeText.replace(" | undefined", ""),
-      union: [],
-      props: others[0].props,
-      typeForProps: others[0].typeForProps,
-    }
-  }
-
-  return {
-    ...type,
-    propName: type.propName + "?",
-    union: others,
-  }
-}
-
-function isUnion(type: BaseType): boolean {
-  return type.union.length !== 0
-}
-
-function isExpandable(type: Type): boolean {
-  return (
-    type.union.length !== 0 ||
-    type.props.length !== 0 ||
-    (typeof type.typeForProps !== "undefined" &&
-      CompilerHandlerStore.fetchHandler()?.getTypeOfProperties(
-        type.typeForProps
-      ).length !== 0) ||
-    "functionName" in type ||
-    "arrayName" in type ||
-    ("__typename" in type && type.__typename === "EnumType")
-  )
+  return undefined
 }
 
 const COMPACT_TEXT = "{...}"
 
-function getLabel(type: Type): string {
-  const isExpand = isExpandable(type)
-  if ("propName" in type) {
-    if (isExpand) {
-      return type.propName
-    }
+function isExpandable(type: TypeObject): boolean {
+  return (
+    type.__type === "UnionTO" ||
+    type.__type === "EnumTO" ||
+    type.__type === "ObjectTO" ||
+    type.__type === "ArrayTO" ||
+    type.__type === "CallableTO" ||
+    type.__type === "PromiseTO"
+  )
+}
 
-    return type.propName ? `${type.propName}: ${type.typeText}` : type.typeText
+function getLabelText(type: TypeObject): string {
+  const typeText = toTypeText(type)
+
+  return typeText.length > ExpandableTypeItem.options.compactPropertyLength
+    ? COMPACT_TEXT
+    : typeText
+}
+
+function toTypeText(type: TypeObject): string {
+  if (
+    type.__type === "UnionTO" ||
+    type.__type === "ArrayTO" ||
+    type.__type === "TupleTO" ||
+    type.__type === "ObjectTO" ||
+    type.__type === "EnumTO"
+  ) {
+    return type.typeName
   }
 
-  if ("__typename" in type && type.__typename === "EnumMemberType") {
-    return `${type.typeText} (${type.value})`
+  if (type.__type === "UnsupportedTO") {
+    return type.typeText ?? "unknown"
   }
 
-  if (isExpand) {
-    return (
-      type.name ??
-      (type.typeText.length > ExpandableTypeItem.options.compactPropertyLength
-        ? COMPACT_TEXT
-        : type.typeText)
-    )
+  if (type.__type === "CallableTO") {
+    return `(${type.argTypes
+      .map(({ name, type }) => `${name}: ${toTypeText(type)}`)
+      .join(", ")}) => ${toTypeText(type.returnType)}`
   }
 
-  return type.name ? `${type.name}: ${type.typeText}` : type.typeText
+  if (type.__type === "PromiseTO") {
+    return `Promise<${toTypeText(type.child)}>`
+  }
+
+  if (type.__type === "PrimitiveTO") {
+    return type.kind
+  }
+
+  if (type.__type === "LiteralTO") {
+    return String(type.value)
+  }
+
+  if (type.__type === "SpecialTO") {
+    return type.kind
+  }
+
+  throw new Error("unreachable here")
 }
 
 class ExpandableTypeItem extends vscode.TreeItem {
-  // public static compilerHandler: CompilerHandler
   public static options: TypeExpandProviderOptions
 
-  constructor(private type: Type, desc?: string) {
+  constructor(
+    private type: TypeObject,
+    meta?: {
+      parent?: TypeObject
+      aliasName?: string
+      desc?: string
+    }
+  ) {
     super(
-      getLabel(type),
+      typeof meta?.aliasName !== "undefined" &&
+        meta.aliasName !== getLabelText(type)
+        ? `${meta.aliasName}: ${getLabelText(type)}`
+        : getLabelText(type),
       isExpandable(type)
         ? vscode.TreeItemCollapsibleState.Collapsed
         : vscode.TreeItemCollapsibleState.None
@@ -282,15 +294,16 @@ class ExpandableTypeItem extends vscode.TreeItem {
 
     const kind = getKindText(this.type)
     this.description = [
-      desc,
+      meta?.desc,
       kind,
-      "arrayName" in this.type && ExpandableTypeItem.options.directExpandArray
-        ? getKindText(this.type.childType)
+      this.type.__type === "ArrayTO" &&
+      ExpandableTypeItem.options.directExpandArray
+        ? getKindText(this.type.child)
         : undefined,
     ]
       .filter((temp) => typeof temp !== "undefined")
       .join(" ")
-    this.tooltip = this.label === COMPACT_TEXT ? type.typeText : undefined
+    this.tooltip = this.label === COMPACT_TEXT ? toTypeText(type) : undefined
   }
 
   static updateOptions(options: TypeExpandProviderOptions) {
@@ -298,57 +311,54 @@ class ExpandableTypeItem extends vscode.TreeItem {
   }
 
   getChildrenItems(): ExpandableTypeItem[] {
-    if ("functionName" in this.type) {
+    if (this.type.__type === "CallableTO") {
       return [
-        ...this.type.args.map(
-          (argType, index) => new ExpandableTypeItem(argType, `Arg${index + 1}`)
+        ...this.type.argTypes.map(
+          ({ name, type }, index) =>
+            new ExpandableTypeItem(type, {
+              aliasName: name,
+              parent: this.type,
+              desc: `Arg${index}`,
+            })
         ),
-        new ExpandableTypeItem(this.type.returnType, "Return"),
+        new ExpandableTypeItem(this.type.returnType, {
+          parent: this.type,
+          desc: "ReturnType",
+        }),
       ]
     }
 
-    if ("arrayName" in this.type) {
-      const childItem = new ExpandableTypeItem(this.type.childType)
+    if (this.type.__type === "ArrayTO") {
+      const childItem = new ExpandableTypeItem(this.type.child)
 
       return ExpandableTypeItem.options.directExpandArray
         ? childItem.getChildrenItems()
         : [childItem]
     }
 
-    if ("__typename" in this.type && this.type.__typename === "EnumType") {
-      return this.type.members.map((member) => {
-        return new ExpandableTypeItem(member)
-      })
+    if (this.type.__type === "EnumTO") {
+      return this.type.enums.map(
+        ({ type, name }) =>
+          new ExpandableTypeItem(type, { parent: this.type, desc: name })
+      )
     }
 
-    return isUnion(this.type)
-      ? this.getUnionTypes().map(
-          (unionType) => new ExpandableTypeItem(unionType)
-        )
-      : this.getPropTypes().map((propType) => {
-          return new ExpandableTypeItem(
-            ExpandableTypeItem.options.compactOptionalType
-              ? convertOptionalType(propType)
-              : propType
-          )
-        })
-  }
+    if (this.type.__type === "UnionTO") {
+      return this.type.unions.map(
+        (type) => new ExpandableTypeItem(type, { parent: type })
+      )
+    }
 
-  getPropTypes(): PropType[] {
-    return this.type.props.length !== 0
-      ? this.type.props
-      : this.type.typeForProps
-      ? CompilerHandlerStore.fetchHandler()?.getTypeOfProperties(
-          this.type.typeForProps
-        ) ?? []
-      : []
-  }
+    if (this.type.__type === "ObjectTO") {
+      return this.type.getProps().map(
+        ({ propName, type }) =>
+          new ExpandableTypeItem(type, {
+            aliasName: propName,
+            parent: this.type,
+          })
+      )
+    }
 
-  getUnionTypes(): BaseType[] {
-    return this.type.union
-  }
-
-  isUnion(): boolean {
-    return this.type.union.length !== 0
+    return []
   }
 }

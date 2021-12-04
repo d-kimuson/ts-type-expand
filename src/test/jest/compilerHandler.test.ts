@@ -81,18 +81,15 @@ handler.initializeWithoutWatch(exampleDir)
 // })
 
 test("example/classes", () => {
-  const types = handler.getDeclaredTypesFromFile(
-    path.resolve(exampleDir, "classes.ts")
-  )
-
-  const userRepo = types[0].type
-  expect(userRepo).toBeDefined()
-  if (!userRepo) {
-    return
-  }
-
+  // const types = handler.getDeclaredTypesFromFile(
+  //   path.resolve(exampleDir, "classes.ts")
+  // )
+  // const userRepo = types[0].type
+  // expect(userRepo).toBeDefined()
+  // if (!userRepo) {
+  //   return
+  // }
   // handler.expandTypeRecursively(userRepo)
-
   // // UserRepository
   // expect(userRepo).toStrictEqual({
   //   name: "UserRepository",
