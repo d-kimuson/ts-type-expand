@@ -1,11 +1,11 @@
-import * as vscode from "vscode"
+import vscode from "vscode"
 
 import {
   getCurrentFilePath,
   getActiveWorkspace,
   getConfig,
 } from "~/utils/vscode"
-import { TypeExpandProvider } from "~/vscode/TypeExpandProvider"
+import { TypeExpandProvider } from "~/vsc/TypeExpandProvider"
 
 let typeExpandProvider: TypeExpandProvider
 

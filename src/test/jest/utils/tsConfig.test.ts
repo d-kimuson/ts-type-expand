@@ -1,5 +1,5 @@
 import { ModuleKind, ScriptTarget } from "typescript"
-import * as path from "path"
+import path from "path"
 
 import { loadTsConfig } from "~/utils/tsConfig"
 
