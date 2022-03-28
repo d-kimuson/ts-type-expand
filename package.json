@@ -123,7 +123,7 @@
     "vscode-test": "^1.6.1"
   },
   "dependencies": {
-    "tsc-alias": "^1.6.4",
+    "tsc-alias": "^1.6.5",
     "typescript": "^4.6.3"
   }
 }
