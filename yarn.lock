@@ -1088,10 +1088,10 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.0.tgz#7036640b4e21cc2f259ae826ce843d277dad8cff"
   integrity sha512-RJJrrySY7A8havqpGObOB4W92QXKJo63/jFLLgpvOtsGUqbQZ9Sbgl35KMm1DjC6j7AvmmU2bIno+3IyEaemaw==
 
-"@types/vscode@1.65":
-  version "1.65.0"
-  resolved "https://registry.yarnpkg.com/@types/vscode/-/vscode-1.65.0.tgz#042dd8d93c32ac62cb826cd0fa12376069d1f448"
-  integrity sha512-wQhExnh2nEzpjDMSKhUvnNmz3ucpd3E+R7wJkOhBNK3No6fG3VUdmVmMOKD0A8NDZDDDiQcLNxe3oGmX5SjJ5w==
+"@types/vscode@1.66":
+  version "1.66.0"
+  resolved "https://registry.yarnpkg.com/@types/vscode/-/vscode-1.66.0.tgz#e90e1308ad103f2bd31b72c17b8031b4cec0713d"
+  integrity sha512-ZfJck4M7nrGasfs4A4YbUoxis3Vu24cETw3DERsNYtDZmYSYtk6ljKexKFKhImO/ZmY6ZMsmegu2FPkXoUFImA==
 
 "@types/yargs-parser@*":
   version "20.2.0"
