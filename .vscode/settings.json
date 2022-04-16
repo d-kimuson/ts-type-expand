@@ -2,12 +2,12 @@
 {
   "editor.tabSize": 2,
   // ESLint
-  "eslint.workingDirectories": ["./"],
+  "eslint.workingDirectories": ["./packages/*"],
   "eslint.options": {
-    "configFile": ".eslintrc.js",
-    "extensions": ["ts", "js"]
+    "overrideConfigFile": ".eslintrc.js",
+    "extensions": ["ts"]
   },
-  "eslint.validate": ["javascript", "typescript"],
+  "eslint.validate": ["typescript"],
   "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
