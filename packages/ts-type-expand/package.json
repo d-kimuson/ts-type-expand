@@ -1,5 +1,5 @@
 {
-  "name": "extension",
+  "name": "ts-type-expand",
   "displayName": "ts-type-expand",
   "description": "vscode extension for expand type of typescript",
   "version": "0.0.12",

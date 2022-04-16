@@ -1,5 +1,5 @@
 {
-  "name": "ts-type-expand",
+  "name": "ts-type-expand-repo",
   "displayName": "ts-type-expand",
   "description": "vscode extension for expand type of typescript",
   "license": "MIT",
@@ -15,15 +15,6 @@
     "lint-staged": "lint-staged --allow-empty -r",
     "prepare": "husky install",
     "deploy": "./bin/deploy.sh"
-  },
-  "lint-staged": {
-    "*.{ts,js}": [
-      "yarn eslint --fix",
-      "yarn prettier --write"
-    ],
-    "*.{json,md}": [
-      "yarn prettier --write"
-    ]
   },
   "devDependencies": {
     "commitizen": "^4.2.4",

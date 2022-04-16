@@ -23,5 +23,17 @@ module.exports = {
       )}`,
     ]
   },
+  /**
+   * @param {string[]} relPaths
+   * @returns {string[]}
+   */
+  "packages/example/*.ts": (relPaths) => {
+    return [
+      `yarn --cwd 'packages/example' eslint --fix ${parsePackagePaths(
+        relPaths,
+        "example"
+      )}`,
+    ]
+  },
   "*.{js,json,md}": ["yarn prettier --write"],
 }
