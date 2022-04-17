@@ -1,0 +1,11 @@
+/node_modules
+/src
+/tests
+/example
+/patches
+/.vscode
+tsconfig.json
+/.github
+/.husky
+/.eslintrc.js
+/jest.config.js

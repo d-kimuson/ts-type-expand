@@ -98,7 +98,7 @@
   },
   "dependencies": {
     "axios": "^0.26.1",
-    "compiler-api-helper": "^0.0.4",
+    "compiler-api-helper": "^0.0.3",
     "get-port": "^6.1.2",
     "ts-type-expand-plugin": "^0.0.1",
     "tsc-alias": "^1.4.2",
