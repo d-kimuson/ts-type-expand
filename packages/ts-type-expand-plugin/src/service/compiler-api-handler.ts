@@ -1,56 +1,27 @@
-import type ts from "typescript"
+import type * as ts from "typescript"
 import { TypeObject } from "compiler-api-helper"
 
 import {
-  createProgram,
   forEachChild,
   getPositionOfLineAndCharacter,
   unescapeLeadingUnderscores,
 } from "typescript"
 import CompilerApiHelper from "compiler-api-helper"
 
-import type {
-  MyType,
-  MyNode,
-  BaseType,
-  PropType,
-  FunctionType,
-  Type,
-  EnumMemberType,
-  EnumType,
-} from "./types/typescript"
-import { loadTsConfig } from "~/utils/tsConfig"
-import { watchCompiler } from "~/watchCompiler"
-
 export class CompilerHandler {
-  private program: ts.Program
   private checker: ts.TypeChecker
   private helper: CompilerApiHelper
-  private watchConf?: ts.WatchOfConfigFile<ts.SemanticDiagnosticsBuilderProgram>
 
-  constructor(private tsConfigPath: string) {
-    // following properties are not initialized by constructor
-    // but they are not possible to be undefined after startWatch()
-    this.program = undefined as unknown as ts.Program
-    this.checker = undefined as unknown as ts.TypeChecker
-    this.helper = undefined as unknown as CompilerApiHelper
+  constructor(private program: ts.Program) {
+    this.checker = this.program.getTypeChecker()
+    this.helper = new CompilerApiHelper(this.program)
   }
 
-  public startWatch(): void {
-    this.watchConf = watchCompiler(
-      this.tsConfigPath, // eslint-disable-next-line @typescript-eslint/no-empty-function
-      () => {},
-      () => {
-        this.updateProgramByWatch()
-      }
-    )
-
-    // Initialize Program & Checker
-    this.updateProgramByWatch()
-  }
-
-  public closeWatch(): void {
-    this.watchConf?.close()
+  public updateProgram(program: ts.Program): void {
+    this.program = program
+    this.checker = this.program.getTypeChecker()
+    this.helper = new CompilerApiHelper(this.program)
+    console.log("program & checker config is updated!")
   }
 
   private checkProgram() {
@@ -60,31 +31,6 @@ export class CompilerHandler {
         "Program should not be undefined (you must run startWatch before using or initializeWithoutWatch)"
       )
     }
-  }
-
-  private updateProgramByWatch() {
-    const maybeProgram = this.watchConf?.getProgram().getProgram()
-    if (!maybeProgram) {
-      console.warn("program is not found")
-      return
-    }
-
-    this.program = maybeProgram
-    this.checker = this.program.getTypeChecker()
-    if (typeof this.helper === "undefined") {
-      this.helper = new CompilerApiHelper(this.program)
-    } else {
-      this.helper.updateProgram(this.program)
-    }
-    console.log("program & checker config is updated!")
-  }
-
-  // Initialize Program For Cli Usage
-  public initializeWithoutWatch(basePath: string): void {
-    const tsConfig = loadTsConfig(this.tsConfigPath, basePath)
-    this.program = createProgram(tsConfig.fileNames, tsConfig.options)
-    this.checker = this.program.getTypeChecker()
-    this.helper = new CompilerApiHelper(this.program)
   }
 
   public getTypeFromLineAndCharacter(

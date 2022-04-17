@@ -5,17 +5,23 @@
     "outDir": "out",
     "lib": ["es6"],
     "sourceMap": true,
-    "rootDir": "src",
-    "baseUrl": "src",
+    "rootDir": ".",
+    "baseUrl": ".",
     "paths": {
-      "~/*": ["*"]
+      "~/*": ["src/*"]
     },
     "strict": true,
     "moduleResolution": "node",
     "noEmit": false,
     "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true
   },
-  "exclude": ["node_modules", ".vscode-test", "example"]
+  "include": ["src", "bin"],
+  "exclude": ["node_modules", ".vscode-test", "example", "src/test"]
 }

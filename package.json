@@ -11,6 +11,10 @@
   "workspaces": [
     "packages/*"
   ],
+  "nohoist": [
+    "**/ts-type-expand",
+    "**/ts-type-expand/**"
+  ],
   "scripts": {
     "lint-staged": "lint-staged --allow-empty -r",
     "prepare": "husky install",

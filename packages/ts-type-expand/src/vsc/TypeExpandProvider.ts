@@ -1,71 +1,12 @@
 import vscode from "vscode"
-import fs from "fs"
-
-import { CompilerHandler } from "~/compilerHandler"
-import { getTsconfigPath, getActiveWorkspace } from "~/utils/vscode"
 import { TypeObject } from "compiler-api-helper"
+import { ApiClient } from "~/api-client"
 
 export type TypeExpandProviderOptions = {
   compactOptionalType: boolean
   compactPropertyLength: number
   directExpandArray: boolean
-}
-
-class CompilerHandlerStore {
-  // put undefined to prevent re-initialization once it has failed.
-  static compilerHandlerMap: Record<number, CompilerHandler | undefined> = {}
-
-  static fetchHandler(): CompilerHandler | undefined {
-    const workspcae = getActiveWorkspace()
-
-    if (!workspcae) {
-      return undefined
-    }
-
-    if (workspcae.index in CompilerHandlerStore.compilerHandlerMap) {
-      return CompilerHandlerStore.compilerHandlerMap[workspcae.index]
-    }
-
-    const handler = CompilerHandlerStore.createHandler()
-    CompilerHandlerStore.compilerHandlerMap[workspcae.index] = handler
-    return handler
-  }
-
-  static createHandler(): CompilerHandler | undefined {
-    const tsconfigPath = getTsconfigPath()
-    if (!fs.existsSync(tsconfigPath)) {
-      vscode.window.showErrorMessage(
-        "tsconfig.json doesn't exist.\n" +
-          "Please make sure that tsconfig.json is placed under the workspace or ts-type-expand.tsconfigPath is set correctly."
-      )
-      return undefined
-    }
-
-    const handler = new CompilerHandler(tsconfigPath)
-    handler.startWatch()
-    return handler
-  }
-
-  static deleteHandler() {
-    const workspcae = getActiveWorkspace()
-    if (!workspcae) {
-      return
-    }
-    this.fetchHandler()?.closeWatch()
-    delete this.compilerHandlerMap[workspcae.index]
-  }
-
-  static deleteAll() {
-    Object.keys(this.compilerHandlerMap).forEach((key) => {
-      this.fetchHandler()?.closeWatch()
-      // @ts-expect-error
-      delete this.compilerHandlerMap[key]
-    })
-  }
-
-  static isActive() {
-    return CompilerHandlerStore.fetchHandler() !== undefined
-  }
+  port: number
 }
 
 export class TypeExpandProvider
@@ -77,8 +18,10 @@ export class TypeExpandProvider
     type: TypeObject
   }
   private activeFilePath: string | undefined
+  private apiClient: ApiClient
 
   constructor(options: TypeExpandProviderOptions) {
+    this.apiClient = new ApiClient(options.port)
     this.updateOptions(options)
   }
 
@@ -87,12 +30,12 @@ export class TypeExpandProvider
   }
 
   public restart(): void {
-    CompilerHandlerStore.deleteHandler()
     this.refresh()
   }
 
   public isActive(): boolean {
-    return CompilerHandlerStore.isActive()
+    // FIXME
+    return true
   }
 
   getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
@@ -118,13 +61,7 @@ export class TypeExpandProvider
         ])
   }
 
-  updateSelection(selection: vscode.Selection): void {
-    const compilerHandler = CompilerHandlerStore.fetchHandler()
-
-    if (typeof compilerHandler === "undefined") {
-      return
-    }
-
+  async updateSelection(selection: vscode.Selection): Promise<void> {
     if (!this.activeFilePath) {
       vscode.window.showWarningMessage(
         "The file you are editing cannot be found."
@@ -140,17 +77,17 @@ export class TypeExpandProvider
     this.selection = selection
 
     try {
-      const result = compilerHandler.getTypeFromLineAndCharacter(
+      const result = await this.apiClient.getTypeFromLineAndCharacter(
         this.activeFilePath,
-        this.selection?.start.line,
-        this.selection?.start.character
+        this.selection.start.line,
+        this.selection.start.character
       )
       if (!result) {
         return
       }
       this.selectedType = {
-        declareName: result[0],
-        type: result[1],
+        declareName: result.declareName,
+        type: result.type,
       }
 
       if (this.selectedType) {
@@ -184,9 +121,7 @@ export class TypeExpandProvider
     this._onDidChangeTreeData.fire()
   }
 
-  close(): void {
-    CompilerHandlerStore.deleteAll()
-  }
+  close(): void {}
 }
 
 type Kind = "Union" | "Properties" | "Function" | "Array" | "Enum" | undefined

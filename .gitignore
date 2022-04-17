@@ -7,3 +7,4 @@ node_modules
 src/run.ts
 
 .history
+yarn-error.log

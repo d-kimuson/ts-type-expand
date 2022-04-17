@@ -1,4 +1,5 @@
 import vscode from "vscode"
+import getPorts from "get-port"
 
 import {
   getCurrentFilePath,
@@ -9,7 +10,25 @@ import { TypeExpandProvider } from "~/vsc/TypeExpandProvider"
 
 let typeExpandProvider: TypeExpandProvider
 
-export function activate(context: vscode.ExtensionContext): void {
+type TypescriptLanguageFeatures = {
+  getAPI(n: number): {
+    configurePlugin: <PluginName extends keyof PluginOptions>(
+      pluginName: PluginName,
+      options: PluginOptions[PluginName]
+    ) => void
+  }
+}
+
+type PluginOptions = {
+  "ts-type-expand-plugin": {
+    port: number
+  }
+}
+
+export async function activate(
+  context: vscode.ExtensionContext
+): Promise<void> {
+  console.log("called activate")
   const workspace = getActiveWorkspace()
   if (!workspace) {
     vscode.window.showErrorMessage("Workspace is not activated")
@@ -17,10 +36,39 @@ export function activate(context: vscode.ExtensionContext): void {
   }
 
   try {
+    const tsFeatureExtension =
+      vscode.extensions.getExtension<TypescriptLanguageFeatures>(
+        "vscode.typescript-language-features"
+      )
+
+    if (!tsFeatureExtension) {
+      vscode.window.showErrorMessage(
+        "Fail to start kimuson.ts-type-expand because vscode.typescript-language-features is not enabled."
+      )
+      return
+    }
+
+    await tsFeatureExtension.activate()
+    const api = tsFeatureExtension.exports
+
+    if (api.getAPI === undefined) {
+      console.log("getAPI undefined")
+      return
+    }
+
+    const tsApi = api.getAPI(0)
+    const port = await getPorts({
+      port: 3264,
+    })
+    tsApi.configurePlugin("ts-type-expand-plugin", {
+      port,
+    })
+
     typeExpandProvider = new TypeExpandProvider({
       compactOptionalType: getConfig<boolean>("compactOptionalType"),
       compactPropertyLength: getConfig<number>("compactPropertyLength"),
       directExpandArray: getConfig<boolean>("directExpandArray"),
+      port,
     })
     typeExpandProvider.updateActiveFile(getCurrentFilePath())
 
@@ -30,6 +78,7 @@ export function activate(context: vscode.ExtensionContext): void {
           compactOptionalType: getConfig<boolean>("compactOptionalType"),
           compactPropertyLength: getConfig<number>("compactPropertyLength"),
           directExpandArray: getConfig<boolean>("directExpandArray"),
+          port,
         })
         typeExpandProvider.updateActiveFile(getCurrentFilePath())
         typeExpandProvider.restart()
