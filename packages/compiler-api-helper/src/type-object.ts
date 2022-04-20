@@ -90,7 +90,7 @@ export type PromiseTO = {
 }
 
 /**
- * @property kind -- identifer of why converted as unsupported
+ * @property kind -- identifier of why converted as unsupported
  */
 export type UnsupportedTO = {
   __type: "UnsupportedTO"
