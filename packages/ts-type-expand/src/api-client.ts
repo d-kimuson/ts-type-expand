@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios"
 import { TypeObject } from "compiler-api-helper"
+import { encycle } from "json-cyclic"
 
 type FetchTypeFromPosReq = {
   filePath: string
@@ -27,7 +28,6 @@ export class ApiClient {
     character: number
   ): Promise<FetchTypeFromPosRes | undefined> {
     try {
-      console.log("called getTypeFromLineAndCharacter")
       const { data } = await this.axiosClient.post<
         FetchTypeFromPosReq,
         AxiosResponse<FetchTypeFromPosRes>
@@ -36,10 +36,15 @@ export class ApiClient {
         line,
         character,
       })
-      return data
+      return {
+        declareName: data.declareName,
+        type: encycle(data.type),
+      }
     } catch (err) {
-      console.log("failed response: ", err)
+      console.log("Failed response: ", err)
       return undefined
+    } finally {
+      console.log("ended getTypeFromLineAndCharacter")
     }
   }
 }

@@ -22,6 +22,6 @@
     "declarationMap": true,
     "emitDeclarationOnly": true
   },
-  "include": ["src", "bin"],
+  "include": ["src", "bin", "@types"],
   "exclude": ["node_modules", ".vscode-test", "example", "src/test"]
 }

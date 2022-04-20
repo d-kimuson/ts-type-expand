@@ -14,7 +14,9 @@
     "watch:esbuild": "IS_WATCH=true yarn build:esbuild"
   },
   "dependencies": {
-    "express": "^4.17.3"
+    "compiler-api-helper": "^0.0.3",
+    "express": "^4.17.3",
+    "json-cyclic": "^1.0.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",

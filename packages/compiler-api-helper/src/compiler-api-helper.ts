@@ -79,7 +79,6 @@ export class CompilerApiHelper {
     return ok(
       nodes
         .flatMap((node) => {
-          // export {} from 'path'
           if (ts.isExportDeclaration(node)) {
             const nodes = this.extractTypesFromExportDeclaration(node)
             if (isOk(nodes)) {
@@ -98,7 +97,7 @@ export class CompilerApiHelper {
               typeof node?.symbol?.escapedName !== "undefined"
                 ? String(node?.symbol?.escapedName)
                 : undefined,
-            type: this.convertType(this.#typeChecker.getTypeAtLocation(node)),
+            type: this._convertType(this.#typeChecker.getTypeAtLocation(node)),
           }
         })
         .filter(
@@ -187,6 +186,11 @@ export class CompilerApiHelper {
   }
 
   public convertType(type: ts.Type): to.TypeObject {
+    this.#recursiveResolveMap = {}
+    return this._convertType(type)
+  }
+
+  public _convertType(type: ts.Type): to.TypeObject {
     return switchExpression({
       type,
       typeNode: type.node,
@@ -202,7 +206,7 @@ export class CompilerApiHelper {
           type.symbol?.exports?.forEach((symbol, key) => {
             const valueDeclare = symbol.valueDeclaration
             if (valueDeclare) {
-              const valType = this.convertType(
+              const valType = this._convertType(
                 this.#typeChecker.getTypeAtLocation(valueDeclare)
               )
 
@@ -228,7 +232,7 @@ export class CompilerApiHelper {
           __type: "UnionTO",
           typeName: typeText,
           unions: (type?.types ?? []).map((type) =>
-            this.convertType(type)
+            this._convertType(type)
           ) as ArrayAtLeastN<to.TypeObject, 2>,
         })
       )
@@ -247,7 +251,7 @@ export class CompilerApiHelper {
           __type: "TupleTO",
           typeName: typeText,
           items: typeNode.elements.map((typeNode) =>
-            this.convertType(this.#typeChecker.getTypeFromTypeNode(typeNode))
+            this._convertType(this.#typeChecker.getTypeFromTypeNode(typeNode))
           ),
         })
       )
@@ -326,7 +330,7 @@ export class CompilerApiHelper {
       .case<to.CallableTO, { type: TypeHasCallSignature }>(
         ({ type }) => this.#isCallable(type),
         ({ type }) =>
-          this.convertTypeFromCallableSignature(type.getCallSignatures()[0])
+          this._convertTypeFromCallableSignature(type.getCallSignatures()[0])
       )
       .case<to.PromiseTO>(
         ({ type }) =>
@@ -363,7 +367,7 @@ export class CompilerApiHelper {
       })
   }
 
-  convertTypeFromCallableSignature(signature: ts.Signature): to.CallableTO {
+  _convertTypeFromCallableSignature(signature: ts.Signature): to.CallableTO {
     return {
       __type: "CallableTO",
       argTypes: signature
@@ -374,7 +378,7 @@ export class CompilerApiHelper {
           return typeof declare !== "undefined"
             ? {
                 name: argSymbol.getName(),
-                type: this.convertType(
+                type: this._convertType(
                   this.#typeChecker.getTypeOfSymbolAtLocation(
                     argSymbol,
                     declare
@@ -384,7 +388,7 @@ export class CompilerApiHelper {
             : undefined
         })
         .filter((arg): arg is to.CallableArgument => arg !== undefined),
-      returnType: this.convertType(
+      returnType: this._convertType(
         this.#typeChecker.getReturnTypeOfSignature(signature)
       ),
     }
@@ -444,10 +448,10 @@ export class CompilerApiHelper {
                 }
               : type
               ? this.#isCallable(type)
-                ? this.convertTypeFromCallableSignature(
+                ? this._convertTypeFromCallableSignature(
                     type.getCallSignatures()[0]
                   )
-                : this.convertType(type)
+                : this._convertType(type)
               : {
                   __type: "UnsupportedTO",
                   kind: "prop",
@@ -460,7 +464,7 @@ export class CompilerApiHelper {
   }
 
   #extractArrayTFromTypeNode(typeNode: ts.ArrayTypeNode): to.TypeObject {
-    return this.convertType(
+    return this._convertType(
       this.#typeChecker.getTypeAtLocation(typeNode.elementType)
     )
   }
@@ -476,7 +480,7 @@ export class CompilerApiHelper {
       type.symbol?.getEscapedName() === "Array" &&
       typeof maybeArrayT !== "undefined"
     ) {
-      return ok(this.convertType(maybeArrayT))
+      return ok(this._convertType(maybeArrayT))
     }
 
     const maybeNode = type?.node
@@ -539,7 +543,7 @@ export class CompilerApiHelper {
     node: ts.TypeReferenceNode
   ): to.TypeObject[] {
     return Array.from(node.typeArguments ?? []).map((arg) =>
-      this.convertType(this.#typeChecker.getTypeFromTypeNode(arg))
+      this._convertType(this.#typeChecker.getTypeFromTypeNode(arg))
     )
   }
 

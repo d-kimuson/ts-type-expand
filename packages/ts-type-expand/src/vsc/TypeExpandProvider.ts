@@ -139,7 +139,7 @@ function getKindText(type: TypeObject): Kind {
   if (type.__type === "ArrayTO") {
     return "Array"
   }
-  if (type.__type === "ObjectTO") {
+  if (type.__type === "ObjectTO" || type.__type === "ObjectRefTO") {
     return "Properties"
   }
   return undefined
@@ -152,6 +152,7 @@ function isExpandable(type: TypeObject): boolean {
     type.__type === "UnionTO" ||
     type.__type === "EnumTO" ||
     type.__type === "ObjectTO" ||
+    type.__type === "ObjectRefTO" ||
     type.__type === "ArrayTO" ||
     type.__type === "CallableTO" ||
     type.__type === "PromiseTO"
@@ -172,6 +173,7 @@ function toTypeText(type: TypeObject): string {
     type.__type === "ArrayTO" ||
     type.__type === "TupleTO" ||
     type.__type === "ObjectTO" ||
+    type.__type === "ObjectRefTO" ||
     type.__type === "EnumTO"
   ) {
     return type.typeName
@@ -279,13 +281,20 @@ class ExpandableTypeItem extends vscode.TreeItem {
     }
 
     if (this.type.__type === "UnionTO") {
-      return this.type.unions.map(
+      return (this.type.unions as TypeObject[]).map(
         (type) => new ExpandableTypeItem(type, { parent: type })
       )
     }
 
-    if (this.type.__type === "ObjectTO") {
-      return this.type.getProps().map(
+    const maybeObjectTO =
+      this.type.__type === "ObjectTO"
+        ? this.type
+        : this.type.__type === "ObjectRefTO"
+        ? this.type.typeRef
+        : undefined
+
+    if (maybeObjectTO !== undefined) {
+      return maybeObjectTO.props.map(
         ({ propName, type }) =>
           new ExpandableTypeItem(type, {
             aliasName: propName,

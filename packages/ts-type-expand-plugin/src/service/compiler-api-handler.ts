@@ -20,7 +20,7 @@ export class CompilerHandler {
   public updateProgram(program: ts.Program): void {
     this.program = program
     this.checker = this.program.getTypeChecker()
-    this.helper = new CompilerApiHelper(this.program)
+    this.helper.updateProgram(this.program)
     console.log("program & checker config is updated!")
   }
 

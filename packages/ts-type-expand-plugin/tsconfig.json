@@ -20,6 +20,6 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": false
   },
-  "include": ["src"],
+  "include": ["src", "@types"],
   "exclude": ["node_modules"]
 }

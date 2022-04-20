@@ -31,7 +31,9 @@
     "deploy": "./bin/deploy.sh",
     "postinstall": "yarn patch",
     "refresh:remove": "rm -rf packages/ts-type-expand/out && rm -rf packages/ts-type-expand-plugin/dist/** && rm -rf packages/compiler-api-helper/dist/**",
-    "patch": "patch-package"
+    "patch": "run-s patch:*",
+    "patch:root": "patch-package",
+    "patch:compiler-api-helper": "yarn --cwd './packages/compiler-api-helper' patch"
   },
   "devDependencies": {
     "commitizen": "^4.2.4",

@@ -1,8 +1,9 @@
-import express, { Express } from "express"
+import { Express } from "express"
 import { CompilerHandler } from "../service/compiler-api-handler"
 import { TypeObject } from "compiler-api-helper"
 import type * as ts from "typescript"
 import type * as tsServer from "typescript/lib/tsserverlibrary"
+import { decycle } from "json-cyclic"
 
 type FetchTypeFromPosReq = {
   filePath: string
@@ -16,19 +17,28 @@ type FetchTypeFromPosRes = {
 }
 
 export const registerApp = (() => {
+  let info: tsServer.server.PluginCreateInfo
   let compilerHandler: CompilerHandler | undefined
 
   return async (
     app: Express,
-    info: tsServer.server.PluginCreateInfo
+    _info: tsServer.server.PluginCreateInfo
   ): Promise<void> => {
+    info = _info
+
     app.use((_req, _res, next) => {
-      if (compilerHandler === undefined) {
-        const program = info.languageService.getProgram()
-        if (program) {
-          compilerHandler = new CompilerHandler(program as ts.Program)
-        }
+      const program = info.languageService.getProgram() as ts.Program
+      if (program === undefined) {
+        _res.send(500).send({ message: "Program not found." })
+        return
       }
+
+      if (compilerHandler === undefined) {
+        compilerHandler = new CompilerHandler(program)
+      } else {
+        compilerHandler.updateProgram(program)
+      }
+
       next()
     })
 
@@ -54,12 +64,16 @@ export const registerApp = (() => {
 
         res.send({
           declareName,
-          // TODO: typeObject がオブジェクトとかだとうまくパースできないので要対応
-          type: typeObject,
+          type: decycle(typeObject),
         })
       } catch (err) {
-        console.log("error occured", err)
-        res.status(500).send({ message: `error: ${(err as Error).toString()}` })
+        if (err instanceof Error) {
+          res.status(500).send({
+            message: `error: ${err.toString()}`,
+          })
+        }
+
+        res.status(500).send({ message: "Unexpected Error" })
       }
     })
   }
