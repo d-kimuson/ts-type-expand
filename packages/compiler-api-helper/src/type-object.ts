@@ -1,4 +1,4 @@
-import type * as ts from "typescript"
+import { ArrayAtLeastN } from "./util"
 
 export type TypeObject =
   | PrimitiveTO
@@ -6,12 +6,13 @@ export type TypeObject =
   | SpecialTO
   | ArrayTO
   | TupleTO
-  | ObjectTO
   | UnionTO
   | EnumTO
   | CallableTO
   | PromiseTO
   | UnsupportedTO
+  | ObjectTO
+  | ObjectRefTO
 
 type WithTypeName = {
   typeName: string
@@ -44,16 +45,20 @@ export type TupleTO = WithTypeName & {
 
 export type ObjectTO = WithTypeName & {
   __type: "ObjectTO"
-  tsType: ts.Type // to resolve recursive type sequentially
-  getProps: () => {
+  props: {
     propName: string
     type: TypeObject
   }[]
 }
 
+export type ObjectRefTO = WithTypeName & {
+  __type: "ObjectRefTO"
+  typeRef: ObjectTO
+}
+
 export type UnionTO = WithTypeName & {
   __type: "UnionTO"
-  unions: [TypeObject, TypeObject, ...TypeObject[]]
+  unions: ArrayAtLeastN<TypeObject, 2>
 }
 
 export type EnumTO = WithTypeName & {

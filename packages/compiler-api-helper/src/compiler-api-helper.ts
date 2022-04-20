@@ -1,7 +1,7 @@
 import * as ts from "typescript"
 import { forEachChild, unescapeLeadingUnderscores } from "typescript"
 import type * as to from "./type-object"
-import type { Result } from "./util"
+import { ArrayAtLeastN, Result } from "./util"
 import { primitive, special } from "./type-object"
 import { ok, ng, switchExpression, isOk, isNg } from "./util"
 
@@ -13,15 +13,18 @@ interface TypeHasCallSignature extends ts.Type {
 export class CompilerApiHelper {
   #program: ts.Program
   #typeChecker: ts.TypeChecker
+  #recursiveResolveMap: { [K: string]: to.ObjectTO }
 
   constructor(program: ts.Program) {
     this.#program = program
     this.#typeChecker = this.#program.getTypeChecker()
+    this.#recursiveResolveMap = {}
   }
 
   public updateProgram(program: ts.Program): void {
     this.#program = program
     this.#typeChecker = this.#program.getTypeChecker()
+    this.#recursiveResolveMap = {}
   }
 
   public extractTypes(
@@ -197,7 +200,6 @@ export class CompilerApiHelper {
         ({ type, typeText }) => {
           const enums: to.EnumTO["enums"] = []
           type.symbol?.exports?.forEach((symbol, key) => {
-            // console.log(key, symbol)
             const valueDeclare = symbol.valueDeclaration
             if (valueDeclare) {
               const valType = this.convertType(
@@ -225,11 +227,9 @@ export class CompilerApiHelper {
         ({ typeText }) => ({
           __type: "UnionTO",
           typeName: typeText,
-          unions: (type?.types ?? []).map((type) => this.convertType(type)) as [
-            to.TypeObject,
-            to.TypeObject,
-            ...to.TypeObject[]
-          ],
+          unions: (type?.types ?? []).map((type) =>
+            this.convertType(type)
+          ) as ArrayAtLeastN<to.TypeObject, 2>,
         })
       )
       .case<to.UnsupportedTO>(
@@ -348,9 +348,11 @@ export class CompilerApiHelper {
           }
         }
       )
-      .case<to.ObjectTO>(
+      .case<to.ObjectTO | to.ObjectRefTO>(
         ({ type }) => this.#typeChecker.getPropertiesOfType(type).length !== 0,
-        ({ type }) => this.#createObjectType(type)
+        ({ type }) => {
+          return this.#createObjectType(type)
+        }
       )
       .default<to.UnsupportedTO>(({ typeText }) => {
         return {
@@ -397,50 +399,64 @@ export class CompilerApiHelper {
     return nodes
   }
 
-  #createObjectType(tsType: ts.Type): to.ObjectTO {
-    return {
-      __type: "ObjectTO",
-      tsType,
-      typeName: this.#typeToString(tsType),
-      getProps: () =>
-        this.#typeChecker.getPropertiesOfType(tsType).map(
-          (
-            symbol
-          ): {
-            propName: string
-            type: to.TypeObject
-          } => {
-            const typeNode = symbol.valueDeclaration?.type
-            const declare = (symbol.declarations ?? [])[0]
-            const type = declare
-              ? this.#typeChecker.getTypeOfSymbolAtLocation(symbol, declare)
-              : undefined
+  #createObjectType(tsType: ts.Type): to.ObjectTO | to.ObjectRefTO {
+    const typeName = this.#typeToString(tsType)
+    const typeRef = this.#recursiveResolveMap[typeName]
 
-            return {
-              propName: String(symbol.escapedName),
-              type:
-                typeNode && ts.isArrayTypeNode(typeNode)
-                  ? {
-                      __type: "ArrayTO",
-                      typeName: this.#typeToString(
-                        this.#typeChecker.getTypeFromTypeNode(typeNode)
-                      ),
-                      child: this.#extractArrayTFromTypeNode(typeNode),
-                    }
-                  : type
-                  ? this.#isCallable(type)
-                    ? this.convertTypeFromCallableSignature(
-                        type.getCallSignatures()[0]
-                      )
-                    : this.convertType(type)
-                  : {
-                      __type: "UnsupportedTO",
-                      kind: "prop",
-                    },
-            }
-          }
-        ),
+    if (typeRef !== undefined) {
+      return {
+        __type: "ObjectRefTO",
+        typeName,
+        typeRef,
+      }
     }
+
+    const resolvedObjectTo: to.ObjectTO = {
+      __type: "ObjectTO",
+      typeName,
+      props: [],
+    }
+
+    this.#recursiveResolveMap[typeName] = resolvedObjectTo
+    resolvedObjectTo.props = this.#typeChecker.getPropertiesOfType(tsType).map(
+      (
+        symbol
+      ): {
+        propName: string
+        type: to.TypeObject
+      } => {
+        const typeNode = symbol.valueDeclaration?.type
+        const declare = (symbol.declarations ?? [])[0]
+        const type = declare
+          ? this.#typeChecker.getTypeOfSymbolAtLocation(symbol, declare)
+          : undefined
+
+        return {
+          propName: String(symbol.escapedName),
+          type:
+            typeNode && ts.isArrayTypeNode(typeNode)
+              ? {
+                  __type: "ArrayTO",
+                  typeName: this.#typeToString(
+                    this.#typeChecker.getTypeFromTypeNode(typeNode)
+                  ),
+                  child: this.#extractArrayTFromTypeNode(typeNode),
+                }
+              : type
+              ? this.#isCallable(type)
+                ? this.convertTypeFromCallableSignature(
+                    type.getCallSignatures()[0]
+                  )
+                : this.convertType(type)
+              : {
+                  __type: "UnsupportedTO",
+                  kind: "prop",
+                },
+        }
+      }
+    )
+
+    return resolvedObjectTo
   }
 
   #extractArrayTFromTypeNode(typeNode: ts.ArrayTypeNode): to.TypeObject {
@@ -535,14 +551,15 @@ export class CompilerApiHelper {
       )
     }
 
-    const deps: to.TypeObject[] =
+    const deps = (
       type.__type === "ObjectTO"
-        ? type.getProps().map((prop) => prop.type)
+        ? type.props.map((prop) => prop.type)
         : type.__type === "ArrayTO"
         ? [type.child]
         : type.__type === "UnionTO"
         ? type.unions
         : []
+    ) as to.TypeObject[]
 
     return deps.reduce(
       (s: boolean, t: to.TypeObject) =>
