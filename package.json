@@ -8,18 +8,29 @@
     "url": "https://github.com/d-kimuson/ts-type-expand"
   },
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "nohoist": [
-    "**/ts-type-expand",
-    "**/ts-type-expand/**"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/compiler-api-helper",
+      "**/compiler-api-helper/**",
+      "**/ts-type-expand-plugin",
+      "**/ts-type-expand-plugin/**",
+      "**/ts-type-expand",
+      "**/ts-type-expand/**"
+    ]
+  },
   "scripts": {
+    "dev": "run-p dev:*",
+    "dev:ts-type-expand": "yarn --cwd './packages/ts-type-expand' watch",
+    "dev:ts-type-expand-plugin": "yarn --cwd './packages/ts-type-expand-plugin' watch",
+    "dev:compiler-api-helper": "yarn --cwd './packages/compiler-api-helper' dev",
     "lint-staged": "lint-staged --allow-empty -r",
     "prepare": "husky install",
     "deploy": "./bin/deploy.sh",
     "postinstall": "yarn patch",
+    "refresh:remove": "rm -rf packages/ts-type-expand/out && rm -rf packages/ts-type-expand-plugin/dist/** && rm -rf packages/compiler-api-helper/dist/**",
     "patch": "patch-package"
   },
   "devDependencies": {
