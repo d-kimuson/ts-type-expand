@@ -18,7 +18,9 @@
       "**/ts-type-expand-plugin",
       "**/ts-type-expand-plugin/**",
       "**/ts-type-expand",
-      "**/ts-type-expand/**"
+      "**/ts-type-expand/**",
+      "**/ts-type-expand-beta",
+      "**/ts-type-expand-beta/**"
     ]
   },
   "scripts": {
@@ -26,6 +28,10 @@
     "dev:ts-type-expand": "yarn --cwd './packages/ts-type-expand' watch",
     "dev:ts-type-expand-plugin": "yarn --cwd './packages/ts-type-expand-plugin' watch",
     "dev:compiler-api-helper": "yarn --cwd './packages/compiler-api-helper' dev",
+    "build": "run-s build:*",
+    "build:compiler-api-helper": "yarn --cwd './packages/compiler-api-helper' build",
+    "build:ts-type-expand-plugin": "yarn --cwd './packages/ts-type-expand-plugin' build",
+    "build:ts-type-expand": "yarn --cwd './packages/ts-type-expand' build",
     "lint-staged": "lint-staged --allow-empty -r",
     "prepare": "husky install",
     "deploy": "./bin/deploy.sh",
