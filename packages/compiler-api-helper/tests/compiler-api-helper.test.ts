@@ -2,6 +2,7 @@ import { resolve } from "path"
 import { CompilerApiHelper } from "~/compiler-api-helper"
 import { createProgram } from "./helpers/program"
 import { isOk } from "~/util"
+import { TypeObject } from "dist/src"
 
 const absolutePath = (path: string) =>
   resolve(__dirname, "./test-project", path)
@@ -553,5 +554,32 @@ describe("convertType", () => {
     ])
 
     expect(type1).not.toBeDefined()
+  })
+
+  it("variable", () => {
+    const typesResult = helper.extractTypes(absolutePath("./types/variable.ts"))
+    if (!isOk(typesResult))
+      throw new TypeError(`TypeResult is ng, reason: ${typesResult.ng.reason}`)
+
+    const [var0] = typesResult.ok
+    if (var0 === undefined)
+      throw new TypeError(`var0 is unexpectedly undefined`)
+
+    expect<{ typeName: string | undefined; type: TypeObject }>(
+      var0
+    ).toStrictEqual({
+      typeName: "asyncFunc",
+      type: {
+        __type: "CallableTO",
+        argTypes: [],
+        returnType: {
+          __type: "PromiseTO",
+          child: {
+            __type: "SpecialTO",
+            kind: "void",
+          },
+        },
+      },
+    })
   })
 })

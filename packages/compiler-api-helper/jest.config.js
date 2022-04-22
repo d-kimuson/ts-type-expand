@@ -31,6 +31,7 @@ module.exports = {
     },
   },
   transform: {
+    // "^.+\\.(t|j)s$": "ts-jest",  // for debug
     "^.+\\.(t|j)s$": "esbuild-jest",
   },
   moduleNameMapper: pathsToModuleNameMapper(options.paths, {

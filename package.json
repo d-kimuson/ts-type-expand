@@ -36,6 +36,7 @@
     "patch:compiler-api-helper": "yarn --cwd './packages/compiler-api-helper' patch"
   },
   "devDependencies": {
+    "@typescript-eslint/parser": "^5.20.0",
     "commitizen": "^4.2.4",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.8",

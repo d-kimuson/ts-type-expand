@@ -60,7 +60,11 @@ export class CompilerApiHelper {
           | ts.TypeAliasDeclaration
           | ts.InterfaceDeclaration
           | ts.EnumDeclaration
+          | ts.VariableDeclaration
+          | ts.VariableStatement
           | ts.ExportDeclaration =>
+          ts.isVariableStatement(node) ||
+          ts.isVariableDeclaration(node) ||
           ts.isExportDeclaration(node) ||
           ts.isEnumDeclaration(node) ||
           ((ts.isInterfaceDeclaration(node) ||
@@ -79,6 +83,7 @@ export class CompilerApiHelper {
     return ok(
       nodes
         .flatMap((node) => {
+          // export declaration
           if (ts.isExportDeclaration(node)) {
             const nodes = this.extractTypesFromExportDeclaration(node)
             if (isOk(nodes)) {
@@ -91,7 +96,24 @@ export class CompilerApiHelper {
             }
           }
 
-          // export declaration
+          // variable declaration
+          if (ts.isVariableStatement(node)) {
+            const declare = node.declarationList.declarations[0]
+            if (declare === undefined) {
+              throw new TypeError(
+                "In variable statement, declarations must have at least 1 item."
+              )
+            }
+
+            return {
+              typeName: declare.name.escapedText,
+              type: this._convertType(
+                this.#typeChecker.getTypeAtLocation(declare)
+              ),
+            }
+          }
+
+          // type declaration
           return {
             typeName:
               typeof node?.symbol?.escapedName !== "undefined"
@@ -516,6 +538,16 @@ export class CompilerApiHelper {
     [to.TypeObject, ...to.TypeObject[]],
     { reason: "node_not_found" | "not_type_ref_node" | "no_type_argument" }
   > {
+    const resolvedTypeArguments = type.resolvedTypeArguments
+    if (resolvedTypeArguments !== undefined) {
+      const typeArgs = resolvedTypeArguments.map((tsType) =>
+        this._convertType(tsType)
+      )
+      if (typeArgs.length >= 1) {
+        return ok(typeArgs as ArrayAtLeastN<to.TypeObject, 1>)
+      }
+    }
+
     const maybeTypeRefNode = (type.aliasSymbol?.declarations ?? [])[0]?.type
 
     if (!maybeTypeRefNode) {
