@@ -42,6 +42,12 @@ export const registerApp = (() => {
       next()
     })
 
+    app.get<{}, { isActivated: boolean }, {}>("/is_activated", (req, res) => {
+      res.send({
+        isActivated: true,
+      })
+    })
+
     app.post<
       {},
       FetchTypeFromPosRes | { message: string },

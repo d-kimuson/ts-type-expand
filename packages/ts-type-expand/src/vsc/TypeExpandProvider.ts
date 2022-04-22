@@ -29,13 +29,28 @@ export class TypeExpandProvider
     ExpandableTypeItem.updateOptions(options)
   }
 
-  public restart(): void {
-    this.refresh()
+  async waitUntilServerActivated(): Promise<void> {
+    return await new Promise<void>((resolve, reject) => {
+      const timer = setInterval(() => {
+        this.apiClient
+          .isActivated()
+          .then(({ isActivated }) => {
+            if (isActivated) {
+              clearInterval(timer)
+              resolve()
+            } else {
+              throw new Error("Unexpected Server Error activation")
+            }
+          })
+          .catch((err) => {
+            console.error(err)
+          })
+      }, 500)
+    })
   }
 
-  public isActive(): boolean {
-    // FIXME
-    return true
+  public restart(): void {
+    this.refresh()
   }
 
   getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
@@ -43,11 +58,6 @@ export class TypeExpandProvider
   }
 
   getChildren(element?: ExpandableTypeItem): Thenable<ExpandableTypeItem[]> {
-    if (!this.isActive) {
-      vscode.window.showInformationMessage("Empty workspace")
-      return Promise.resolve([])
-    }
-
     if (!this.selectedType) {
       return Promise.resolve([])
     }

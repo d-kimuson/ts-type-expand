@@ -27,11 +27,6 @@
       "title": "Ts Type Expand",
       "type": "object",
       "properties": {
-        "ts-type-expand.tsconfigPath": {
-          "type": "string",
-          "default": "tsconfig.json",
-          "description": "Path to tsconfig.json"
-        },
         "ts-type-expand.compactOptionalType": {
           "type": "boolean",
           "default": true,
@@ -46,6 +41,11 @@
           "type": "boolean",
           "default": true,
           "description": "Directly expand T for Array[T]"
+        },
+        "ts-type-expand.port": {
+          "type": "number",
+          "default": 3264,
+          "description": "Port used for communication with TS server."
         }
       }
     },

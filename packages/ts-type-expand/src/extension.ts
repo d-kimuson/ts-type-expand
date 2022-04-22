@@ -1,14 +1,11 @@
 import vscode from "vscode"
 import getPorts from "get-port"
 
+import { getCurrentFilePath, getConfig } from "~/utils/vscode"
 import {
-  getCurrentFilePath,
-  getActiveWorkspace,
-  getConfig,
-} from "~/utils/vscode"
-import { TypeExpandProvider } from "~/vsc/TypeExpandProvider"
-
-let typeExpandProvider: TypeExpandProvider
+  TypeExpandProvider,
+  TypeExpandProviderOptions,
+} from "~/vsc/TypeExpandProvider"
 
 type TypescriptLanguageFeatures = {
   getAPI(n: number): {
@@ -25,99 +22,133 @@ type PluginOptions = {
   }
 }
 
-export async function activate(
-  context: vscode.ExtensionContext
-): Promise<void> {
-  console.log("called activate")
-  const workspace = getActiveWorkspace()
-  if (!workspace) {
-    vscode.window.showErrorMessage("Workspace is not activated")
-    return
-  }
+const extensionClosure = () => {
+  let isActivatedTsServer = false
+  let prevPortNum = NaN
+  let typeExpandProvider: TypeExpandProvider
+  let tsApi: ReturnType<TypescriptLanguageFeatures["getAPI"]>
 
-  try {
-    const tsFeatureExtension =
-      vscode.extensions.getExtension<TypescriptLanguageFeatures>(
-        "vscode.typescript-language-features"
-      )
-
-    if (!tsFeatureExtension) {
-      vscode.window.showErrorMessage(
-        "Fail to start kimuson.ts-type-expand because vscode.typescript-language-features is not enabled."
-      )
-      return
+  // private
+  const getAndUpdatePort = async (): Promise<number> => {
+    const portNum = getConfig<number>("port")
+    if (!Number.isNaN(prevPortNum) && prevPortNum === portNum) {
+      return portNum
     }
 
-    await tsFeatureExtension.activate()
-    const api = tsFeatureExtension.exports
-
-    if (api.getAPI === undefined) {
-      console.log("getAPI undefined")
-      return
-    }
-
-    const tsApi = api.getAPI(0)
     const port = await getPorts({
-      port: 3264,
+      port: prevPortNum,
     })
     tsApi.configurePlugin("ts-type-expand-plugin", {
       port,
     })
+    prevPortNum = port
+    return port
+  }
 
-    typeExpandProvider = new TypeExpandProvider({
+  const getExtensionConfig = async (): Promise<TypeExpandProviderOptions> => {
+    return {
       compactOptionalType: getConfig<boolean>("compactOptionalType"),
       compactPropertyLength: getConfig<number>("compactPropertyLength"),
       directExpandArray: getConfig<boolean>("directExpandArray"),
-      port,
-    })
-    typeExpandProvider.updateActiveFile(getCurrentFilePath())
-
-    const disposes = [
-      vscode.commands.registerCommand("ts-type-expand.restart", () => {
-        typeExpandProvider.updateOptions({
-          compactOptionalType: getConfig<boolean>("compactOptionalType"),
-          compactPropertyLength: getConfig<number>("compactPropertyLength"),
-          directExpandArray: getConfig<boolean>("directExpandArray"),
-          port,
-        })
-        typeExpandProvider.updateActiveFile(getCurrentFilePath())
-        typeExpandProvider.restart()
-
-        if (typeExpandProvider.isActive()) {
-          vscode.window.showInformationMessage(
-            "ts-type-expand is successfully activated!"
-          )
-        }
-      }),
-      vscode.window.registerTreeDataProvider("typeExpand", typeExpandProvider),
-      vscode.window.createTreeView("typeExpand", {
-        treeDataProvider: typeExpandProvider,
-      }),
-      vscode.window.onDidChangeTextEditorSelection((e) => {
-        typeExpandProvider.updateSelection(e.textEditor.selection)
-      }),
-      vscode.window.onDidChangeActiveTextEditor(() => {
-        typeExpandProvider.updateActiveFile(getCurrentFilePath())
-      }),
-    ]
-
-    disposes.forEach((dispose) => {
-      context.subscriptions.push(dispose)
-    })
-
-    if (typeExpandProvider.isActive()) {
-      vscode.window.showInformationMessage(
-        "ts-type-expand is successfully activated!"
-      )
+      port: await getAndUpdatePort(),
     }
-  } catch (error) {
-    const typedError = error as Error
-    vscode.window.showErrorMessage(typedError.message)
   }
+
+  const updateCurrentFile = async (): Promise<void> => {
+    const currentFile = getCurrentFilePath()
+    if (currentFile === undefined) return
+
+    if (!(currentFile.endsWith(".ts") || currentFile.endsWith(".tsx"))) {
+      // ts ファイルだが tsconfig に含まれてない？ケースだとバグる気がする？
+      // js ファイルがサポートできてないのでロジック見直しが必要
+      return
+    }
+
+    if (!isActivatedTsServer) {
+      // timeout したほうが良さそうではあるな :thinking_face:
+      await typeExpandProvider.waitUntilServerActivated()
+    }
+
+    isActivatedTsServer = true
+    typeExpandProvider.updateActiveFile(currentFile)
+    vscode.window.showInformationMessage("ts-type-expand is ready to use!")
+  }
+
+  // exports
+  const activate = async (context: vscode.ExtensionContext): Promise<void> => {
+    try {
+      const tsFeatureExtension =
+        vscode.extensions.getExtension<TypescriptLanguageFeatures>(
+          "vscode.typescript-language-features"
+        )
+
+      if (!tsFeatureExtension) {
+        vscode.window.showErrorMessage(
+          "Fail to start kimuson.ts-type-expand because vscode.typescript-language-features is not enabled."
+        )
+        return
+      }
+
+      await tsFeatureExtension.activate()
+      const api = tsFeatureExtension.exports
+
+      if (api.getAPI === undefined) {
+        return
+      }
+
+      tsApi = api.getAPI(0)
+
+      typeExpandProvider = new TypeExpandProvider(await getExtensionConfig())
+
+      const disposes = [
+        vscode.commands.registerCommand("ts-type-expand.restart", async () => {
+          typeExpandProvider.updateOptions(await getExtensionConfig())
+          await updateCurrentFile()
+          typeExpandProvider.restart()
+
+          vscode.window.showInformationMessage(
+            "ts-type-expand is successfully restarted!"
+          )
+        }),
+        vscode.window.registerTreeDataProvider(
+          "typeExpand",
+          typeExpandProvider
+        ),
+        vscode.window.createTreeView("typeExpand", {
+          treeDataProvider: typeExpandProvider,
+        }),
+        vscode.window.onDidChangeTextEditorSelection((e) => {
+          if (!isActivatedTsServer) {
+            vscode.window.showWarningMessage(
+              "TS server is not ready. Please wait a few seconds."
+            )
+            return
+          }
+
+          typeExpandProvider.updateSelection(e.textEditor.selection)
+        }),
+        vscode.window.onDidChangeActiveTextEditor(async () => {
+          await updateCurrentFile()
+        }),
+      ]
+
+      disposes.forEach((dispose) => {
+        context.subscriptions.push(dispose)
+      })
+
+      await updateCurrentFile()
+    } catch (error) {
+      const typedError = error as Error
+      vscode.window.showErrorMessage(typedError.message)
+    }
+  }
+
+  const deactivate = () => {
+    typeExpandProvider.close()
+    console.log("ts-type-expand is deactivated")
+  }
+
+  return { activate, deactivate }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export function deactivate(): void {
-  typeExpandProvider.close()
-  console.log("ts-type-expand is deactivated")
-}
+export const { activate, deactivate } = extensionClosure()
