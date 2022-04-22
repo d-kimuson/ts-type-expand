@@ -43,27 +43,28 @@ export class CompilerHandler {
     const sourceFile = this.program.getSourceFile(filePath)
     if (!sourceFile) {
       if (filePath.endsWith(".ts") || filePath.endsWith(".tsx")) {
-        throw new Error(`File not found: ${filePath}`)
+        throw new Error(`SourceFile not found: ${filePath}`)
       } else {
-        return undefined
+        throw new Error(`File extension is not supported: ${filePath}`)
       }
     }
     let pos: number
     try {
       pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
     } catch (error) {
-      return undefined
+      throw error
     }
     const maybeNode = this.getNodeFromPos(sourceFile, pos)
 
     if (!maybeNode) {
-      return undefined
+      throw new Error("Node is not defined")
     }
 
     const tsType = this.checker.getTypeAtLocation(maybeNode)
     // @ts-expect-error no typedef but it exists
     if ("intrinsicName" in tsType && tsType.intrinsicName === "error") {
-      return undefined
+      throw new Error(`Unexpected intrinsicName Error, ${tsType.toString()}`)
+      // return undefined
     }
     const escapedName = this.checker
       .getSymbolAtLocation(maybeNode)
