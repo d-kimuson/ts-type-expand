@@ -9,8 +9,10 @@
       "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/ts-type-expand"
+      ],
+      "outFiles": ["${workspaceFolder}/packages/ts-type-expand/out/**/*.js"],
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
@@ -18,10 +20,12 @@
       "type": "extensionHost",
       "request": "launch",
       "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/ts-type-expand",
+        "--extensionTestsPath=${workspaceFolder}/packages/ts-type-expand/out/test/suite/index"
       ],
-      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/packages/ts-type-expand/out/test/**/*.js"
+      ],
       "preLaunchTask": "${defaultBuildTask}"
     }
   ]

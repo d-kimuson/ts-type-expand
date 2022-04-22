@@ -1,71 +1,12 @@
 import vscode from "vscode"
-import fs from "fs"
-
-import { CompilerHandler } from "~/compilerHandler"
-import { getTsconfigPath, getActiveWorkspace } from "~/utils/vscode"
 import { TypeObject } from "compiler-api-helper"
+import { ApiClient } from "~/api-client"
 
 export type TypeExpandProviderOptions = {
   compactOptionalType: boolean
   compactPropertyLength: number
   directExpandArray: boolean
-}
-
-class CompilerHandlerStore {
-  // put undefined to prevent re-initialization once it has failed.
-  static compilerHandlerMap: Record<number, CompilerHandler | undefined> = {}
-
-  static fetchHandler(): CompilerHandler | undefined {
-    const workspcae = getActiveWorkspace()
-
-    if (!workspcae) {
-      return undefined
-    }
-
-    if (workspcae.index in CompilerHandlerStore.compilerHandlerMap) {
-      return CompilerHandlerStore.compilerHandlerMap[workspcae.index]
-    }
-
-    const handler = CompilerHandlerStore.createHandler()
-    CompilerHandlerStore.compilerHandlerMap[workspcae.index] = handler
-    return handler
-  }
-
-  static createHandler(): CompilerHandler | undefined {
-    const tsconfigPath = getTsconfigPath()
-    if (!fs.existsSync(tsconfigPath)) {
-      vscode.window.showErrorMessage(
-        "tsconfig.json doesn't exist.\n" +
-          "Please make sure that tsconfig.json is placed under the workspace or ts-type-expand.tsconfigPath is set correctly."
-      )
-      return undefined
-    }
-
-    const handler = new CompilerHandler(tsconfigPath)
-    handler.startWatch()
-    return handler
-  }
-
-  static deleteHandler() {
-    const workspcae = getActiveWorkspace()
-    if (!workspcae) {
-      return
-    }
-    this.fetchHandler()?.closeWatch()
-    delete this.compilerHandlerMap[workspcae.index]
-  }
-
-  static deleteAll() {
-    Object.keys(this.compilerHandlerMap).forEach((key) => {
-      this.fetchHandler()?.closeWatch()
-      // @ts-expect-error
-      delete this.compilerHandlerMap[key]
-    })
-  }
-
-  static isActive() {
-    return CompilerHandlerStore.fetchHandler() !== undefined
-  }
+  port: number
 }
 
 export class TypeExpandProvider
@@ -77,8 +18,10 @@ export class TypeExpandProvider
     type: TypeObject
   }
   private activeFilePath: string | undefined
+  private apiClient: ApiClient
 
   constructor(options: TypeExpandProviderOptions) {
+    this.apiClient = new ApiClient(options.port)
     this.updateOptions(options)
   }
 
@@ -86,13 +29,33 @@ export class TypeExpandProvider
     ExpandableTypeItem.updateOptions(options)
   }
 
-  public restart(): void {
-    CompilerHandlerStore.deleteHandler()
-    this.refresh()
+  async waitUntilServerActivated(timeout?: number): Promise<void> {
+    return await new Promise<void>((resolve, reject) => {
+      const timer = setInterval(() => {
+        this.apiClient
+          .isActivated()
+          .then(({ isActivated }) => {
+            if (isActivated) {
+              clearInterval(timer)
+              resolve()
+            } else {
+              throw new Error("Unexpected Server Error activation")
+            }
+          })
+          .catch(() => {})
+      }, 500)
+
+      if (typeof timeout === "number") {
+        setTimeout(() => {
+          clearInterval(timer)
+          reject("timeout")
+        }, timeout)
+      }
+    })
   }
 
-  public isActive(): boolean {
-    return CompilerHandlerStore.isActive()
+  public restart(): void {
+    this.refresh()
   }
 
   getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
@@ -100,11 +63,6 @@ export class TypeExpandProvider
   }
 
   getChildren(element?: ExpandableTypeItem): Thenable<ExpandableTypeItem[]> {
-    if (!this.isActive) {
-      vscode.window.showInformationMessage("Empty workspace")
-      return Promise.resolve([])
-    }
-
     if (!this.selectedType) {
       return Promise.resolve([])
     }
@@ -118,13 +76,7 @@ export class TypeExpandProvider
         ])
   }
 
-  updateSelection(selection: vscode.Selection): void {
-    const compilerHandler = CompilerHandlerStore.fetchHandler()
-
-    if (typeof compilerHandler === "undefined") {
-      return
-    }
-
+  async updateSelection(selection: vscode.Selection): Promise<void> {
     if (!this.activeFilePath) {
       vscode.window.showWarningMessage(
         "The file you are editing cannot be found."
@@ -140,17 +92,17 @@ export class TypeExpandProvider
     this.selection = selection
 
     try {
-      const result = compilerHandler.getTypeFromLineAndCharacter(
+      const result = await this.apiClient.getTypeFromLineAndCharacter(
         this.activeFilePath,
-        this.selection?.start.line,
-        this.selection?.start.character
+        this.selection.start.line,
+        this.selection.start.character
       )
       if (!result) {
         return
       }
       this.selectedType = {
-        declareName: result[0],
-        type: result[1],
+        declareName: result.declareName,
+        type: result.type,
       }
 
       if (this.selectedType) {
@@ -184,9 +136,7 @@ export class TypeExpandProvider
     this._onDidChangeTreeData.fire()
   }
 
-  close(): void {
-    CompilerHandlerStore.deleteAll()
-  }
+  close(): void {}
 }
 
 type Kind = "Union" | "Properties" | "Function" | "Array" | "Enum" | undefined
@@ -204,7 +154,7 @@ function getKindText(type: TypeObject): Kind {
   if (type.__type === "ArrayTO") {
     return "Array"
   }
-  if (type.__type === "ObjectTO") {
+  if (type.__type === "ObjectTO" || type.__type === "ObjectRefTO") {
     return "Properties"
   }
   return undefined
@@ -217,6 +167,7 @@ function isExpandable(type: TypeObject): boolean {
     type.__type === "UnionTO" ||
     type.__type === "EnumTO" ||
     type.__type === "ObjectTO" ||
+    type.__type === "ObjectRefTO" ||
     type.__type === "ArrayTO" ||
     type.__type === "CallableTO" ||
     type.__type === "PromiseTO"
@@ -237,6 +188,7 @@ function toTypeText(type: TypeObject): string {
     type.__type === "ArrayTO" ||
     type.__type === "TupleTO" ||
     type.__type === "ObjectTO" ||
+    type.__type === "ObjectRefTO" ||
     type.__type === "EnumTO"
   ) {
     return type.typeName
@@ -344,13 +296,20 @@ class ExpandableTypeItem extends vscode.TreeItem {
     }
 
     if (this.type.__type === "UnionTO") {
-      return this.type.unions.map(
+      return (this.type.unions as TypeObject[]).map(
         (type) => new ExpandableTypeItem(type, { parent: type })
       )
     }
 
-    if (this.type.__type === "ObjectTO") {
-      return this.type.getProps().map(
+    const maybeObjectTO =
+      this.type.__type === "ObjectTO"
+        ? this.type
+        : this.type.__type === "ObjectRefTO"
+        ? this.type.typeRef
+        : undefined
+
+    if (maybeObjectTO !== undefined) {
+      return maybeObjectTO.props.map(
         ({ propName, type }) =>
           new ExpandableTypeItem(type, {
             aliasName: propName,

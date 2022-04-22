@@ -2,12 +2,12 @@
 {
   "editor.tabSize": 2,
   // ESLint
-  "eslint.workingDirectories": ["./"],
+  "eslint.workingDirectories": ["./packages/*"],
   "eslint.options": {
-    "configFile": ".eslintrc.js",
-    "extensions": ["ts", "js"]
+    "overrideConfigFile": ".eslintrc.js",
+    "extensions": ["ts"]
   },
-  "eslint.validate": ["javascript", "typescript"],
+  "eslint.validate": ["typescript"],
   "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
@@ -42,5 +42,6 @@
     "out": true // set this to false to include "out" folder in search results
   },
   // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-  "typescript.tsc.autoDetect": "off"
+  "typescript.tsc.autoDetect": "off",
+  "cSpell.words": ["decycle", "encycle", "tsserverlibrary"]
 }
