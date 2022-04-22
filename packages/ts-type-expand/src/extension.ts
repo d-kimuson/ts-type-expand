@@ -1,7 +1,7 @@
 import vscode from "vscode"
 import getPorts from "get-port"
 
-import { getCurrentFilePath, getConfig } from "~/utils/vscode"
+import { getCurrentFilePath, getExtensionConfig } from "~/utils/vscode"
 import {
   TypeExpandProvider,
   TypeExpandProviderOptions,
@@ -30,7 +30,7 @@ const extensionClosure = () => {
 
   // private
   const getAndUpdatePort = async (): Promise<number> => {
-    const portNum = getConfig<number>("port")
+    const portNum = getExtensionConfig("port")
     if (!Number.isNaN(prevPortNum) && prevPortNum === portNum) {
       return portNum
     }
@@ -45,11 +45,11 @@ const extensionClosure = () => {
     return port
   }
 
-  const getExtensionConfig = async (): Promise<TypeExpandProviderOptions> => {
+  const extensionConfig = async (): Promise<TypeExpandProviderOptions> => {
     return {
-      compactOptionalType: getConfig<boolean>("compactOptionalType"),
-      compactPropertyLength: getConfig<number>("compactPropertyLength"),
-      directExpandArray: getConfig<boolean>("directExpandArray"),
+      compactOptionalType: getExtensionConfig("compactOptionalType"),
+      compactPropertyLength: getExtensionConfig("compactPropertyLength"),
+      directExpandArray: getExtensionConfig("directExpandArray"),
       port: await getAndUpdatePort(),
     }
   }
@@ -98,11 +98,11 @@ const extensionClosure = () => {
 
       tsApi = api.getAPI(0)
 
-      typeExpandProvider = new TypeExpandProvider(await getExtensionConfig())
+      typeExpandProvider = new TypeExpandProvider(await extensionConfig())
 
       const disposes = [
         vscode.commands.registerCommand("ts-type-expand.restart", async () => {
-          typeExpandProvider.updateOptions(await getExtensionConfig())
+          typeExpandProvider.updateOptions(await extensionConfig())
           await updateCurrentFile()
           typeExpandProvider.restart()
 
