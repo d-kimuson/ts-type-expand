@@ -102,7 +102,7 @@ export type ArrayAtLeastN<
   T extends unknown,
   N extends number = 1,
   Tuple = TupleN<N, T>
-> = Tuple extends T[] ? [...Tuple, T[]] : never
+> = Tuple extends T[] ? [...Tuple, ...T[]] : never
 export type TupleN<Num extends number, T, TupleT extends T[] = []> = {
   current: TupleT
   next: TupleN<Num, T, Append<T, TupleT>>

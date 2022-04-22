@@ -1,8 +1,8 @@
 diff --git a/node_modules/typescript/lib/typescript.d.ts b/node_modules/typescript/lib/typescript.d.ts
-index 0c17632..f251e34 100644
+index 0c17632..cf90dee 100644
 --- a/node_modules/typescript/lib/typescript.d.ts
 +++ b/node_modules/typescript/lib/typescript.d.ts
-@@ -7604,4 +7604,26 @@ declare namespace ts {
+@@ -7604,4 +7604,27 @@ declare namespace ts {
      const isIdentifierOrPrivateIdentifier: (node: Node) => node is MemberName;
  }
  
@@ -10,7 +10,8 @@ index 0c17632..f251e34 100644
 +declare namespace ts {
 +    export interface Node extends ReadonlyTextRange {
 +        readonly type?: TypeNode,
-+        readonly symbol?: Symbol
++        readonly symbol?: Symbol,
++        readonly escapedText?: __String
 +    }
 +
 +    export interface TypeNode extends Node {
