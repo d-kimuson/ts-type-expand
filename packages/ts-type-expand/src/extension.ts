@@ -1,7 +1,11 @@
 import vscode from "vscode"
 import getPorts from "get-port"
 
-import { getCurrentFilePath, getExtensionConfig } from "~/utils/vscode"
+import {
+  getCurrentFileLanguageId,
+  getCurrentFilePath,
+  getExtensionConfig,
+} from "~/utils/vscode"
 import {
   TypeExpandProvider,
   TypeExpandProviderOptions,
@@ -56,22 +60,33 @@ const extensionClosure = () => {
 
   const updateCurrentFile = async (): Promise<void> => {
     const currentFile = getCurrentFilePath()
-    if (currentFile === undefined) return
+    const languageId = getCurrentFileLanguageId()
 
-    if (!(currentFile.endsWith(".ts") || currentFile.endsWith(".tsx"))) {
-      // ts ファイルだが tsconfig に含まれてない？ケースだとバグる気がする？
-      // js ファイルがサポートできてないのでロジック見直しが必要
+    if (currentFile === undefined || languageId === undefined) return
+
+    const isValidatedExtension =
+      getExtensionConfig("validate").includes(languageId)
+
+    if (!isValidatedExtension) {
       return
     }
 
     if (!isActivatedTsServer) {
-      // timeout したほうが良さそうではあるな :thinking_face:
-      await typeExpandProvider.waitUntilServerActivated()
+      try {
+        await typeExpandProvider.waitUntilServerActivated(15000)
+      } catch (err) {
+        console.error(err)
+        vscode.window.showErrorMessage(
+          "Could not connect to TS server. Try `typescript.restartTsServer`."
+        )
+        return
+      }
+
+      isActivatedTsServer = true
+      vscode.window.showInformationMessage("ts-type-expand is ready to use!")
     }
 
-    isActivatedTsServer = true
     typeExpandProvider.updateActiveFile(currentFile)
-    vscode.window.showInformationMessage("ts-type-expand is ready to use!")
   }
 
   // exports
@@ -125,7 +140,13 @@ const extensionClosure = () => {
             return
           }
 
-          typeExpandProvider.updateSelection(e.textEditor.selection)
+          const languageId = getCurrentFileLanguageId()
+          if (
+            languageId !== undefined &&
+            getExtensionConfig("validate").includes(languageId)
+          ) {
+            typeExpandProvider.updateSelection(e.textEditor.selection)
+          }
         }),
         vscode.window.onDidChangeActiveTextEditor(async () => {
           await updateCurrentFile()

@@ -27,6 +27,23 @@
       "title": "Ts Type Expand",
       "type": "object",
       "properties": {
+        "ts-type-expand.validate": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "description": "Fold optional type",
+          "default": [
+            "typescript",
+            "typescriptreact",
+            "javascript",
+            "javascriptreact"
+          ]
+        },
         "ts-type-expand.compactOptionalType": {
           "type": "boolean",
           "default": true,

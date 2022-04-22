@@ -29,7 +29,7 @@ export class TypeExpandProvider
     ExpandableTypeItem.updateOptions(options)
   }
 
-  async waitUntilServerActivated(): Promise<void> {
+  async waitUntilServerActivated(timeout?: number): Promise<void> {
     return await new Promise<void>((resolve, reject) => {
       const timer = setInterval(() => {
         this.apiClient
@@ -42,10 +42,15 @@ export class TypeExpandProvider
               throw new Error("Unexpected Server Error activation")
             }
           })
-          .catch((err) => {
-            console.error(err)
-          })
+          .catch(() => {})
       }, 500)
+
+      if (typeof timeout === "number") {
+        setTimeout(() => {
+          clearInterval(timer)
+          reject("timeout")
+        }, timeout)
+      }
     })
   }
 

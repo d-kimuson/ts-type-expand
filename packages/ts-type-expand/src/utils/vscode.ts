@@ -5,6 +5,10 @@ export function getCurrentFilePath(): string | undefined {
   return vscode.window.activeTextEditor?.document.uri.fsPath
 }
 
+export function getCurrentFileLanguageId(): string | undefined {
+  return vscode.window.activeTextEditor?.document.languageId
+}
+
 export function getActiveWorkspace(): vscode.WorkspaceFolder | undefined {
   const currentFileUri = vscode.window.activeTextEditor?.document.uri
 
