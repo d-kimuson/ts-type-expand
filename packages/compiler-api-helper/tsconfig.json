@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2020",
+    "outDir": "dist",
+    "lib": ["es2020"],
+    "types": ["node"],
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"]
+    },
+    "strict": true,
+    "declaration": true,
+    "moduleResolution": "node",
+    "noEmit": false,
+    "skipLibCheck": true,
+    "noUncheckedIndexedAccess": true,
+    "noErrorTruncation": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": false
+  },
+  "include": ["src"]
+}
