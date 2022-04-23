@@ -12,7 +12,6 @@ export type TypeObject =
   | PromiseTO
   | UnsupportedTO
   | ObjectTO
-  | ObjectRefTO
 
 type WithTypeName = {
   typeName: string
@@ -45,15 +44,7 @@ export type TupleTO = WithTypeName & {
 
 export type ObjectTO = WithTypeName & {
   __type: "ObjectTO"
-  props: {
-    propName: string
-    type: TypeObject
-  }[]
-}
-
-export type ObjectRefTO = WithTypeName & {
-  __type: "ObjectRefTO"
-  typeRef: ObjectTO
+  storeKey: string
 }
 
 export type UnionTO = WithTypeName & {

@@ -121,8 +121,7 @@
     "axios": "^0.26.1",
     "compiler-api-helper": "^0.0.3",
     "get-port": "^6.1.2",
-    "json-cyclic": "^1.0.2",
-    "ts-type-expand-plugin": "^0.0.1",
+    "ts-type-expand-plugin": "^0.0.2",
     "tsc-alias": "^1.4.2",
     "typescript": "^4.5.2"
   },

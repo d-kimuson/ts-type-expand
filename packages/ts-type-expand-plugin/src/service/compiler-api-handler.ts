@@ -75,6 +75,12 @@ export class CompilerHandler {
     ]
   }
 
+  public getObjectProps(
+    storeKey: string
+  ): { propName: string; type: TypeObject }[] {
+    return this.helper.getObjectProps(storeKey)
+  }
+
   private getNodeFromPos(
     sourceFile: ts.SourceFile,
     pos: number

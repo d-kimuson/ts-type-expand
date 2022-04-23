@@ -10,3 +10,5 @@ vsc-extension-quickstart.md
 **/*.map
 example
 src/**/*.ts
+!node_modules/ts-type-expand-plugin/**
+!/ts-type-expand-plugin/**

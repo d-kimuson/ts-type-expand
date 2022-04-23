@@ -23,6 +23,7 @@ export class TypeExpandProvider
   constructor(options: TypeExpandProviderOptions) {
     this.apiClient = new ApiClient(options.port)
     this.updateOptions(options)
+    ExpandableTypeItem.apiClient = this.apiClient
   }
 
   public updateOptions(options: TypeExpandProviderOptions): void {
@@ -154,7 +155,7 @@ function getKindText(type: TypeObject): Kind {
   if (type.__type === "ArrayTO") {
     return "Array"
   }
-  if (type.__type === "ObjectTO" || type.__type === "ObjectRefTO") {
+  if (type.__type === "ObjectTO") {
     return "Properties"
   }
   return undefined
@@ -167,7 +168,6 @@ function isExpandable(type: TypeObject): boolean {
     type.__type === "UnionTO" ||
     type.__type === "EnumTO" ||
     type.__type === "ObjectTO" ||
-    type.__type === "ObjectRefTO" ||
     type.__type === "ArrayTO" ||
     type.__type === "CallableTO" ||
     type.__type === "PromiseTO"
@@ -188,7 +188,6 @@ function toTypeText(type: TypeObject): string {
     type.__type === "ArrayTO" ||
     type.__type === "TupleTO" ||
     type.__type === "ObjectTO" ||
-    type.__type === "ObjectRefTO" ||
     type.__type === "EnumTO"
   ) {
     return type.typeName
@@ -225,6 +224,7 @@ function toTypeText(type: TypeObject): string {
 
 class ExpandableTypeItem extends vscode.TreeItem {
   public static options: TypeExpandProviderOptions
+  public static apiClient: ApiClient
 
   constructor(
     private type: TypeObject,
@@ -262,7 +262,7 @@ class ExpandableTypeItem extends vscode.TreeItem {
     ExpandableTypeItem.options = options
   }
 
-  getChildrenItems(): ExpandableTypeItem[] {
+  async getChildrenItems(): Promise<ExpandableTypeItem[]> {
     if (this.type.__type === "CallableTO") {
       return [
         ...this.type.argTypes.map(
@@ -301,15 +301,13 @@ class ExpandableTypeItem extends vscode.TreeItem {
       )
     }
 
-    const maybeObjectTO =
-      this.type.__type === "ObjectTO"
-        ? this.type
-        : this.type.__type === "ObjectRefTO"
-        ? this.type.typeRef
-        : undefined
+    if (this.type.__type === "ObjectTO") {
+      const data = await ExpandableTypeItem.apiClient.getObjectProps(
+        this.type.storeKey
+      )
+      if (data === undefined) return []
 
-    if (maybeObjectTO !== undefined) {
-      return maybeObjectTO.props.map(
+      return data.props.map(
         ({ propName, type }) =>
           new ExpandableTypeItem(type, {
             aliasName: propName,

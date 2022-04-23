@@ -1,7 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios"
 import { TypeObject } from "compiler-api-helper"
-import { encycle } from "json-cyclic"
-import { removeListener } from "process"
 
 type FetchTypeFromPosReq = {
   filePath: string
@@ -12,6 +10,14 @@ type FetchTypeFromPosReq = {
 type FetchTypeFromPosRes = {
   declareName?: string
   type: TypeObject
+}
+
+type GetObjectPropsReq = {
+  storeKey: string
+}
+
+type GetObjectPropsRes = {
+  props: { propName: string; type: TypeObject }[]
 }
 
 export class ApiClient {
@@ -47,13 +53,33 @@ export class ApiClient {
       })
       return {
         declareName: data.declareName,
-        type: encycle(data.type),
+        type: data.type,
       }
     } catch (err) {
       console.log("Failed response: ", err)
       return undefined
     } finally {
       console.log("ended getTypeFromLineAndCharacter")
+    }
+  }
+
+  public async getObjectProps(
+    storeKey: string
+  ): Promise<GetObjectPropsRes | undefined> {
+    try {
+      const { data } = await this.axiosClient.post<
+        GetObjectPropsReq,
+        AxiosResponse<GetObjectPropsRes>
+      >("/get_object_props", { storeKey })
+      console.log(`called getObjectProps with ${storeKey}`, data)
+      return {
+        props: data.props,
+      }
+    } catch (err) {
+      console.log("Failed response: ", err)
+      return undefined
+    } finally {
+      console.log("Ended getTypeFromLineAndCharacter")
     }
   }
 }

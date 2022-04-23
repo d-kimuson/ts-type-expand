@@ -1,5 +1,6 @@
 import * as ts from "typescript"
 import { forEachChild, unescapeLeadingUnderscores } from "typescript"
+import { v4 as uuidv4 } from "uuid"
 import type * as to from "./type-object"
 import { ArrayAtLeastN, Result } from "./util"
 import { primitive, special } from "./type-object"
@@ -13,18 +14,20 @@ interface TypeHasCallSignature extends ts.Type {
 export class CompilerApiHelper {
   #program: ts.Program
   #typeChecker: ts.TypeChecker
-  #recursiveResolveMap: { [K: string]: to.ObjectTO }
+  #objectPropsStore: {
+    [K: string]: ts.Type
+  }
 
   constructor(program: ts.Program) {
     this.#program = program
     this.#typeChecker = this.#program.getTypeChecker()
-    this.#recursiveResolveMap = {}
+    this.#objectPropsStore = {}
   }
 
   public updateProgram(program: ts.Program): void {
     this.#program = program
     this.#typeChecker = this.#program.getTypeChecker()
-    this.#recursiveResolveMap = {}
+    this.#objectPropsStore = {}
   }
 
   public extractTypes(
@@ -207,8 +210,63 @@ export class CompilerApiHelper {
     })
   }
 
+  getObjectProps(
+    storeKey: string
+  ): { propName: string; type: to.TypeObject }[] {
+    const storedTsType = this.#objectPropsStore[storeKey]
+    if (storedTsType === undefined) {
+      return [
+        {
+          propName: "debug2 storedTsType not found",
+          type: {
+            __type: "UnsupportedTO",
+            kind: "enumValNotFound", // 適当
+          },
+        },
+      ]
+    }
+
+    return this.#typeChecker.getPropertiesOfType(storedTsType).map(
+      (
+        symbol
+      ): {
+        propName: string
+        type: to.TypeObject
+      } => {
+        const typeNode = symbol.valueDeclaration?.type
+        const declare = (symbol.declarations ?? [])[0]
+        const type = declare
+          ? this.#typeChecker.getTypeOfSymbolAtLocation(symbol, declare)
+          : undefined
+
+        return {
+          propName: String(symbol.escapedName),
+          type:
+            typeNode && ts.isArrayTypeNode(typeNode)
+              ? {
+                  __type: "ArrayTO",
+                  typeName: this.#typeToString(
+                    this.#typeChecker.getTypeFromTypeNode(typeNode)
+                  ),
+                  child: this.#extractArrayTFromTypeNode(typeNode),
+                }
+              : type
+              ? this.#isCallable(type)
+                ? this._convertTypeFromCallableSignature(
+                    type.getCallSignatures()[0]
+                  )
+                : this._convertType(type)
+              : {
+                  __type: "UnsupportedTO",
+                  kind: "prop",
+                },
+        }
+      }
+    )
+  }
+
   public convertType(type: ts.Type): to.TypeObject {
-    this.#recursiveResolveMap = {}
+    this.#objectPropsStore = {}
     return this._convertType(type)
   }
 
@@ -374,7 +432,7 @@ export class CompilerApiHelper {
           }
         }
       )
-      .case<to.ObjectTO | to.ObjectRefTO>(
+      .case<to.ObjectTO>(
         ({ type }) => this.#typeChecker.getPropertiesOfType(type).length !== 0,
         ({ type }) => {
           return this.#createObjectType(type)
@@ -425,64 +483,15 @@ export class CompilerApiHelper {
     return nodes
   }
 
-  #createObjectType(tsType: ts.Type): to.ObjectTO | to.ObjectRefTO {
+  #createObjectType(tsType: ts.Type): to.ObjectTO {
     const typeName = this.#typeToString(tsType)
-    const typeRef = this.#recursiveResolveMap[typeName]
-
-    if (typeRef !== undefined) {
-      return {
-        __type: "ObjectRefTO",
-        typeName,
-        typeRef,
-      }
-    }
-
-    const resolvedObjectTo: to.ObjectTO = {
+    const key = uuidv4()
+    this.#objectPropsStore[key] = tsType
+    return {
       __type: "ObjectTO",
       typeName,
-      props: [],
+      storeKey: key,
     }
-
-    this.#recursiveResolveMap[typeName] = resolvedObjectTo
-    resolvedObjectTo.props = this.#typeChecker.getPropertiesOfType(tsType).map(
-      (
-        symbol
-      ): {
-        propName: string
-        type: to.TypeObject
-      } => {
-        const typeNode = symbol.valueDeclaration?.type
-        const declare = (symbol.declarations ?? [])[0]
-        const type = declare
-          ? this.#typeChecker.getTypeOfSymbolAtLocation(symbol, declare)
-          : undefined
-
-        return {
-          propName: String(symbol.escapedName),
-          type:
-            typeNode && ts.isArrayTypeNode(typeNode)
-              ? {
-                  __type: "ArrayTO",
-                  typeName: this.#typeToString(
-                    this.#typeChecker.getTypeFromTypeNode(typeNode)
-                  ),
-                  child: this.#extractArrayTFromTypeNode(typeNode),
-                }
-              : type
-              ? this.#isCallable(type)
-                ? this._convertTypeFromCallableSignature(
-                    type.getCallSignatures()[0]
-                  )
-                : this._convertType(type)
-              : {
-                  __type: "UnsupportedTO",
-                  kind: "prop",
-                },
-        }
-      }
-    )
-
-    return resolvedObjectTo
   }
 
   #extractArrayTFromTypeNode(typeNode: ts.ArrayTypeNode): to.TypeObject {
@@ -589,7 +598,7 @@ export class CompilerApiHelper {
 
     const deps = (
       type.__type === "ObjectTO"
-        ? type.props.map((prop) => prop.type)
+        ? this.getObjectProps(type.storeKey).map((prop) => prop.type)
         : type.__type === "ArrayTO"
         ? [type.child]
         : type.__type === "UnionTO"
