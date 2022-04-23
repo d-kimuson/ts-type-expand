@@ -26,8 +26,10 @@ type PluginOptions = {
   }
 }
 
+type ServerStatus = "unloaded" | "loading" | "active" | "failed"
+
 const extensionClosure = () => {
-  let isActivatedTsServer = false
+  let serverStatus: ServerStatus = "unloaded"
   let prevPortNum = NaN
   let typeExpandProvider: TypeExpandProvider
   let tsApi: ReturnType<TypescriptLanguageFeatures["getAPI"]>
@@ -54,6 +56,7 @@ const extensionClosure = () => {
       compactOptionalType: getExtensionConfig("compactOptionalType"),
       compactPropertyLength: getExtensionConfig("compactPropertyLength"),
       directExpandArray: getExtensionConfig("directExpandArray"),
+      validate: getExtensionConfig("validate"),
       port: await getAndUpdatePort(),
     }
   }
@@ -71,18 +74,20 @@ const extensionClosure = () => {
       return
     }
 
-    if (!isActivatedTsServer) {
+    if (serverStatus === "unloaded") {
       try {
+        serverStatus = "loading"
         await typeExpandProvider.waitUntilServerActivated(15000)
       } catch (err) {
         console.error(err)
+        serverStatus = "failed"
         vscode.window.showErrorMessage(
           "Could not connect to TS server. Try `typescript.restartTsServer`."
         )
         return
       }
 
-      isActivatedTsServer = true
+      serverStatus = "active"
       vscode.window.showInformationMessage("ts-type-expand is ready to use!")
     }
 
@@ -133,20 +138,24 @@ const extensionClosure = () => {
           treeDataProvider: typeExpandProvider,
         }),
         vscode.window.onDidChangeTextEditorSelection((e) => {
-          if (!isActivatedTsServer) {
+          const languageId = getCurrentFileLanguageId()
+          if (
+            languageId === undefined ||
+            !getExtensionConfig("validate").includes(languageId)
+          ) {
+            return // skip
+          }
+
+          if (serverStatus === "unloaded" || serverStatus === "loading") {
             vscode.window.showWarningMessage(
               "TS server is not ready. Please wait a few seconds."
             )
             return
           }
 
-          const languageId = getCurrentFileLanguageId()
-          if (
-            languageId !== undefined &&
-            getExtensionConfig("validate").includes(languageId)
-          ) {
-            typeExpandProvider.updateSelection(e.textEditor.selection)
-          }
+          if (serverStatus !== "active") return
+
+          typeExpandProvider.updateSelection(e.textEditor.selection)
         }),
         vscode.window.onDidChangeActiveTextEditor(async () => {
           await updateCurrentFile()

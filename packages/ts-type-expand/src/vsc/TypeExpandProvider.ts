@@ -1,13 +1,10 @@
 import vscode from "vscode"
 import { TypeObject } from "compiler-api-helper"
 import { ApiClient } from "~/api-client"
+import { ExtensionOption } from "~/types/option"
+import { getCurrentFileLanguageId } from "~/utils/vscode"
 
-export type TypeExpandProviderOptions = {
-  compactOptionalType: boolean
-  compactPropertyLength: number
-  directExpandArray: boolean
-  port: number
-}
+export type TypeExpandProviderOptions = ExtensionOption & {}
 
 export class TypeExpandProvider
   implements vscode.TreeDataProvider<ExpandableTypeItem>
@@ -20,7 +17,7 @@ export class TypeExpandProvider
   private activeFilePath: string | undefined
   private apiClient: ApiClient
 
-  constructor(options: TypeExpandProviderOptions) {
+  constructor(private options: TypeExpandProviderOptions) {
     this.apiClient = new ApiClient(options.port)
     this.updateOptions(options)
     ExpandableTypeItem.apiClient = this.apiClient
@@ -53,6 +50,13 @@ export class TypeExpandProvider
         }, timeout)
       }
     })
+  }
+
+  private isCurrentFileValidated(): boolean {
+    const languageId = getCurrentFileLanguageId()
+    if (languageId === undefined) return false
+
+    return this.options.validate.includes(languageId)
   }
 
   public restart(): void {
