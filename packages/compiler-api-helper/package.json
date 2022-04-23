@@ -24,6 +24,7 @@
   "dependencies": {
     "compiler-api-helper": "^0.0.3",
     "ramda": "^0.27.1",
+    "shared": "0.0.1",
     "typescript": "^4.5.2",
     "uuid": "^8.3.2"
   },

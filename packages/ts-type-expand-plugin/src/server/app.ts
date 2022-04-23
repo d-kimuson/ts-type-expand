@@ -1,27 +1,15 @@
 import { Express } from "express"
 import { CompilerHandler } from "../service/compiler-api-handler"
-import type { TypeObject } from "compiler-api-helper"
 import type { Program } from "typescript"
 import type { server } from "typescript/lib/tsserverlibrary"
-
-type FetchTypeFromPosReq = {
-  filePath: string
-  line: number
-  character: number
-}
-
-type FetchTypeFromPosRes = {
-  declareName?: string
-  type: TypeObject
-}
-
-type GetObjectPropsReq = {
-  storeKey: string
-}
-
-type GetObjectPropsRes = {
-  props: { propName: string; type: TypeObject }[]
-}
+import type {
+  CommonRes,
+  FetchTypeFromPosReq,
+  FetchTypeFromPosRes,
+  GetObjectPropsReq,
+  GetObjectPropsRes,
+  IsActivatedRes,
+} from "shared"
 
 export const registerApp = (() => {
   let info: server.PluginCreateInfo
@@ -33,66 +21,73 @@ export const registerApp = (() => {
   ): Promise<void> => {
     info = _info
 
-    app.get<{}, { isActivated: boolean }, {}>("/is_activated", (req, res) => {
+    app.get<{}, CommonRes<IsActivatedRes>, {}>("/is_activated", (req, res) => {
       res.send({
-        isActivated: true,
+        success: true,
+        data: {
+          isActivated: true,
+        },
       })
     })
 
-    app.post<
-      {},
-      FetchTypeFromPosRes | { message: string },
-      FetchTypeFromPosReq
-    >("/get_type_from_pos", (req, res) => {
-      const program = info.languageService.getProgram() as Program
-      if (program === undefined) {
-        res.status(400).send({ message: "Program not found." })
-        return
-      }
-
-      if (compilerHandler === undefined) {
-        compilerHandler = new CompilerHandler(program)
-      } else {
-        compilerHandler.updateProgram(program)
-      }
-
-      try {
-        const { filePath, line, character } = req.body
-        const maybeType = compilerHandler?.getTypeFromLineAndCharacter(
-          filePath,
-          line,
-          character
-        )
-
-        if (!maybeType) {
-          res.status(400).send({ message: "maybeType is not defined" })
+    app.post<{}, CommonRes<FetchTypeFromPosRes>, FetchTypeFromPosReq>(
+      "/get_type_from_pos",
+      (req, res) => {
+        const program = info.languageService.getProgram() as Program
+        if (program === undefined) {
+          res.send({ success: false, message: "Program not found." })
           return
         }
 
-        const [declareName, typeObject] = maybeType
-
-        res.send({
-          declareName,
-          type: typeObject,
-        })
-      } catch (err) {
-        if (err instanceof Error) {
-          res.status(400).send({
-            message: `error: ${err.toString()}`,
-          })
+        if (compilerHandler === undefined) {
+          compilerHandler = new CompilerHandler(program)
+        } else {
+          compilerHandler.updateProgram(program)
         }
 
-        res.status(400).send({ message: "Unexpected Error" })
-      }
-    })
+        try {
+          const { filePath, line, character } = req.body
+          const maybeType = compilerHandler.getTypeFromLineAndCharacter(
+            filePath,
+            line,
+            character
+          )
 
-    app.post<{}, GetObjectPropsRes | { message: string }, GetObjectPropsReq>(
+          if (!maybeType) {
+            res.send({ success: false, message: "maybeType is not defined" })
+            return
+          }
+
+          const [declareName, typeObject] = maybeType
+
+          res.send({
+            success: true,
+            data: {
+              declareName,
+              type: typeObject,
+            },
+          })
+        } catch (err) {
+          if (err instanceof Error) {
+            res.send({
+              success: false,
+              message: `error: ${err.toString()}`,
+            })
+          }
+
+          res.send({ success: false, message: "Unexpected Error" })
+        }
+      }
+    )
+
+    app.post<{}, CommonRes<GetObjectPropsRes>, GetObjectPropsReq>(
       "/get_object_props",
       (req, res) => {
         try {
           const { storeKey } = req.body
           if (compilerHandler === undefined) {
-            res.status(400).send({
+            res.send({
+              success: false,
               message: "compilerHandler not found",
             })
             return
@@ -100,16 +95,20 @@ export const registerApp = (() => {
           const props = compilerHandler.getObjectProps(storeKey)
 
           res.send({
-            props: props,
+            success: true,
+            data: {
+              props: props,
+            },
           })
         } catch (err) {
           if (err instanceof Error) {
-            res.status(400).send({
+            res.send({
+              success: false,
               message: `error: ${err.toString()}`,
             })
           }
 
-          res.status(400).send({ message: "Unexpected Error" })
+          res.send({ success: false, message: "Unexpected Error" })
         }
       }
     )

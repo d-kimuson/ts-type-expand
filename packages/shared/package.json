@@ -1,0 +1,6 @@
+{
+  "name": "shared",
+  "version": "0.0.1",
+  "types": "index.ts",
+  "license": "MIT"
+}

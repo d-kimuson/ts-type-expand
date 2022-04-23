@@ -48,7 +48,7 @@ export class TypeExpandProvider
               throw new Error("Unexpected Server Error activation")
             }
           })
-          .catch(() => {})
+          .catch((err) => {})
       }, 500)
 
       if (typeof timeout === "number") {

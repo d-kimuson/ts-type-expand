@@ -1,24 +1,12 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios"
-import { TypeObject } from "compiler-api-helper"
-
-type FetchTypeFromPosReq = {
-  filePath: string
-  line: number
-  character: number
-}
-
-type FetchTypeFromPosRes = {
-  declareName?: string
-  type: TypeObject
-}
-
-type GetObjectPropsReq = {
-  storeKey: string
-}
-
-type GetObjectPropsRes = {
-  props: { propName: string; type: TypeObject }[]
-}
+import type {
+  CommonRes,
+  FetchTypeFromPosReq,
+  FetchTypeFromPosRes,
+  GetObjectPropsReq,
+  GetObjectPropsRes,
+  IsActivatedRes,
+} from "shared"
 
 export class ApiClient {
   private axiosClient: AxiosInstance
@@ -33,44 +21,67 @@ export class ApiClient {
     this.axiosClient = axios.create({
       baseURL: `http://localhost:${port}`,
     })
-    this.interceptorIds = []
     const id = this.axiosClient.interceptors.response.use(
-      (res) => res,
+      (res) => {
+        if (res === undefined) {
+          return {
+            data: {
+              success: false,
+            },
+          }
+        }
+
+        return res
+      },
       (err: AxiosError<{ message: string } | undefined>) => {
         if (typeof onError === "function") {
           onError(err)
         }
+        throw err
       }
     )
-    this.interceptorIds.push(id)
+    this.interceptorIds = [id]
   }
 
   public updatePort(port: number) {
     this.interceptorIds.forEach((id) => {
       this.axiosClient.interceptors.response.eject(id)
     })
-    this.interceptorIds = []
-
     this.axiosClient = axios.create({
       baseURL: `http://localhost:${port}`,
     })
     const id = this.axiosClient.interceptors.response.use(
-      (res) => res,
+      (res) => {
+        if (res === undefined) {
+          return {
+            data: {
+              success: false,
+            },
+          }
+        }
+
+        return res
+      },
       (err: AxiosError<{ message: string } | undefined>) => {
         if (typeof this.onError === "function") {
           this.onError(err)
         }
+        throw err
       }
     )
-    this.interceptorIds.push(id)
+    this.interceptorIds = [id]
   }
 
-  public async isActivated(): Promise<{ isActivated: boolean }> {
-    const { data } = await this.axiosClient.get<{ isActivated: boolean }>(
+  public async isActivated(): Promise<IsActivatedRes> {
+    const { data } = await this.axiosClient.get<CommonRes<IsActivatedRes>>(
       "/is_activated"
     )
 
-    return data
+    if (!data.success) {
+      return { isActivated: false }
+    }
+
+    return data.data
   }
 
   public async getTypeFromLineAndCharacter(
@@ -81,18 +92,24 @@ export class ApiClient {
     try {
       const { data } = await this.axiosClient.post<
         FetchTypeFromPosReq,
-        AxiosResponse<FetchTypeFromPosRes>
+        AxiosResponse<CommonRes<FetchTypeFromPosRes>>
       >("/get_type_from_pos", {
         filePath,
         line,
         character,
       })
+
+      if (!data.success) {
+        return
+      }
+
       return {
-        declareName: data.declareName,
-        type: data.type,
+        declareName: data.data.declareName,
+        type: data.data.type,
       }
     } catch (err) {
-      console.error("Failed response: ", err)
+      // @ts-expect-error
+      console.error("Failed response: ", err, err.response?.status)
       return undefined
     }
   }
@@ -103,17 +120,18 @@ export class ApiClient {
     try {
       const { data } = await this.axiosClient.post<
         GetObjectPropsReq,
-        AxiosResponse<GetObjectPropsRes>
+        AxiosResponse<CommonRes<GetObjectPropsRes>>
       >("/get_object_props", { storeKey })
-      console.log(`called getObjectProps with ${storeKey}`, data)
+      if (!data.success) {
+        return
+      }
+
       return {
-        props: data.props,
+        props: data.data.props,
       }
     } catch (err) {
-      console.log("Failed response: ", err)
+      console.error("Failed Response: ", err)
       return undefined
-    } finally {
-      console.log("Ended getTypeFromLineAndCharacter")
     }
   }
 }
