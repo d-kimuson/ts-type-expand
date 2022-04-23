@@ -10,6 +10,7 @@ import {
   TypeExpandProvider,
   TypeExpandProviderOptions,
 } from "~/vsc/TypeExpandProvider"
+import { ApiClient } from "./api-client"
 
 type TypescriptLanguageFeatures = {
   getAPI(n: number): {
@@ -33,6 +34,7 @@ const extensionClosure = () => {
   let prevPortNum = NaN
   let typeExpandProvider: TypeExpandProvider
   let tsApi: ReturnType<TypescriptLanguageFeatures["getAPI"]>
+  let apiClient: ApiClient
 
   // private
   const getAndUpdatePort = async (): Promise<number> => {
@@ -118,7 +120,25 @@ const extensionClosure = () => {
 
       tsApi = api.getAPI(0)
 
-      typeExpandProvider = new TypeExpandProvider(await extensionConfig())
+      const config = await extensionConfig()
+      apiClient = new ApiClient(config.port, (err) => {
+        const errorRes = err.response
+        if (
+          serverStatus === "active" &&
+          (errorRes === undefined || errorRes.status === 500)
+        ) {
+          console.error(
+            "Unexpected Error Occurred",
+            errorRes,
+            500,
+            serverStatus
+          )
+          vscode.window.showErrorMessage(
+            "Connection to the TS server has been lost. Try `typescript.restartTsServer`."
+          )
+        }
+      })
+      typeExpandProvider = new TypeExpandProvider(config, apiClient)
 
       const disposes = [
         vscode.commands.registerCommand("ts-type-expand.restart", async () => {

@@ -17,14 +17,22 @@ export class TypeExpandProvider
   private activeFilePath: string | undefined
   private apiClient: ApiClient
 
-  constructor(private options: TypeExpandProviderOptions) {
-    this.apiClient = new ApiClient(options.port)
+  constructor(
+    private options: TypeExpandProviderOptions,
+    apiClient: ApiClient
+  ) {
+    this.apiClient = apiClient
     this.updateOptions(options)
     ExpandableTypeItem.apiClient = this.apiClient
   }
 
   public updateOptions(options: TypeExpandProviderOptions): void {
     ExpandableTypeItem.updateOptions(options)
+    if (this.options.port !== options.port) {
+      this.apiClient.updatePort(options.port)
+    }
+
+    this.options = options
   }
 
   async waitUntilServerActivated(timeout?: number): Promise<void> {

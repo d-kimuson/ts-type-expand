@@ -46,7 +46,7 @@ export const registerApp = (() => {
     >("/get_type_from_pos", (req, res) => {
       const program = info.languageService.getProgram() as Program
       if (program === undefined) {
-        res.status(500).send({ message: "Program not found." })
+        res.status(400).send({ message: "Program not found." })
         return
       }
 
@@ -65,7 +65,7 @@ export const registerApp = (() => {
         )
 
         if (!maybeType) {
-          res.status(500).send({ message: "maybeType is not defined" })
+          res.status(400).send({ message: "maybeType is not defined" })
           return
         }
 
@@ -77,12 +77,12 @@ export const registerApp = (() => {
         })
       } catch (err) {
         if (err instanceof Error) {
-          res.status(500).send({
+          res.status(400).send({
             message: `error: ${err.toString()}`,
           })
         }
 
-        res.status(500).send({ message: "Unexpected Error" })
+        res.status(400).send({ message: "Unexpected Error" })
       }
     })
 
@@ -92,16 +92,8 @@ export const registerApp = (() => {
         try {
           const { storeKey } = req.body
           if (compilerHandler === undefined) {
-            res.send({
-              props: [
-                {
-                  propName: "debug1",
-                  type: {
-                    __type: "UnsupportedTO",
-                    kind: "enumValNotFound", // 適当
-                  },
-                },
-              ],
+            res.status(400).send({
+              message: "compilerHandler not found",
             })
             return
           }
@@ -112,12 +104,12 @@ export const registerApp = (() => {
           })
         } catch (err) {
           if (err instanceof Error) {
-            res.status(500).send({
+            res.status(400).send({
               message: `error: ${err.toString()}`,
             })
           }
 
-          res.status(500).send({ message: "Unexpected Error" })
+          res.status(400).send({ message: "Unexpected Error" })
         }
       }
     )

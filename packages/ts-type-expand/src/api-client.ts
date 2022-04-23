@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from "axios"
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios"
 import { TypeObject } from "compiler-api-helper"
 
 type FetchTypeFromPosReq = {
@@ -22,11 +22,47 @@ type GetObjectPropsRes = {
 
 export class ApiClient {
   private axiosClient: AxiosInstance
+  private interceptorIds: number[]
 
-  constructor(port: number) {
+  constructor(
+    private port: number,
+    private onError?: (
+      error: AxiosError<{ message: string } | undefined>
+    ) => void
+  ) {
     this.axiosClient = axios.create({
       baseURL: `http://localhost:${port}`,
     })
+    this.interceptorIds = []
+    const id = this.axiosClient.interceptors.response.use(
+      (res) => res,
+      (err: AxiosError<{ message: string } | undefined>) => {
+        if (typeof onError === "function") {
+          onError(err)
+        }
+      }
+    )
+    this.interceptorIds.push(id)
+  }
+
+  public updatePort(port: number) {
+    this.interceptorIds.forEach((id) => {
+      this.axiosClient.interceptors.response.eject(id)
+    })
+    this.interceptorIds = []
+
+    this.axiosClient = axios.create({
+      baseURL: `http://localhost:${port}`,
+    })
+    const id = this.axiosClient.interceptors.response.use(
+      (res) => res,
+      (err: AxiosError<{ message: string } | undefined>) => {
+        if (typeof this.onError === "function") {
+          this.onError(err)
+        }
+      }
+    )
+    this.interceptorIds.push(id)
   }
 
   public async isActivated(): Promise<{ isActivated: boolean }> {
@@ -56,10 +92,8 @@ export class ApiClient {
         type: data.type,
       }
     } catch (err) {
-      console.log("Failed response: ", err)
+      console.error("Failed response: ", err)
       return undefined
-    } finally {
-      console.log("ended getTypeFromLineAndCharacter")
     }
   }
 
