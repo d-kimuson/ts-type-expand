@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd $(git rev-parse --show-toplevel)/packages/ts-type-expand
+cd $(git rev-parse --show-toplevel)/packages/ts-type-expand-beta
 
 current_version=$(cat package.json | grep version | cut -f 4 -d '"')
 echo "current version is ${current_version}"

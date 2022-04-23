@@ -1,1 +1,16 @@
-../ts-type-expand/.vscodeignore
+.vscode/**
+.vscode-test/**
+out/test/**
+src/**
+.gitignore
+.yarnrc
+vsc-extension-quickstart.md
+**/tsconfig.json
+**/.eslintrc.json
+**/*.map
+example
+src/**/*.ts
+
+**/node_modules
+!node_modules/ts-type-expand-plugin/dist/*.js
+!node_modules/ts-type-expand-plugin/package.json
