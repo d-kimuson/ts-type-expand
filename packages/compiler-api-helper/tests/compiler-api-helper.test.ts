@@ -210,7 +210,7 @@ describe("convertType", () => {
       const arrInProp = types[2]?.type
       expect(arrInProp?.__type).toBe("ObjectTO")
       if (arrInProp?.__type !== "ObjectTO") return
-      expect(arrInProp.props[0]).toStrictEqual({
+      expect(helper.getObjectProps(arrInProp.storeKey)[0]).toStrictEqual({
         propName: "arr",
         type: {
           __type: "ArrayTO",
@@ -243,7 +243,7 @@ describe("convertType", () => {
     if (type1.type.__type !== "ObjectTO") {
       return
     }
-    expect(type1.type.props).toStrictEqual([
+    expect(helper.getObjectProps(type1.type.storeKey)).toStrictEqual([
       {
         propName: "name",
         type: {
@@ -290,7 +290,7 @@ describe("convertType", () => {
 
     if (type2.type.__type !== "ObjectTO")
       throw new TypeError("expected ObjectTO")
-    const propsOneRecursive = type2?.type.props
+    const propsOneRecursive = helper.getObjectProps(type2?.type.storeKey)
     expect(propsOneRecursive[0]).toStrictEqual({
       propName: "name",
       type: {
@@ -300,9 +300,11 @@ describe("convertType", () => {
     })
     const recursiveProp = propsOneRecursive[1]?.type
     if (recursiveProp === undefined) throw new TypeError("Unexpected undefined")
-    if (recursiveProp.__type !== "ObjectRefTO")
-      throw new TypeError("expected ObjectTO")
-    expect(recursiveProp.typeRef.props[0]).toStrictEqual({
+    if (recursiveProp.__type !== "ObjectTO") {
+      throw new Error("Error")
+    }
+    //   throw new TypeError("expected ObjectTO")
+    expect(helper.getObjectProps(recursiveProp.storeKey)[0]).toStrictEqual({
       propName: "name",
       type: {
         __type: "PrimitiveTO",
@@ -327,7 +329,7 @@ describe("convertType", () => {
         return
       }
 
-      expect(type_0.type.props).toStrictEqual([
+      expect(helper.getObjectProps(type_0.type.storeKey)).toStrictEqual([
         {
           propName: "id",
           type: {
@@ -381,7 +383,7 @@ describe("convertType", () => {
     expect(type0.type.__type).toBe("ObjectTO")
     if (type0.type.__type !== "ObjectTO") return
 
-    expect(type0.type.props).toStrictEqual([
+    expect(helper.getObjectProps(type0.type.storeKey)).toStrictEqual([
       {
         propName: "name",
         type: {
@@ -422,7 +424,7 @@ describe("convertType", () => {
     expect(type1).toBeDefined()
     expect(type1?.type.__type).toBe("ObjectTO")
     if (!type1 || type1?.type.__type !== "ObjectTO") return
-    expect(type1?.type.props).toStrictEqual([
+    expect(helper.getObjectProps(type1?.type.storeKey)).toStrictEqual([
       {
         propName: "hoge",
         type: {
@@ -459,7 +461,7 @@ describe("convertType", () => {
     if (type0?.type.__type !== "ObjectTO") {
       return
     }
-    expect(type0?.type.props).toStrictEqual([
+    expect(helper.getObjectProps(type0?.type.storeKey)).toStrictEqual([
       {
         propName: "name",
         type: {
@@ -501,7 +503,7 @@ describe("convertType", () => {
     const typeObj = type1?.type
     if (!typeObj || typeObj.__type !== "ObjectTO") return
 
-    expect(typeObj.props).toStrictEqual([
+    expect(helper.getObjectProps(typeObj.storeKey)).toStrictEqual([
       {
         propName: "method",
         type: {
@@ -543,7 +545,7 @@ describe("convertType", () => {
     const childType = type0.type.child
     expect(childType.__type).toBe("ObjectTO")
     if (childType.__type !== "ObjectTO") return
-    expect(childType.props).toStrictEqual([
+    expect(helper.getObjectProps(childType.storeKey)).toStrictEqual([
       {
         propName: "name",
         type: {
