@@ -1,8 +1,8 @@
 import { Express } from "express"
 import { CompilerHandler } from "../service/compiler-api-handler"
-import { TypeObject } from "compiler-api-helper"
-import type * as ts from "typescript"
-import type * as tsServer from "typescript/lib/tsserverlibrary"
+import type { TypeObject } from "compiler-api-helper"
+import type { Program } from "typescript"
+import type { server } from "typescript/lib/tsserverlibrary"
 import { decycle } from "json-cyclic"
 
 type FetchTypeFromPosReq = {
@@ -17,17 +17,17 @@ type FetchTypeFromPosRes = {
 }
 
 export const registerApp = (() => {
-  let info: tsServer.server.PluginCreateInfo
+  let info: server.PluginCreateInfo
   let compilerHandler: CompilerHandler | undefined
 
   return async (
     app: Express,
-    _info: tsServer.server.PluginCreateInfo
+    _info: server.PluginCreateInfo
   ): Promise<void> => {
     info = _info
 
     app.use((_req, _res, next) => {
-      const program = info.languageService.getProgram() as ts.Program
+      const program = info.languageService.getProgram() as Program
       if (program === undefined) {
         _res.send(500).send({ message: "Program not found." })
         return

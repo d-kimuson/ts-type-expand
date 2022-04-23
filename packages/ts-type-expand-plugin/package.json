@@ -9,9 +9,11 @@
     "build": "run-s build:*",
     "build:types": "tsc -p .",
     "build:esbuild": "esno ./bin/build.ts",
+    "prebuild": "rm -rf dist",
     "watch": "run-p watch:*",
     "watch:types": "yarn build:types --watch",
-    "watch:esbuild": "IS_WATCH=true yarn build:esbuild"
+    "watch:esbuild": "IS_WATCH=true yarn build:esbuild",
+    "prepublish": "yarn build"
   },
   "dependencies": {
     "compiler-api-helper": "^0.0.3",

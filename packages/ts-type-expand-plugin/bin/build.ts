@@ -7,7 +7,7 @@ build({
   outdir: resolve(__dirname, "../dist"),
   platform: "node",
   format: "cjs",
-  sourcemap: true,
+  minify: true,
   watch:
     process.env.IS_WATCH === "true"
       ? {

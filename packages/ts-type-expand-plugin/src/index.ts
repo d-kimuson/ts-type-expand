@@ -1,13 +1,12 @@
-import type * as ts from "typescript/lib/tsserverlibrary"
-import "open-typescript"
-
+import type { server } from "typescript/lib/tsserverlibrary"
+import type { Server } from "http"
 import express from "express"
-import * as http from "http"
+
 import type { PluginConfiguration } from "./types"
 import { registerApp } from "./server/app"
 
-const factory: ts.server.PluginModuleFactory = (mod) => {
-  let server: http.Server | undefined
+const factory: server.PluginModuleFactory = (mod) => {
+  let server: Server | undefined
   let start: ((port: number) => void) | undefined
 
   return {
