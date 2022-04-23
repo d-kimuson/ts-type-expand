@@ -40,7 +40,7 @@
               }
             ]
           },
-          "description": "Fold optional type",
+          "description": "Validate by specifying languageId",
           "default": [
             "typescript",
             "typescriptreact",

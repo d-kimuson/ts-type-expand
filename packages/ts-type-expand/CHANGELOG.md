@@ -9,6 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Added
 
 - Date, Promise type support
+- Add `validate` option to allow the target languageId to be specified.
 
 ### Changed
 
@@ -17,6 +18,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - Resolve types based on the developer's choice of TypeScript version
   - lightweight
 - Revamped type resolution logic.
+
+### Removed
+
+- remove `tsconfigPath` option
+  - `tsconfig.json` interpreted by the embedded TS server is used.
 
 ## [0.0.12] - 2021-09-12
 
