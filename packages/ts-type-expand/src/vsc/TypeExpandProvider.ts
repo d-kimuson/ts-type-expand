@@ -89,7 +89,7 @@ export class TypeExpandProvider
         ])
   }
 
-  async updateSelection(selection: vscode.Selection): Promise<void> {
+  async updateSelection(selection: vscode.Selection) {
     if (!this.activeFilePath) {
       vscode.window.showWarningMessage(
         "The file you are editing cannot be found."
@@ -326,6 +326,11 @@ class ExpandableTypeItem extends vscode.TreeItem {
             parent: this.type,
           })
       )
+    }
+
+    if (this.type.__type === "PromiseTO") {
+      const childItem = new ExpandableTypeItem(this.type.child)
+      return [childItem]
     }
 
     return []

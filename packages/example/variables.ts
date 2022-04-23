@@ -18,3 +18,7 @@ export const getUser2 = function (userId: string): User {
 }
 
 export const userRepository = new UserRepository([user])
+
+export const asyncF = async () => {
+  console.log('asyncF')
+}

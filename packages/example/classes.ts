@@ -13,4 +13,14 @@ export class UserRepository {
       age: 20,
     }
   }
+
+  async asyncF() {
+    console.log('asyncF')
+  }
+
+  async asyncF2() {
+    return {
+      name: 'taro',
+    }
+  }
 }
