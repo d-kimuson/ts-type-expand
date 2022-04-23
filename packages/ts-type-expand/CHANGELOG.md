@@ -6,6 +6,18 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### Added
+
+- Date, Promise type support
+
+### Changed
+
+- Use the built-in TS server instead of building `kimuson.ts-type-expand`'s own TS server.
+  - Real-time type retrieval (Information is updated by OnType instead of OnSave, so it can be update with real-time type information that has not been saved)
+  - Resolve types based on the developer's choice of TypeScript version
+  - lightweight
+- Revamped type resolution logic.
+
 ## [0.0.12] - 2021-09-12
 
 ### Added
