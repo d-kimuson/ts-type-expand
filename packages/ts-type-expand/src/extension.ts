@@ -27,7 +27,7 @@ type PluginOptions = {
   }
 }
 
-type ServerStatus = "unloaded" | "loading" | "active" | "failed"
+type ServerStatus = "unloaded" | "loading" | "active" | "dead"
 
 const extensionClosure = () => {
   let serverStatus: ServerStatus = "unloaded"
@@ -63,6 +63,24 @@ const extensionClosure = () => {
     }
   }
 
+  const checkDeadServerAndTryRestart = async () => {
+    const { isActivated } = await apiClient.isActivated()
+    if (isActivated) {
+      serverStatus = "active"
+      return
+    }
+
+    try {
+      // re-configure ts-plugin
+      typeExpandProvider.updateOptions(await extensionConfig())
+    } catch (err) {
+      serverStatus = "dead"
+      vscode.window.showErrorMessage(
+        "Could not connect to TS server. Try `typescript.restartTsServer`."
+      )
+    }
+  }
+
   const updateCurrentFile = async (): Promise<void> => {
     const currentFile = getCurrentFilePath()
     const languageId = getCurrentFileLanguageId()
@@ -82,10 +100,7 @@ const extensionClosure = () => {
         await typeExpandProvider.waitUntilServerActivated(15000)
       } catch (err) {
         console.error(err)
-        serverStatus = "failed"
-        vscode.window.showErrorMessage(
-          "Could not connect to TS server. Try `typescript.restartTsServer`."
-        )
+        checkDeadServerAndTryRestart()
         return
       }
 
