@@ -173,8 +173,6 @@ function getKindText(type: TypeObject): Kind {
   return undefined
 }
 
-const COMPACT_TEXT = "{...}"
-
 function isExpandable(type: TypeObject): boolean {
   return (
     type.__type === "UnionTO" ||
@@ -190,8 +188,18 @@ function getLabelText(type: TypeObject): string {
   const typeText = toTypeText(type)
 
   return typeText.length > ExpandableTypeItem.options.compactPropertyLength
-    ? COMPACT_TEXT
+    ? typeText.slice(0, ExpandableTypeItem.options.compactPropertyLength) +
+        "..."
     : typeText
+}
+
+function getCompatLabelText(type: TypeObject): string {
+  const labelText = getLabelText(type)
+
+  return labelText.length > ExpandableTypeItem.options.compactPropertyLength
+    ? labelText.slice(0, ExpandableTypeItem.options.compactPropertyLength) +
+        "..."
+    : labelText
 }
 
 function toTypeText(type: TypeObject): string {
@@ -247,10 +255,11 @@ class ExpandableTypeItem extends vscode.TreeItem {
     }
   ) {
     super(
-      typeof meta?.aliasName !== "undefined" &&
-        meta.aliasName !== getLabelText(type)
-        ? `${meta.aliasName}: ${getLabelText(type)}`
-        : getLabelText(type),
+      typeof meta?.aliasName !== "undefined"
+        ? isExpandable(type)
+          ? meta.aliasName
+          : `${meta.aliasName}: ${getLabelText(type)}`
+        : getCompatLabelText(type),
       isExpandable(type)
         ? vscode.TreeItemCollapsibleState.Collapsed
         : vscode.TreeItemCollapsibleState.None
@@ -267,7 +276,7 @@ class ExpandableTypeItem extends vscode.TreeItem {
     ]
       .filter((temp) => typeof temp !== "undefined")
       .join(" ")
-    this.tooltip = this.label === COMPACT_TEXT ? toTypeText(type) : undefined
+    this.tooltip = toTypeText(type)
   }
 
   static updateOptions(options: TypeExpandProviderOptions) {
