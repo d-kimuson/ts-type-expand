@@ -27,7 +27,7 @@ type PluginOptions = {
   }
 }
 
-type ServerStatus = "unloaded" | "loading" | "active" | "dead"
+type ServerStatus = "unloaded" | "loading" | "active" | "failed" | "dead"
 
 const extensionClosure = () => {
   let serverStatus: ServerStatus = "unloaded"
@@ -39,7 +39,13 @@ const extensionClosure = () => {
   // private
   const getAndUpdatePort = async (): Promise<number> => {
     const portNum = getExtensionConfig("port")
-    if (!Number.isNaN(prevPortNum) && prevPortNum === portNum) {
+
+    if (Number.isNaN(portNum)) {
+      throw new TypeError("postNum should not be NaN.")
+    }
+
+    // サーバーが生きててポート番号が変わってないならそのまま
+    if (serverStatus !== "failed" && prevPortNum === portNum) {
       return portNum
     }
 
@@ -63,21 +69,59 @@ const extensionClosure = () => {
     }
   }
 
-  const checkDeadServerAndTryRestart = async () => {
+  const checkAndUpdateServerStatus = async (): Promise<boolean> => {
     const { isActivated } = await apiClient.isActivated()
     if (isActivated) {
       serverStatus = "active"
-      return
+      return true
     }
 
+    return false
+  }
+
+  const checkDeadServerAndTryRestart = async () => {
     try {
+      const isActive = await checkAndUpdateServerStatus()
+
+      if (isActive) return
+
       // re-configure ts-plugin
       typeExpandProvider.updateOptions(await extensionConfig())
+      setTimeout(() => {
+        checkAndUpdateServerStatus().then((isActive) => {
+          if (!isActive) {
+            serverStatus = "dead"
+            vscode.window.showErrorMessage(
+              "Could not connect to TS server. Try `typescript.restartTsServer`."
+            )
+          }
+        })
+      }, 500)
     } catch (err) {
       serverStatus = "dead"
       vscode.window.showErrorMessage(
         "Could not connect to TS server. Try `typescript.restartTsServer`."
       )
+    }
+  }
+
+  const initializeOrRepairPlugin = async () => {
+    if (serverStatus === "unloaded") {
+      try {
+        serverStatus = "loading"
+        await typeExpandProvider.waitUntilServerActivated(15000)
+      } catch (err) {
+        console.error(err)
+        checkDeadServerAndTryRestart()
+        return
+      }
+
+      serverStatus = "active"
+      vscode.window.showInformationMessage("ts-type-expand is ready to use!")
+    }
+
+    if (serverStatus === "failed") {
+      checkDeadServerAndTryRestart()
     }
   }
 
@@ -94,20 +138,7 @@ const extensionClosure = () => {
       return
     }
 
-    if (serverStatus === "unloaded") {
-      try {
-        serverStatus = "loading"
-        await typeExpandProvider.waitUntilServerActivated(15000)
-      } catch (err) {
-        console.error(err)
-        checkDeadServerAndTryRestart()
-        return
-      }
-
-      serverStatus = "active"
-      vscode.window.showInformationMessage("ts-type-expand is ready to use!")
-    }
-
+    initializeOrRepairPlugin()
     typeExpandProvider.updateActiveFile(currentFile)
   }
 
@@ -148,9 +179,9 @@ const extensionClosure = () => {
             500,
             serverStatus
           )
-          vscode.window.showErrorMessage(
-            "Connection to the TS server has been lost. Try `typescript.restartTsServer`."
-          )
+
+          serverStatus = "failed"
+          checkDeadServerAndTryRestart()
         }
       })
       typeExpandProvider = new TypeExpandProvider(config, apiClient)
