@@ -1,10 +1,19 @@
 import * as ts from "typescript"
 import { forEachChild, unescapeLeadingUnderscores } from "typescript"
-import { v4 as uuidv4 } from "uuid"
+import { v4 as generateUuid } from "uuid"
 import type * as to from "./type-object"
 import { ArrayAtLeastN, Result } from "./util"
 import { primitive, special } from "./type-object"
 import { ok, ng, switchExpression, isOk, isNg } from "./util"
+import {
+  dangerouslyDeclarationToType,
+  dangerouslyDeclareToEscapedText,
+  dangerouslyExportSpecifierToEscapedName,
+  dangerouslyNodeToSymbol,
+  dangerouslyTypeToNode,
+  dangerouslyTypeToResolvedTypeArguments,
+  dangerouslyTypeToTypes,
+} from "./extract"
 
 type TypeDeclaration = { typeName: string | undefined; type: to.TypeObject }
 interface TypeHasCallSignature extends ts.Type {
@@ -109,7 +118,7 @@ export class CompilerApiHelper {
             }
 
             return {
-              typeName: declare.name.escapedText,
+              typeName: dangerouslyDeclareToEscapedText(declare),
               type: this._convertType(
                 this.#typeChecker.getTypeAtLocation(declare)
               ),
@@ -119,8 +128,8 @@ export class CompilerApiHelper {
           // type declaration
           return {
             typeName:
-              typeof node?.symbol?.escapedName !== "undefined"
-                ? String(node?.symbol?.escapedName)
+              typeof dangerouslyNodeToSymbol(node)?.escapedName !== "undefined"
+                ? String(dangerouslyNodeToSymbol(node)?.escapedName)
                 : undefined,
             type: this._convertType(this.#typeChecker.getTypeAtLocation(node)),
           }
@@ -197,11 +206,15 @@ export class CompilerApiHelper {
     if (ts.isNamedExports(clause)) {
       return ok(
         clause.elements
-          .map(({ symbol }) => symbol?.getEscapedName())
-          .filter((str): str is ts.__String => typeof str !== "undefined")
-          .map((str) => ts.unescapeLeadingUnderscores(str))
-          .map((key) => types.ok.find(({ typeName }) => typeName === key))
-          .filter((type): type is TypeDeclaration => type !== undefined)
+          .map(dangerouslyExportSpecifierToEscapedName)
+          .flatMap((str) =>
+            typeof str === "undefined"
+              ? []
+              : types.ok.find(
+                  ({ typeName }) =>
+                    typeName === ts.unescapeLeadingUnderscores(str)
+                ) ?? []
+          )
       )
     }
 
@@ -233,7 +246,9 @@ export class CompilerApiHelper {
         propName: string
         type: to.TypeObject
       } => {
-        const typeNode = symbol.valueDeclaration?.type
+        const typeNode = symbol.valueDeclaration
+          ? dangerouslyDeclarationToType(symbol.valueDeclaration)
+          : undefined
         const declare = (symbol.declarations ?? [])[0]
         const type = declare
           ? this.#typeChecker.getTypeOfSymbolAtLocation(symbol, declare)
@@ -273,7 +288,7 @@ export class CompilerApiHelper {
   public _convertType(type: ts.Type): to.TypeObject {
     return switchExpression({
       type,
-      typeNode: type.node,
+      typeNode: dangerouslyTypeToNode(type),
       typeText: this.#typeToString(type),
     })
       .case<to.EnumTO>(
@@ -311,7 +326,7 @@ export class CompilerApiHelper {
         ({ typeText }) => ({
           __type: "UnionTO",
           typeName: typeText,
-          unions: (type?.types ?? []).map((type) =>
+          unions: dangerouslyTypeToTypes(type).map((type) =>
             this._convertType(type)
           ) as ArrayAtLeastN<to.TypeObject, 2>,
         })
@@ -339,7 +354,7 @@ export class CompilerApiHelper {
         ({ type }) => type.isLiteral(),
         ({ type }) => ({
           __type: "LiteralTO",
-          value: type.value,
+          value: type.isLiteral() ? type.value : undefined,
         })
       )
       .case<to.LiteralTO>(
@@ -485,7 +500,7 @@ export class CompilerApiHelper {
 
   #createObjectType(tsType: ts.Type): to.ObjectTO {
     const typeName = this.#typeToString(tsType)
-    const key = uuidv4()
+    const key = generateUuid()
     this.#objectPropsStore[key] = tsType
     return {
       __type: "ObjectTO",
@@ -506,7 +521,7 @@ export class CompilerApiHelper {
     to.TypeObject,
     { reason: "node_not_defined" | "not_array_type_node" | "cannot_resolve" }
   > {
-    const maybeArrayT = (type.resolvedTypeArguments ?? [])[0]
+    const maybeArrayT = dangerouslyTypeToResolvedTypeArguments(type)[0]
     if (
       type.symbol?.getEscapedName() === "Array" &&
       typeof maybeArrayT !== "undefined"
@@ -514,7 +529,7 @@ export class CompilerApiHelper {
       return ok(this._convertType(maybeArrayT))
     }
 
-    const maybeNode = type?.node
+    const maybeNode = dangerouslyTypeToNode(type)
     if (!maybeNode) {
       return ng({
         reason: "node_not_defined",
@@ -547,7 +562,7 @@ export class CompilerApiHelper {
     [to.TypeObject, ...to.TypeObject[]],
     { reason: "node_not_found" | "not_type_ref_node" | "no_type_argument" }
   > {
-    const resolvedTypeArguments = type.resolvedTypeArguments
+    const resolvedTypeArguments = dangerouslyTypeToResolvedTypeArguments(type)
     if (resolvedTypeArguments !== undefined) {
       const typeArgs = resolvedTypeArguments.map((tsType) =>
         this._convertType(tsType)
@@ -557,7 +572,10 @@ export class CompilerApiHelper {
       }
     }
 
-    const maybeTypeRefNode = (type.aliasSymbol?.declarations ?? [])[0]?.type
+    const maybeDeclare = (type.aliasSymbol?.declarations ?? [])[0]
+    const maybeTypeRefNode = maybeDeclare
+      ? dangerouslyDeclarationToType(maybeDeclare)
+      : undefined
 
     if (!maybeTypeRefNode) {
       return ng({

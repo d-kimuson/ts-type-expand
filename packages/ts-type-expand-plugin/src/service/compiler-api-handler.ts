@@ -61,7 +61,6 @@ export class CompilerHandler {
     }
 
     const tsType = this.checker.getTypeAtLocation(maybeNode)
-    // @ts-expect-error no typedef but it exists
     if ("intrinsicName" in tsType && tsType.intrinsicName === "error") {
       throw new Error(`Unexpected intrinsicName Error, ${tsType.toString()}`)
       // return undefined

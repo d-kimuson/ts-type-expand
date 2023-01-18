@@ -11,6 +11,7 @@ import {
   TypeExpandProviderOptions,
 } from "~/vsc/TypeExpandProvider"
 import { ApiClient } from "./api-client"
+import { logger } from "./utils/logger"
 
 type TypescriptLanguageFeatures = {
   getAPI(n: number): {
@@ -83,21 +84,31 @@ const extensionClosure = () => {
     try {
       const isActive = await checkAndUpdateServerStatus()
 
-      if (isActive) return
+      if (isActive) {
+        return
+      }
 
       // re-configure ts-plugin
       typeExpandProvider.updateOptions(await extensionConfig())
       setTimeout(() => {
         checkAndUpdateServerStatus().then((isActive) => {
           if (!isActive) {
+            logger.error("FAILED_TO_CONNECT_SERVER", {
+              reason: "timeout",
+              error: undefined,
+            })
             serverStatus = "dead"
             vscode.window.showErrorMessage(
               "Could not connect to TS server. Try `typescript.restartTsServer`."
             )
           }
         })
-      }, 500)
+      }, 1000)
     } catch (err) {
+      logger.error("FAILED_TO_CONNECT_SERVER", {
+        reason: "caught-error",
+        error: err,
+      })
       serverStatus = "dead"
       vscode.window.showErrorMessage(
         "Could not connect to TS server. Try `typescript.restartTsServer`."
@@ -241,7 +252,7 @@ const extensionClosure = () => {
 
   const deactivate = () => {
     typeExpandProvider.close()
-    console.log("ts-type-expand is deactivated")
+    logger.info("DEACTIVATE_EXTENSION", {})
   }
 
   return { activate, deactivate }

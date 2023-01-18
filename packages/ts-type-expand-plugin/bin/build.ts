@@ -1,10 +1,9 @@
 import { build } from "esbuild"
-import { resolve } from "path"
 
 build({
-  entryPoints: [resolve(__dirname, "../src/index.ts")],
+  entryPoints: ["src/index.ts"],
   bundle: true,
-  outdir: resolve(__dirname, "../dist"),
+  outdir: "dist",
   platform: "node",
   format: "cjs",
   minify: true,

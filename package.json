@@ -70,6 +70,6 @@
   },
   "dependencies": {
     "tsc-alias": "^1.6.7",
-    "typescript": "^4.6.4"
+    "typescript": "^4.9.4"
   }
 }

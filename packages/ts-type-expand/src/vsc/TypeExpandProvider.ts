@@ -3,8 +3,9 @@ import { TypeObject } from "compiler-api-helper"
 import { ApiClient } from "~/api-client"
 import { ExtensionOption } from "~/types/option"
 import { getCurrentFileLanguageId } from "~/utils/vscode"
+import { logger } from "~/utils/logger"
 
-export type TypeExpandProviderOptions = ExtensionOption & {}
+export type TypeExpandProviderOptions = ExtensionOption
 
 export class TypeExpandProvider
   implements vscode.TreeDataProvider<ExpandableTypeItem>
@@ -48,7 +49,9 @@ export class TypeExpandProvider
               throw new Error("Unexpected Server Error activation")
             }
           })
-          .catch((err) => {})
+          .catch((err) => {
+            logger.error("FailedToWaitServerActivation", err)
+          })
       }, 500)
 
       if (typeof timeout === "number") {
@@ -62,7 +65,9 @@ export class TypeExpandProvider
 
   private isCurrentFileValidated(): boolean {
     const languageId = getCurrentFileLanguageId()
-    if (languageId === undefined) return false
+    if (languageId === undefined) {
+      return false
+    }
 
     return this.options.validate.includes(languageId)
   }
@@ -149,7 +154,9 @@ export class TypeExpandProvider
     this._onDidChangeTreeData.fire()
   }
 
-  close(): void {}
+  close(): void {
+    //
+  }
 }
 
 type Kind = "Union" | "Properties" | "Function" | "Array" | "Enum" | undefined

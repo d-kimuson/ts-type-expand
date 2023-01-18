@@ -10,6 +10,7 @@
       "type": "extensionHost",
       "request": "launch",
       "args": [
+        "--profile-temp",
         "--extensionDevelopmentPath=${workspaceFolder}/packages/ts-type-expand"
       ],
       "outFiles": ["${workspaceFolder}/packages/ts-type-expand/out/**/*.js"],
