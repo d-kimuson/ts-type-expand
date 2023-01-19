@@ -73,3 +73,17 @@ In order for these settings to take effect, you need to run `ts-type-expand.rest
 ## License
 
 MIT
+
+## Contribute
+
+Welcome.
+
+### :memo:
+
+For debugging purposes, it is recommended to put a symbolic link to the directory where the logs are written.
+
+```bash
+$ ln -s ~/.ts-type-expand/logs ./logs
+```
+
+To start the debugger in a plain environment, you must enable `Workbench > Experimental > Settings Profile`. This setting does not exist in the per-workspace settings, only in the user settings, and must be set individually by the developer.

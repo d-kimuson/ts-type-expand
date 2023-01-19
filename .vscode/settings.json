@@ -1,13 +1,10 @@
 // Place your settings in this file to overwrite default and user settings.
 {
   "editor.tabSize": 2,
+  // typescript
+  "typescript.tsdk": "node_modules/typescript/lib",
   // ESLint
   "eslint.workingDirectories": ["./packages/*"],
-  "eslint.options": {
-    "overrideConfigFile": ".eslintrc.js",
-    "extensions": ["ts"]
-  },
-  "eslint.validate": ["typescript"],
   "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
