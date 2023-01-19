@@ -14,6 +14,7 @@ import {
 import { client, updatePortNumber } from "./api-client"
 import { logger } from "./utils/logger"
 import { resolve } from "node:path"
+import { TRPCClientError } from "@trpc/client"
 
 type TypescriptLanguageFeatures = {
   getAPI(n: number): {
@@ -60,19 +61,15 @@ const extensionClosure = () => {
     currentPortNumber = portNumber
     updatePortNumber(currentPortNumber)
 
-    await waitUntilServerActivated(15000)
-      .then(() => {
-        vscode.window.showInformationMessage("ts-type-expand is ready to use!")
+    await waitUntilServerActivated(15000).catch((error) => {
+      logger.error("SERVER_START_TIMEOUT", {
+        message: "timeout for starting ts-type-expand-plugin start.",
+        error,
       })
-      .catch((error) => {
-        logger.error("SERVER_START_TIMEOUT", {
-          message: "timeout for starting ts-type-expand-plugin start.",
-          error,
-        })
-        vscode.window.showErrorMessage(
-          "Could not connect to TS server. Try `typescript.restartTsServer`."
-        )
-      })
+      vscode.window.showErrorMessage(
+        "Could not connect to TS server. Try `typescript.restartTsServer`."
+      )
+    })
 
     return portNumber
   }
@@ -188,6 +185,10 @@ const extensionClosure = () => {
       await startPlugin()
       await updateCurrentFile()
 
+      if (serverStatus === "active") {
+        vscode.window.showInformationMessage("ts-type-expand is ready to use!")
+      }
+
       const disposes = [
         vscode.commands.registerCommand("ts-type-expand.restart", async () => {
           typeExpandProvider.updateOptions(await extensionConfig())
@@ -195,9 +196,11 @@ const extensionClosure = () => {
           await updateCurrentFile()
           typeExpandProvider.restart()
 
-          vscode.window.showInformationMessage(
-            "ts-type-expand is successfully restarted!"
-          )
+          if (serverStatus === "active") {
+            vscode.window.showInformationMessage(
+              "ts-type-expand is successfully restarted!"
+            )
+          }
         }),
         vscode.window.registerTreeDataProvider(
           "typeExpand",
@@ -229,17 +232,38 @@ const extensionClosure = () => {
             return
           }
 
+          if (serverStatus === "failed") {
+            await startPlugin()
+          }
+
           if (serverStatus !== "active") return
 
           try {
             await typeExpandProvider.updateSelection(e.textEditor.selection)
           } catch (error) {
+            if (error instanceof TRPCClientError) {
+              logger.error("TRPC_SERVER_ERROR", {
+                error,
+              })
+              return
+            }
+
+            serverStatus = "failed"
+
             if (error instanceof Error) {
               logger.error("UPDATE_SELECTION_ERROR", {
                 message: error.message,
                 stack: error.stack,
               })
+
+              vscode.window.showErrorMessage(error.message)
+              return
             }
+
+            logger.error("UPDATE_SELECTION_ERROR", {
+              error,
+            })
+            vscode.window.showErrorMessage(String(error))
           }
         }),
         vscode.window.onDidChangeActiveTextEditor(async () => {

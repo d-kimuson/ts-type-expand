@@ -105,31 +105,19 @@ export class TypeExpandProvider
 
     this.selection = selection
 
-    try {
-      const result = await client().getTypeFromPos.query({
-        filePath: this.activeFilePath,
-        line: this.selection.start.line,
-        character: this.selection.start.character,
-      })
+    const result = await client().getTypeFromPos.query({
+      filePath: this.activeFilePath,
+      line: this.selection.start.line,
+      character: this.selection.start.character,
+    })
 
-      this.selectedType = {
-        declareName: result.declareName,
-        type: deserializeTypeObject(result.type),
-      }
+    this.selectedType = {
+      declareName: result.declareName,
+      type: deserializeTypeObject(result.type),
+    }
 
-      if (this.selectedType) {
-        this.refresh()
-      }
-    } catch (error) {
-      const typedError = error as Error
-      logger.error("UPDATE_SELECTION_ERROR", {
-        message: typedError.message,
-        stack: typedError.stack,
-      })
-
-      if (!(error instanceof TRPCClientError)) {
-        vscode.window.showErrorMessage(typedError.message)
-      }
+    if (this.selectedType) {
+      this.refresh()
     }
   }
 
@@ -222,7 +210,7 @@ function toTypeText(type: TypeObject): string {
   }
 
   if (type.__type === "UnsupportedTO") {
-    return type.typeText ?? "unknown"
+    return type.typeText ?? "unsupported"
   }
 
   if (type.__type === "CallableTO") {

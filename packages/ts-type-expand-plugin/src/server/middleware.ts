@@ -65,6 +65,12 @@ export const loggingMiddleware = t.middleware(
       path,
       type,
       durationMs,
+      result: result.ok
+        ? result.data
+        : {
+            error: true,
+            value: result.error,
+          },
     })
 
     return result

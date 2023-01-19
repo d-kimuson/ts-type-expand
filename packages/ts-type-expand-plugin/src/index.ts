@@ -18,11 +18,12 @@ const factory: server.PluginModuleFactory = (mod) => {
         config: info.config,
       })
 
+      setCreateInfo(info)
+
       if (isInitialized) {
         return info.languageService
       }
 
-      setCreateInfo(info)
       const app = express()
       registerApp(app)
 
