@@ -21,8 +21,10 @@ export const dangerouslyDeclareToEscapedText = (
   throw new ExtractError("dangerouslyDeclareToEscapedText")
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export const dangerouslyNodeToSymbol = (node: Node): Symbol | undefined => {
   if ("symbol" in node) {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     return node.symbol as Symbol
   }
 
@@ -32,9 +34,9 @@ export const dangerouslyNodeToSymbol = (node: Node): Symbol | undefined => {
 export const dangerouslyExportSpecifierToEscapedName = (
   element: ExportSpecifier
 ): __String | undefined => {
-  // @ts-expect-error
+  // @ts-expect-error -- Because the type definition side is in error.
   if ("symbol" in element && "getEscapedName" in element["symbol"]) {
-    // @ts-expect-error
+    // @ts-expect-error Because the type definition side is in error.
     return element.symbol.getEscapedName() as __String
   }
 

@@ -1,28 +1,27 @@
-import vscode, { TextEditorSelectionChangeKind } from "vscode"
-import getPorts from "get-port"
 import { mkdirSync } from "fs"
-
+import { resolve } from "node:path"
+import { TRPCClientError } from "@trpc/client"
+import getPorts from "get-port"
+import vscode, { TextEditorSelectionChangeKind } from "vscode"
 import {
   getCurrentFileLanguageId,
   getCurrentFilePath,
   getExtensionConfig,
 } from "~/utils/vscode"
-import {
-  TypeExpandProvider,
-  TypeExpandProviderOptions,
-} from "~/vsc/type-expand-provider"
+import type { TypeExpandProviderOptions } from "~/vsc/type-expand-provider"
+import { TypeExpandProvider } from "~/vsc/type-expand-provider"
 import { client, updatePortNumber } from "./api-client"
 import { logger } from "./utils/logger"
-import { resolve } from "node:path"
-import { TRPCClientError } from "@trpc/client"
+
+type GetAPI = (n: number) => {
+  configurePlugin: <PluginName extends keyof PluginOptions>(
+    pluginName: PluginName,
+    options: PluginOptions[PluginName]
+  ) => void
+}
 
 type TypescriptLanguageFeatures = {
-  getAPI(n: number): {
-    configurePlugin: <PluginName extends keyof PluginOptions>(
-      pluginName: PluginName,
-      options: PluginOptions[PluginName]
-    ) => void
-  }
+  getAPI?: GetAPI
 }
 
 type PluginOptions = {
@@ -37,7 +36,7 @@ const extensionClosure = () => {
   let serverStatus: ServerStatus = "unloaded"
   let currentPortNumber = NaN
   let typeExpandProvider: TypeExpandProvider
-  let tsApi: ReturnType<TypescriptLanguageFeatures["getAPI"]>
+  let tsApi: ReturnType<GetAPI>
 
   const startPlugin = async () => {
     const defaultPort = getExtensionConfig("port")

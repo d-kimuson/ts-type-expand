@@ -1,9 +1,9 @@
 import * as trpcExpress from "@trpc/server/adapters/express"
-import { Express } from "express"
-import { router } from "./controller"
+import type { Express } from "express"
 import { createContext } from "./context"
+import { router } from "./controller"
 
-export const registerApp = (app: Express) => {
+export const registerApp = (app: Express): void => {
   app.use(
     "/trpc",
     trpcExpress.createExpressMiddleware({

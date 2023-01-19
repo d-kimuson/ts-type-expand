@@ -4,7 +4,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 6,
     sourceType: "module",
-    project: "./**/tsconfig.json",
+    project: "./**/(tsconfig|tsconfig.test).json",
   },
   extends: [
     "eslint:recommended",

@@ -1,4 +1,4 @@
-import { Program } from "typescript"
+import type { Program } from "typescript"
 import type { server } from "typescript/lib/tsserverlibrary"
 
 export type Context = {

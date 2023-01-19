@@ -1,5 +1,5 @@
 import vscode from "vscode"
-import { ExtensionOption } from "~/types/option"
+import type { ExtensionOption } from "~/types/option"
 
 export function getCurrentFilePath(): string | undefined {
   return vscode.window.activeTextEditor?.document.uri.fsPath

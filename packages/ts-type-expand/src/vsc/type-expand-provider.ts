@@ -1,11 +1,9 @@
-import vscode from "vscode"
-import { TypeObject } from "compiler-api-helper"
-import { client, updatePortNumber } from "~/api-client"
-import { ExtensionOption } from "~/types/option"
-import { getCurrentFileLanguageId } from "~/utils/vscode"
-import { logger } from "~/utils/logger"
 import { deserializeTypeObject } from "compiler-api-helper/src/serialize"
-import { TRPCClientError } from "@trpc/client"
+import vscode from "vscode"
+import type { TypeObject } from "compiler-api-helper"
+import { client, updatePortNumber } from "~/api-client"
+import type { ExtensionOption } from "~/types/option"
+import { getCurrentFileLanguageId } from "~/utils/vscode"
 
 export type TypeExpandProviderOptions = ExtensionOption
 
@@ -19,7 +17,7 @@ export class TypeExpandProvider
   }
   private activeFilePath: string | undefined
 
-  constructor(private options: TypeExpandProviderOptions) {
+  public constructor(private options: TypeExpandProviderOptions) {
     this.updateOptions(options)
   }
 
@@ -31,33 +29,6 @@ export class TypeExpandProvider
 
     this.options = options
   }
-
-  // async waitUntilServerActivated(timeout?: number): Promise<void> {
-  //   return await new Promise<void>((resolve, reject) => {
-  //     const timer = setInterval(() => {
-  //       client()
-  //         .isServerActivated.query()
-  //         .then(({ success, data }) => {
-  //           if (data.isActivated) {
-  //             clearInterval(timer)
-  //             resolve()
-  //           } else {
-  //             throw new Error("Unexpected Server Error activation")
-  //           }
-  //         })
-  //         .catch((err) => {
-  //           logger.error("FailedToWaitServerActivation", err)
-  //         })
-  //     }, 500)
-
-  //     if (typeof timeout === "number") {
-  //       setTimeout(() => {
-  //         clearInterval(timer)
-  //         reject("timeout")
-  //       }, timeout)
-  //     }
-  //   })
-  // }
 
   private isCurrentFileValidated(): boolean {
     const languageId = getCurrentFileLanguageId()
@@ -72,11 +43,13 @@ export class TypeExpandProvider
     this.refresh()
   }
 
-  getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
+  public getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
     return element
   }
 
-  getChildren(element?: ExpandableTypeItem): Thenable<ExpandableTypeItem[]> {
+  public getChildren(
+    element?: ExpandableTypeItem
+  ): Thenable<ExpandableTypeItem[]> {
     if (!this.selectedType) {
       return Promise.resolve([])
     }
@@ -90,7 +63,7 @@ export class TypeExpandProvider
         ])
   }
 
-  async updateSelection(selection: vscode.Selection) {
+  public async updateSelection(selection: vscode.Selection): Promise<void> {
     if (!this.activeFilePath) {
       vscode.window.showWarningMessage(
         "The file you are editing cannot be found."
@@ -116,9 +89,7 @@ export class TypeExpandProvider
       type: deserializeTypeObject(result.type),
     }
 
-    if (this.selectedType) {
-      this.refresh()
-    }
+    this.refresh()
   }
 
   public updateActiveFile(activeFilePath: string | undefined): void {
@@ -135,15 +106,15 @@ export class TypeExpandProvider
   private _onDidChangeTreeData: vscode.EventEmitter<
     ExpandableTypeItem | undefined | null | void
   > = new vscode.EventEmitter<ExpandableTypeItem | undefined | null | void>()
-  readonly onDidChangeTreeData: vscode.Event<
+  public readonly onDidChangeTreeData: vscode.Event<
     ExpandableTypeItem | undefined | null | void
   > = this._onDidChangeTreeData.event
 
-  refresh(): void {
+  public refresh(): void {
     this._onDidChangeTreeData.fire()
   }
 
-  close(): void {
+  public close(): void {
     //
   }
 }
@@ -235,6 +206,7 @@ function toTypeText(type: TypeObject): string {
     return String(type.value)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (type.__type === "SpecialTO") {
     return type.kind
   }
@@ -245,7 +217,7 @@ function toTypeText(type: TypeObject): string {
 class ExpandableTypeItem extends vscode.TreeItem {
   public static options: TypeExpandProviderOptions
 
-  constructor(
+  public constructor(
     private type: TypeObject,
     meta?: {
       parent?: TypeObject
@@ -278,11 +250,11 @@ class ExpandableTypeItem extends vscode.TreeItem {
     this.tooltip = toTypeText(type)
   }
 
-  static updateOptions(options: TypeExpandProviderOptions) {
+  public static updateOptions(options: TypeExpandProviderOptions) {
     ExpandableTypeItem.options = options
   }
 
-  async getChildrenItems(): Promise<ExpandableTypeItem[]> {
+  public async getChildrenItems(): Promise<ExpandableTypeItem[]> {
     if (this.type.__type === "CallableTO") {
       return [
         ...this.type.argTypes.map(

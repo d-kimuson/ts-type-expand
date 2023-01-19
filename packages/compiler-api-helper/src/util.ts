@@ -99,7 +99,7 @@ export const switchExpression = <T>(target: T): SwitchResult<T, never> => {
 
 type Append<Item, Tuple extends unknown[]> = [Item, ...Tuple]
 export type ArrayAtLeastN<
-  T extends unknown,
+  T,
   N extends number = 1,
   Tuple = TupleN<N, T>
 > = Tuple extends T[] ? [...Tuple, ...T[]] : never
@@ -112,9 +112,10 @@ export function assertMinLength<T, L extends number>(
   arr: T[],
   length: L
 ): ArrayAtLeastN<T, L> {
-  if (arr.length < length)
+  if (arr.length < length) {
     throw new TypeError(
       `Type assertion failed. arr.length should be gt ${length}, but get ${arr.length}`
     )
+  }
   return arr as unknown as ArrayAtLeastN<T, L>
 }

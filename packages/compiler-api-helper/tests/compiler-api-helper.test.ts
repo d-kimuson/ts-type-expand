@@ -1,8 +1,8 @@
 import { resolve } from "path"
+import type { TypeObject } from "dist/src"
 import { CompilerApiHelper } from "~/compiler-api-helper"
-import { createProgram } from "./helpers/program"
 import { isOk } from "~/util"
-import { TypeObject } from "dist/src"
+import { createProgram } from "./helpers/program"
 
 const absolutePath = (path: string) =>
   resolve(__dirname, "./test-project", path)
@@ -92,7 +92,7 @@ describe("convertType", () => {
     const [type0, type1] = types
     expect(type0).toBeDefined()
     expect(type1).not.toBeDefined()
-    if (!type0) return
+    if (!type0) {return}
 
     expect(type0.type).toStrictEqual({
       __type: "UnionTO",
@@ -122,7 +122,7 @@ describe("convertType", () => {
     expect(type0).toBeDefined()
     expect(type1).toBeDefined()
     expect(type2).not.toBeDefined()
-    if (!type0 || !type1) return
+    if (!type0 || !type1) {return}
 
     expect(type0.type).toStrictEqual({
       __type: "EnumTO",
@@ -209,7 +209,7 @@ describe("convertType", () => {
       // array in property
       const arrInProp = types[2]?.type
       expect(arrInProp?.__type).toBe("ObjectTO")
-      if (arrInProp?.__type !== "ObjectTO") return
+      if (arrInProp?.__type !== "ObjectTO") {return}
       expect(helper.getObjectProps(arrInProp.storeKey)[0]).toStrictEqual({
         propName: "arr",
         type: {
@@ -289,8 +289,8 @@ describe("convertType", () => {
     ])
 
     if (type2.type.__type !== "ObjectTO")
-      throw new TypeError("expected ObjectTO")
-    const propsOneRecursive = helper.getObjectProps(type2?.type.storeKey)
+      {throw new TypeError("expected ObjectTO")}
+    const propsOneRecursive = helper.getObjectProps(type2.type.storeKey)
     expect(propsOneRecursive[0]).toStrictEqual({
       propName: "name",
       type: {
@@ -299,7 +299,7 @@ describe("convertType", () => {
       },
     })
     const recursiveProp = propsOneRecursive[1]?.type
-    if (recursiveProp === undefined) throw new TypeError("Unexpected undefined")
+    if (recursiveProp === undefined) {throw new TypeError("Unexpected undefined")}
     if (recursiveProp.__type !== "ObjectTO") {
       throw new Error("Error")
     }
@@ -320,7 +320,7 @@ describe("convertType", () => {
       const [type_0, type_1] = typesResult.ok
       expect(type_0).toBeDefined()
       expect(type_1).not.toBeDefined()
-      if (!type_0) return
+      if (!type_0) {return}
 
       expect(type_0.typeName).toBe("ResultOfGenerics")
       expect(type_0.type.__type).toBe("ObjectTO")
@@ -378,10 +378,10 @@ describe("convertType", () => {
     const types = typesResult.ok
     const [type0, type1] = types
     expect(type0).toBeDefined()
-    if (typeof type0 === "undefined") return
+    if (typeof type0 === "undefined") {return}
 
     expect(type0.type.__type).toBe("ObjectTO")
-    if (type0.type.__type !== "ObjectTO") return
+    if (type0.type.__type !== "ObjectTO") {return}
 
     expect(helper.getObjectProps(type0.type.storeKey)).toStrictEqual([
       {
@@ -423,8 +423,8 @@ describe("convertType", () => {
     // intersection
     expect(type1).toBeDefined()
     expect(type1?.type.__type).toBe("ObjectTO")
-    if (!type1 || type1?.type.__type !== "ObjectTO") return
-    expect(helper.getObjectProps(type1?.type.storeKey)).toStrictEqual([
+    if (!type1 || type1.type.__type !== "ObjectTO") {return}
+    expect(helper.getObjectProps(type1.type.storeKey)).toStrictEqual([
       {
         propName: "hoge",
         type: {
@@ -461,7 +461,7 @@ describe("convertType", () => {
     if (type0?.type.__type !== "ObjectTO") {
       return
     }
-    expect(helper.getObjectProps(type0?.type.storeKey)).toStrictEqual([
+    expect(helper.getObjectProps(type0.type.storeKey)).toStrictEqual([
       {
         propName: "name",
         type: {
@@ -501,7 +501,7 @@ describe("convertType", () => {
 
     expect(type1?.type.__type).toBe("ObjectTO")
     const typeObj = type1?.type
-    if (!typeObj || typeObj.__type !== "ObjectTO") return
+    if (!typeObj || typeObj.__type !== "ObjectTO") {return}
 
     expect(helper.getObjectProps(typeObj.storeKey)).toStrictEqual([
       {
@@ -540,11 +540,11 @@ describe("convertType", () => {
     const [type0, type1] = types
     expect(type0).toBeDefined()
     expect(type0?.type.__type).toBe("PromiseTO")
-    if (!type0 || type0.type.__type !== "PromiseTO") return
+    if (!type0 || type0.type.__type !== "PromiseTO") {return}
 
     const childType = type0.type.child
     expect(childType.__type).toBe("ObjectTO")
-    if (childType.__type !== "ObjectTO") return
+    if (childType.__type !== "ObjectTO") {return}
     expect(helper.getObjectProps(childType.storeKey)).toStrictEqual([
       {
         propName: "name",
@@ -572,11 +572,11 @@ describe("convertType", () => {
     const [type0, type1] = types
     expect(type0).toBeDefined()
     expect(type0?.type.__type).toBe("PromiseLikeTO")
-    if (!type0 || type0.type.__type !== "PromiseLikeTO") return
+    if (!type0 || type0.type.__type !== "PromiseLikeTO") {return}
 
     const childType = type0.type.child
     expect(childType.__type).toBe("ObjectTO")
-    if (childType.__type !== "ObjectTO") return
+    if (childType.__type !== "ObjectTO") {return}
     expect(helper.getObjectProps(childType.storeKey)).toStrictEqual([
       {
         propName: "name",
@@ -603,22 +603,22 @@ describe("convertType", () => {
     expect(type1).toBeDefined()
 
     expect(type0?.type.__type).toBe("SpecialTO")
-    if (!type0 || type0.type.__type !== "SpecialTO") return
-    expect(type0?.type.kind).toBe("unique symbol")
+    if (!type0 || type0.type.__type !== "SpecialTO") {return}
+    expect(type0.type.kind).toBe("unique symbol")
 
     expect(type1?.type.__type).toBe("SpecialTO")
-    if (!type1 || type1.type.__type !== "SpecialTO") return
-    expect(type1?.type.kind).toBe("Symbol")
+    if (!type1 || type1.type.__type !== "SpecialTO") {return}
+    expect(type1.type.kind).toBe("Symbol")
   })
 
   it("variable", () => {
     const typesResult = helper.extractTypes(absolutePath("./types/variable.ts"))
     if (!isOk(typesResult))
-      throw new TypeError(`TypeResult is ng, reason: ${typesResult.ng.reason}`)
+      {throw new TypeError(`TypeResult is ng, reason: ${typesResult.ng.reason}`)}
 
     const [var0] = typesResult.ok
     if (var0 === undefined)
-      throw new TypeError(`var0 is unexpectedly undefined`)
+      {throw new TypeError(`var0 is unexpectedly undefined`)}
 
     expect<{ typeName: string | undefined; type: TypeObject }>(
       var0

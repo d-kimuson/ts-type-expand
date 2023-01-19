@@ -1,5 +1,5 @@
-import type { ParsedCommandLine } from "typescript"
 import { readConfigFile, parseJsonConfigFileContent, sys } from "typescript"
+import type { ParsedCommandLine } from "typescript"
 
 export function loadTsConfig(
   filePath: string,

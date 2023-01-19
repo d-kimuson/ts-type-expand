@@ -1,4 +1,4 @@
-import { ArrayAtLeastN } from "./util"
+import type { ArrayAtLeastN } from "./util"
 
 export type TypeObject =
   | PrimitiveTO

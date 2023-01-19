@@ -7,11 +7,11 @@ module.exports = {
   testMatch: ["<rootDir>/src/test/jest/**/?(*.)+(spec|test).+(ts)"],
   globals: {
     "ts-jest": {
-      tsconfig: "src/test/jest/tsconfig.json",
+      tsconfig: "./tsconfig.test.json",
     },
   },
   preset: "ts-jest",
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
-    prefix: "<rootDir>/src",
+    prefix: "<rootDir>",
   }),
 }

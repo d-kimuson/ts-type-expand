@@ -1,18 +1,17 @@
-import type * as ts from "typescript"
-import { TypeObject } from "compiler-api-helper"
-
+import CompilerApiHelper from "compiler-api-helper"
 import {
   forEachChild,
   getPositionOfLineAndCharacter,
   unescapeLeadingUnderscores,
 } from "typescript"
-import CompilerApiHelper from "compiler-api-helper"
+import type { TypeObject } from "compiler-api-helper"
+import type * as ts from "typescript"
 
 export class CompilerHandler {
   private checker: ts.TypeChecker
   private helper: CompilerApiHelper
 
-  constructor(private program: ts.Program) {
+  public constructor(private program: ts.Program) {
     this.checker = this.program.getTypeChecker()
     this.helper = new CompilerApiHelper(this.program)
   }
@@ -21,7 +20,6 @@ export class CompilerHandler {
     this.program = program
     this.checker = this.program.getTypeChecker()
     this.helper.updateProgram(this.program)
-    console.log("program & checker config is updated!")
   }
 
   private checkProgram() {
@@ -48,12 +46,7 @@ export class CompilerHandler {
         throw new Error(`File extension is not supported: ${filePath}`)
       }
     }
-    let pos: number
-    try {
-      pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
-    } catch (error) {
-      throw error
-    }
+    const pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
     const maybeNode = this.getNodeFromPos(sourceFile, pos)
 
     if (!maybeNode) {

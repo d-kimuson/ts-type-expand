@@ -1,9 +1,8 @@
-import { ModuleKind, ScriptTarget } from "typescript"
 import path from "path"
+import { ModuleKind, ScriptTarget } from "typescript"
+import { loadTsConfig } from "~/utils/tsconfig"
 
-import { loadTsConfig } from "~/utils/tsConfig"
-
-const exampleDir = path.resolve(__dirname, "../../../../example")
+const exampleDir = path.resolve(__dirname, "../../../../../example")
 
 test("load example tsconfig", () => {
   const tsConfig = loadTsConfig(

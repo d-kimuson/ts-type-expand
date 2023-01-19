@@ -1,15 +1,16 @@
-import { LanguageServiceMode, server } from "typescript/lib/tsserverlibrary"
-import type { Server } from "http"
 import express from "express"
-import { PluginConfiguration, pluginConfigurationSchema } from "./schema"
-import { registerApp } from "./server/app"
+import type { PluginConfiguration } from "./schema"
+import type { Server } from "http"
+import type { server } from "typescript/lib/tsserverlibrary"
 import { logger } from "./logger"
+import { pluginConfigurationSchema } from "./schema"
+import { registerApp } from "./server/app"
 import { setCreateInfo } from "./server/context"
 
-const factory: server.PluginModuleFactory = (mod) => {
+const factory: server.PluginModuleFactory = (_mod) => {
   let server: Server | undefined
   let start: ((port: number) => void) | undefined
-  let isInitialized: boolean = false
+  let isInitialized = false
 
   return {
     create(info) {

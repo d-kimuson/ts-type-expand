@@ -1,12 +1,12 @@
 import { TRPCError } from "@trpc/server"
 import { serializeTypeObject } from "compiler-api-helper/src/serialize"
 import { z } from "zod"
+import type { CompilerHandler } from "../service/compiler-api-handler"
 import { logger } from "../logger"
-import { CompilerHandler } from "../service/compiler-api-handler"
 import { procedure, requiredProgramProcedure } from "./procedure"
 import { t } from "./trpc"
 
-export const isServerActivated = procedure.query((req) => ({
+export const isServerActivated = procedure.query(() => ({
   success: true,
   data: {
     isActivated: true,

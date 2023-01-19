@@ -23,5 +23,5 @@
     "emitDeclarationOnly": true
   },
   "include": ["src", "bin"],
-  "exclude": ["node_modules", ".vscode-test", "example", "src/test"]
+  "exclude": ["node_modules", ".vscode-test", "example", "*.test.ts"]
 }

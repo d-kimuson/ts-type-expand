@@ -1,9 +1,9 @@
 import { TRPCError } from "@trpc/server"
-import { Context } from "./context"
-import { t } from "./trpc"
-import { Program } from "typescript"
-import { CompilerHandler } from "../service/compiler-api-handler"
+import type { Context } from "./context"
+import type { Program } from "typescript"
 import { logger } from "../logger"
+import { CompilerHandler } from "../service/compiler-api-handler"
+import { t } from "./trpc"
 
 export type RequiredProgramContext = Omit<Context, "program"> & {
   program: Program
@@ -49,30 +49,28 @@ export const requiredProgramMiddleware = t.middleware(({ ctx, next }) => {
   })
 })
 
-export const loggingMiddleware = t.middleware(
-  async ({ path, type, ctx, next }) => {
-    const start = Date.now()
+export const loggingMiddleware = t.middleware(async ({ path, type, next }) => {
+  const start = Date.now()
 
-    logger.info("START_REQUEST", {
-      path,
-      type,
-    })
+  logger.info("START_REQUEST", {
+    path,
+    type,
+  })
 
-    const result = await next()
-    const durationMs = Date.now() - start
+  const result = await next()
+  const durationMs = Date.now() - start
 
-    logger.info("SERVER_RESPONSE", {
-      path,
-      type,
-      durationMs,
-      result: result.ok
-        ? result.data
-        : {
-            error: true,
-            value: result.error,
-          },
-    })
+  logger.info("SERVER_RESPONSE", {
+    path,
+    type,
+    durationMs,
+    result: result.ok
+      ? result.data
+      : {
+          error: true,
+          value: result.error,
+        },
+  })
 
-    return result
-  }
-)
+  return result
+})

@@ -1,4 +1,4 @@
-import { TypeObject } from "./type-object"
+import type { TypeObject } from "./type-object"
 
 type SerializedTypeObject = {
   kind: "SERIALIZED_TYPE_OBJECT"
