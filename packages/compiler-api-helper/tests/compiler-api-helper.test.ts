@@ -558,6 +558,59 @@ describe("convertType", () => {
     expect(type1).not.toBeDefined()
   })
 
+  it("promise-like", () => {
+    const typesResult = helper.extractTypes(
+      absolutePath("./types/promise-like.ts")
+    )
+    expect(isOk(typesResult)).toBe(true)
+    if (!isOk(typesResult)) {
+      return
+    }
+
+    const types = typesResult.ok
+
+    const [type0, type1] = types
+    expect(type0).toBeDefined()
+    expect(type0?.type.__type).toBe("PromiseLikeTO")
+    if (!type0 || type0.type.__type !== "PromiseLikeTO") return
+
+    const childType = type0.type.child
+    expect(childType.__type).toBe("ObjectTO")
+    if (childType.__type !== "ObjectTO") return
+    expect(helper.getObjectProps(childType.storeKey)).toStrictEqual([
+      {
+        propName: "name",
+        type: {
+          __type: "PrimitiveTO",
+          kind: "string",
+        },
+      },
+    ])
+
+    expect(type1).not.toBeDefined()
+  })
+
+  it("symbol", () => {
+    const typesResult = helper.extractTypes(absolutePath("./types/symbol.ts"))
+    expect(isOk(typesResult)).toBe(true)
+    if (!isOk(typesResult)) {
+      return
+    }
+
+    const types = typesResult.ok
+
+    const [type0, type1] = types
+    expect(type1).toBeDefined()
+
+    expect(type0?.type.__type).toBe("SpecialTO")
+    if (!type0 || type0.type.__type !== "SpecialTO") return
+    expect(type0?.type.kind).toBe("unique symbol")
+
+    expect(type1?.type.__type).toBe("SpecialTO")
+    if (!type1 || type1.type.__type !== "SpecialTO") return
+    expect(type1?.type.kind).toBe("Symbol")
+  })
+
   it("variable", () => {
     const typesResult = helper.extractTypes(absolutePath("./types/variable.ts"))
     if (!isOk(typesResult))

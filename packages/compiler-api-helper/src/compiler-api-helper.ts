@@ -285,6 +285,9 @@ export class CompilerApiHelper {
   }
 
   public _convertType(type: ts.Type): to.TypeObject {
+    console.log({
+      typeText: this.#typeToString(type),
+    })
     return switchExpression({
       type,
       typeNode: dangerouslyTypeToNode(type),
@@ -407,6 +410,14 @@ export class CompilerApiHelper {
         ({ typeText }) => typeText === "Date",
         () => special("Date")
       )
+      .case<to.SpecialTO>(
+        ({ typeText }) => typeText === "unique symbol",
+        () => special("unique symbol")
+      )
+      .case<to.SpecialTO>(
+        ({ typeText }) => typeText === "Symbol",
+        () => special("Symbol")
+      )
       .case<to.ArrayTO>(
         ({ type, typeText }) =>
           typeText.endsWith("[]") || type.symbol?.escapedName === "Array",
@@ -442,6 +453,26 @@ export class CompilerApiHelper {
 
           return {
             __type: "PromiseTO",
+            child: typeArg,
+          }
+        }
+      )
+      .case<to.PromiseLikeTO>(
+        ({ type }) =>
+          (typeof type.symbol?.escapedName !== "undefined"
+            ? unescapeLeadingUnderscores(type.symbol?.escapedName)
+            : "") === "PromiseLike",
+        ({ type }) => {
+          const typeArgResult = this.#extractTypeArguments(type)
+          const typeArg: to.TypeObject = isOk(typeArgResult)
+            ? typeArgResult.ok[0]
+            : {
+                __type: "UnsupportedTO",
+                kind: "promiseNoArgument",
+              }
+
+          return {
+            __type: "PromiseLikeTO",
             child: typeArg,
           }
         }

@@ -10,6 +10,7 @@ export type TypeObject =
   | EnumTO
   | CallableTO
   | PromiseTO
+  | PromiseLikeTO
   | UnsupportedTO
   | ObjectTO
 
@@ -24,7 +25,16 @@ export type PrimitiveTO = {
 
 export type SpecialTO = {
   __type: "SpecialTO"
-  kind: "null" | "undefined" | "any" | "unknown" | "never" | "void" | "Date"
+  kind:
+    | "null"
+    | "undefined"
+    | "any"
+    | "unknown"
+    | "never"
+    | "void"
+    | "Date"
+    | "unique symbol"
+    | "Symbol"
 }
 
 export type LiteralTO = {
@@ -73,6 +83,11 @@ export type CallableTO = {
     // should support optional arguments?
   }[]
   returnType: TypeObject
+}
+
+export type PromiseLikeTO = {
+  __type: "PromiseLikeTO"
+  child: TypeObject
 }
 
 export type PromiseTO = {

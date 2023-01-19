@@ -32,9 +32,10 @@ export const dangerouslyNodeToSymbol = (node: Node): Symbol | undefined => {
 export const dangerouslyExportSpecifierToEscapedName = (
   element: ExportSpecifier
 ): __String | undefined => {
-  if ("symbol" in element) {
+  // @ts-expect-error
+  if ("symbol" in element && "getEscapedName" in element["symbol"]) {
     // @ts-expect-error
-    return element.getEscapedName() as __String
+    return element.symbol.getEscapedName() as __String
   }
 
   return undefined

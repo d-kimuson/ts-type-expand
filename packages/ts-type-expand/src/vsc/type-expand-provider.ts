@@ -235,6 +235,10 @@ function toTypeText(type: TypeObject): string {
     return `Promise<${toTypeText(type.child)}>`
   }
 
+  if (type.__type === "PromiseLikeTO") {
+    return `PromiseLike<${toTypeText(type.child)}>`
+  }
+
   if (type.__type === "PrimitiveTO") {
     return type.kind
   }
