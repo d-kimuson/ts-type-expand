@@ -18,15 +18,18 @@ const winstonLogger = createLogger({
   },
   transports: [
     new transports.File({
-      filename: resolve(process.cwd(), "logs/info.log"),
+      filename:
+        "/Users/kaito/Playground/ts-type-expand/packages/ts-type-expand-plugin/logs/info.log",
       level: "info",
     }),
     new transports.File({
-      filename: resolve(process.cwd(), "logs/warn.log"),
+      filename:
+        "/Users/kaito/Playground/ts-type-expand/packages/ts-type-expand-plugin/logs/warn.log",
       level: "warn",
     }),
     new transports.File({
-      filename: resolve(process.cwd(), "logs/error.log"),
+      filename:
+        "/Users/kaito/Playground/ts-type-expand/packages/ts-type-expand-plugin/logs/error.log",
       level: "error",
     }),
   ],

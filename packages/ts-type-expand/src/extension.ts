@@ -1,4 +1,4 @@
-import vscode from "vscode"
+import vscode, { TextEditorSelectionChangeKind } from "vscode"
 import getPorts from "get-port"
 
 import {
@@ -9,8 +9,8 @@ import {
 import {
   TypeExpandProvider,
   TypeExpandProviderOptions,
-} from "~/vsc/TypeExpandProvider"
-import { ApiClient } from "./api-client"
+} from "~/vsc/type-expand-provider"
+import { client, updatePortNumber } from "./api-client"
 import { logger } from "./utils/logger"
 
 type TypescriptLanguageFeatures = {
@@ -32,32 +32,47 @@ type ServerStatus = "unloaded" | "loading" | "active" | "failed" | "dead"
 
 const extensionClosure = () => {
   let serverStatus: ServerStatus = "unloaded"
-  let prevPortNum = NaN
+  let currentPortNumber = NaN
   let typeExpandProvider: TypeExpandProvider
   let tsApi: ReturnType<TypescriptLanguageFeatures["getAPI"]>
-  let apiClient: ApiClient
 
-  // private
-  const getAndUpdatePort = async (): Promise<number> => {
-    const portNum = getExtensionConfig("port")
+  const startPlugin = async () => {
+    const defaultPort = getExtensionConfig("port")
 
-    if (Number.isNaN(portNum)) {
+    if (Number.isNaN(defaultPort)) {
       throw new TypeError("postNum should not be NaN.")
     }
 
-    // サーバーが生きててポート番号が変わってないならそのまま
-    if (serverStatus !== "failed" && prevPortNum === portNum) {
-      return portNum
-    }
+    const portNumber = await getPorts({
+      port: defaultPort,
+    })
 
-    const port = await getPorts({
-      port: prevPortNum,
+    logger.info("REQUEST_PLUGIN", {
+      message: "configurePlugin",
+      port: portNumber,
     })
+
     tsApi.configurePlugin("ts-type-expand-plugin", {
-      port,
+      port: portNumber,
     })
-    prevPortNum = port
-    return port
+    currentPortNumber = portNumber
+    updatePortNumber(currentPortNumber)
+
+    await waitUntilServerActivated(15000)
+      .then(() => {
+        vscode.window.showInformationMessage("ts-type-expand is ready to use!")
+      })
+      .catch((error) => {
+        logger.error("SERVER_START_TIMEOUT", {
+          message: "timeout for starting ts-type-expand-plugin start.",
+          error,
+        })
+        vscode.window.showErrorMessage(
+          "Could not connect to TS server. Try `typescript.restartTsServer`."
+        )
+      })
+
+    return portNumber
   }
 
   const extensionConfig = async (): Promise<TypeExpandProviderOptions> => {
@@ -66,75 +81,53 @@ const extensionClosure = () => {
       compactPropertyLength: getExtensionConfig("compactPropertyLength"),
       directExpandArray: getExtensionConfig("directExpandArray"),
       validate: getExtensionConfig("validate"),
-      port: await getAndUpdatePort(),
+      port: currentPortNumber,
     }
   }
 
-  const checkAndUpdateServerStatus = async (): Promise<boolean> => {
-    const { isActivated } = await apiClient.isActivated()
-    if (isActivated) {
-      serverStatus = "active"
-      return true
-    }
-
-    return false
-  }
-
-  const checkDeadServerAndTryRestart = async () => {
+  const updateServerStatus = async (): Promise<void> => {
     try {
-      const isActive = await checkAndUpdateServerStatus()
-
-      if (isActive) {
-        return
+      const { data } = await client().isServerActivated.query()
+      if (data.isActivated) {
+        serverStatus = "active"
+      } else {
+        serverStatus = "failed"
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        logger.error("FAILED_TO_FETCH_SERVER_ACTIVATED", {
+          message: error.message,
+          stack: error.stack,
+        })
       }
 
-      // re-configure ts-plugin
-      typeExpandProvider.updateOptions(await extensionConfig())
-      setTimeout(() => {
-        checkAndUpdateServerStatus().then((isActive) => {
-          if (!isActive) {
-            logger.error("FAILED_TO_CONNECT_SERVER", {
-              reason: "timeout",
-              error: undefined,
-            })
-            serverStatus = "dead"
-            vscode.window.showErrorMessage(
-              "Could not connect to TS server. Try `typescript.restartTsServer`."
-            )
+      serverStatus = "failed"
+    }
+  }
+
+  const waitUntilServerActivated = async (timeout?: number) =>
+    new Promise((resolve, reject) => {
+      serverStatus = "loading"
+
+      const timerId = setInterval(() => {
+        updateServerStatus().then(() => {
+          if (serverStatus === "active") {
+            clearInterval(timerId)
+            resolve(undefined)
           }
         })
-      }, 1000)
-    } catch (err) {
-      logger.error("FAILED_TO_CONNECT_SERVER", {
-        reason: "caught-error",
-        error: err,
-      })
-      serverStatus = "dead"
-      vscode.window.showErrorMessage(
-        "Could not connect to TS server. Try `typescript.restartTsServer`."
-      )
-    }
-  }
+      }, 500)
 
-  const initializeOrRepairPlugin = async () => {
-    if (serverStatus === "unloaded") {
-      try {
-        serverStatus = "loading"
-        await typeExpandProvider.waitUntilServerActivated(15000)
-      } catch (err) {
-        console.error(err)
-        checkDeadServerAndTryRestart()
-        return
-      }
+      setTimeout(() => {
+        if (serverStatus === "active") {
+          return
+        }
 
-      serverStatus = "active"
-      vscode.window.showInformationMessage("ts-type-expand is ready to use!")
-    }
-
-    if (serverStatus === "failed") {
-      checkDeadServerAndTryRestart()
-    }
-  }
+        serverStatus = "dead"
+        clearInterval(timerId)
+        reject("timeout")
+      }, timeout ?? 10000)
+    })
 
   const updateCurrentFile = async (): Promise<void> => {
     const currentFile = getCurrentFilePath()
@@ -149,7 +142,6 @@ const extensionClosure = () => {
       return
     }
 
-    initializeOrRepairPlugin()
     typeExpandProvider.updateActiveFile(currentFile)
   }
 
@@ -168,6 +160,9 @@ const extensionClosure = () => {
         return
       }
 
+      const config = await extensionConfig()
+      typeExpandProvider = new TypeExpandProvider(config)
+
       await tsFeatureExtension.activate()
       const api = tsFeatureExtension.exports
 
@@ -176,30 +171,13 @@ const extensionClosure = () => {
       }
 
       tsApi = api.getAPI(0)
-
-      const config = await extensionConfig()
-      apiClient = new ApiClient(config.port, (err) => {
-        const errorRes = err.response
-        if (
-          serverStatus === "active" &&
-          (errorRes === undefined || errorRes.status === 500)
-        ) {
-          console.error(
-            "Unexpected Error Occurred",
-            errorRes,
-            500,
-            serverStatus
-          )
-
-          serverStatus = "failed"
-          checkDeadServerAndTryRestart()
-        }
-      })
-      typeExpandProvider = new TypeExpandProvider(config, apiClient)
+      await startPlugin()
+      await updateCurrentFile()
 
       const disposes = [
         vscode.commands.registerCommand("ts-type-expand.restart", async () => {
           typeExpandProvider.updateOptions(await extensionConfig())
+          await startPlugin()
           await updateCurrentFile()
           typeExpandProvider.restart()
 
@@ -214,7 +192,14 @@ const extensionClosure = () => {
         vscode.window.createTreeView("typeExpand", {
           treeDataProvider: typeExpandProvider,
         }),
-        vscode.window.onDidChangeTextEditorSelection((e) => {
+        vscode.window.onDidChangeTextEditorSelection(async (e) => {
+          /**
+           * If move it even with keystrokes, it delays and break the LSP.
+           */
+          if (e.kind !== TextEditorSelectionChangeKind.Mouse) {
+            return // skip
+          }
+
           const languageId = getCurrentFileLanguageId()
           if (
             languageId === undefined ||
@@ -223,7 +208,7 @@ const extensionClosure = () => {
             return // skip
           }
 
-          if (serverStatus === "unloaded" || serverStatus === "loading") {
+          if (serverStatus === "loading") {
             vscode.window.showWarningMessage(
               "TS server is not ready. Please wait a few seconds."
             )
@@ -232,7 +217,16 @@ const extensionClosure = () => {
 
           if (serverStatus !== "active") return
 
-          typeExpandProvider.updateSelection(e.textEditor.selection)
+          try {
+            await typeExpandProvider.updateSelection(e.textEditor.selection)
+          } catch (error) {
+            if (error instanceof Error) {
+              logger.error("UPDATE_SELECTION_ERROR", {
+                message: error.message,
+                stack: error.stack,
+              })
+            }
+          }
         }),
         vscode.window.onDidChangeActiveTextEditor(async () => {
           await updateCurrentFile()
@@ -242,17 +236,24 @@ const extensionClosure = () => {
       disposes.forEach((dispose) => {
         context.subscriptions.push(dispose)
       })
-
-      await updateCurrentFile()
     } catch (error) {
-      const typedError = error as Error
-      vscode.window.showErrorMessage(typedError.message)
+      if (error instanceof Error) {
+        vscode.window.showErrorMessage(error.message)
+        logger.error("ACTIVATION_ERROR", {
+          message: error.message,
+          stack: error.stack,
+        })
+      } else {
+        logger.error("UNEXPECTED_ERROR", {
+          error,
+        })
+      }
     }
   }
 
   const deactivate = () => {
-    typeExpandProvider.close()
     logger.info("DEACTIVATE_EXTENSION", {})
+    typeExpandProvider.close()
   }
 
   return { activate, deactivate }

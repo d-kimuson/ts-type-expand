@@ -36,7 +36,6 @@ export class CompilerApiHelper {
   public updateProgram(program: ts.Program): void {
     this.#program = program
     this.#typeChecker = this.#program.getTypeChecker()
-    this.#objectPropsStore = {}
   }
 
   public extractTypes(

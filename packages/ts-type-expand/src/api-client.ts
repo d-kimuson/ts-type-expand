@@ -1,137 +1,37 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios"
-import type {
-  CommonRes,
-  FetchTypeFromPosReq,
-  FetchTypeFromPosRes,
-  GetObjectPropsReq,
-  GetObjectPropsRes,
-  IsActivatedRes,
-} from "shared"
+import { createTRPCProxyClient, httpLink } from "@trpc/client"
+import type { AppRouter } from "ts-type-expand-plugin/src/server/controller"
+import fetch from "node-fetch"
 
-export class ApiClient {
-  private axiosClient: AxiosInstance
-  private interceptorIds: number[]
+const createClient = (port: number) =>
+  createTRPCProxyClient<AppRouter>({
+    links: [
+      httpLink({
+        url: `http://localhost:${port}/trpc`,
+        fetch,
+      }),
+    ],
+  })
 
-  constructor(
-    private port: number,
-    private onError?: (
-      error: AxiosError<{ message: string } | undefined>
-    ) => void
-  ) {
-    this.axiosClient = axios.create({
-      baseURL: `http://localhost:${port}`,
-    })
-    const id = this.axiosClient.interceptors.response.use(
-      (res) => {
-        if (res === undefined) {
-          return {
-            data: {
-              success: false,
-            },
-          }
-        }
+export type ApiClient = ReturnType<typeof createClient>
 
-        return res
-      },
-      (err: AxiosError<{ message: string } | undefined>) => {
-        if (typeof onError === "function") {
-          onError(err)
-        }
-        throw err
+export const { updatePortNumber, client } = (() => {
+  let port: number
+  let clientCache: ApiClient | undefined
+
+  return {
+    updatePortNumber: (nextPort: number) => {
+      if (port !== nextPort) {
+        clientCache = createClient(nextPort)
       }
-    )
-    this.interceptorIds = [id]
+
+      port = nextPort
+    },
+    client: () => {
+      if (clientCache === undefined) {
+        throw new Error("port number must initialized by updatePortNumber")
+      }
+
+      return clientCache
+    },
   }
-
-  public updatePort(port: number) {
-    this.interceptorIds.forEach((id) => {
-      this.axiosClient.interceptors.response.eject(id)
-    })
-    this.axiosClient = axios.create({
-      baseURL: `http://localhost:${port}`,
-    })
-    const id = this.axiosClient.interceptors.response.use(
-      (res) => {
-        if (res === undefined) {
-          return {
-            data: {
-              success: false,
-            },
-          }
-        }
-
-        return res
-      },
-      (err: AxiosError<{ message: string } | undefined>) => {
-        if (typeof this.onError === "function") {
-          this.onError(err)
-        }
-        throw err
-      }
-    )
-    this.interceptorIds = [id]
-  }
-
-  public async isActivated(): Promise<IsActivatedRes> {
-    const { data } = await this.axiosClient.get<CommonRes<IsActivatedRes>>(
-      "/is_activated"
-    )
-
-    if (!data.success) {
-      return { isActivated: false }
-    }
-
-    return data.data
-  }
-
-  public async getTypeFromLineAndCharacter(
-    filePath: string,
-    line: number,
-    character: number
-  ): Promise<FetchTypeFromPosRes | undefined> {
-    try {
-      const { data } = await this.axiosClient.post<
-        FetchTypeFromPosReq,
-        AxiosResponse<CommonRes<FetchTypeFromPosRes>>
-      >("/get_type_from_pos", {
-        filePath,
-        line,
-        character,
-      })
-
-      if (!data.success) {
-        return
-      }
-
-      return {
-        declareName: data.data.declareName,
-        type: data.data.type,
-      }
-    } catch (err) {
-      // @ts-expect-error
-      console.error("Failed response: ", err, err.response?.status)
-      return undefined
-    }
-  }
-
-  public async getObjectProps(
-    storeKey: string
-  ): Promise<GetObjectPropsRes | undefined> {
-    try {
-      const { data } = await this.axiosClient.post<
-        GetObjectPropsReq,
-        AxiosResponse<CommonRes<GetObjectPropsRes>>
-      >("/get_object_props", { storeKey })
-      if (!data.success) {
-        return
-      }
-
-      return {
-        props: data.data.props,
-      }
-    } catch (err) {
-      console.error("Failed Response: ", err)
-      return undefined
-    }
-  }
-}
+})()

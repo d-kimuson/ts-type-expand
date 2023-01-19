@@ -1,9 +1,11 @@
 import vscode from "vscode"
 import { TypeObject } from "compiler-api-helper"
-import { ApiClient } from "~/api-client"
+import { client, updatePortNumber } from "~/api-client"
 import { ExtensionOption } from "~/types/option"
 import { getCurrentFileLanguageId } from "~/utils/vscode"
 import { logger } from "~/utils/logger"
+import { deserializeTypeObject } from "compiler-api-helper/src/serialize"
+import { TRPCClientError } from "@trpc/client"
 
 export type TypeExpandProviderOptions = ExtensionOption
 
@@ -16,52 +18,46 @@ export class TypeExpandProvider
     type: TypeObject
   }
   private activeFilePath: string | undefined
-  private apiClient: ApiClient
 
-  constructor(
-    private options: TypeExpandProviderOptions,
-    apiClient: ApiClient
-  ) {
-    this.apiClient = apiClient
+  constructor(private options: TypeExpandProviderOptions) {
     this.updateOptions(options)
-    ExpandableTypeItem.apiClient = this.apiClient
   }
 
   public updateOptions(options: TypeExpandProviderOptions): void {
     ExpandableTypeItem.updateOptions(options)
     if (this.options.port !== options.port) {
-      this.apiClient.updatePort(options.port)
+      updatePortNumber(options.port)
     }
 
     this.options = options
   }
 
-  async waitUntilServerActivated(timeout?: number): Promise<void> {
-    return await new Promise<void>((resolve, reject) => {
-      const timer = setInterval(() => {
-        this.apiClient
-          .isActivated()
-          .then(({ isActivated }) => {
-            if (isActivated) {
-              clearInterval(timer)
-              resolve()
-            } else {
-              throw new Error("Unexpected Server Error activation")
-            }
-          })
-          .catch((err) => {
-            logger.error("FailedToWaitServerActivation", err)
-          })
-      }, 500)
+  // async waitUntilServerActivated(timeout?: number): Promise<void> {
+  //   return await new Promise<void>((resolve, reject) => {
+  //     const timer = setInterval(() => {
+  //       client()
+  //         .isServerActivated.query()
+  //         .then(({ success, data }) => {
+  //           if (data.isActivated) {
+  //             clearInterval(timer)
+  //             resolve()
+  //           } else {
+  //             throw new Error("Unexpected Server Error activation")
+  //           }
+  //         })
+  //         .catch((err) => {
+  //           logger.error("FailedToWaitServerActivation", err)
+  //         })
+  //     }, 500)
 
-      if (typeof timeout === "number") {
-        setTimeout(() => {
-          clearInterval(timer)
-          reject("timeout")
-        }, timeout)
-      }
-    })
-  }
+  //     if (typeof timeout === "number") {
+  //       setTimeout(() => {
+  //         clearInterval(timer)
+  //         reject("timeout")
+  //       }, timeout)
+  //     }
+  //   })
+  // }
 
   private isCurrentFileValidated(): boolean {
     const languageId = getCurrentFileLanguageId()
@@ -110,25 +106,30 @@ export class TypeExpandProvider
     this.selection = selection
 
     try {
-      const result = await this.apiClient.getTypeFromLineAndCharacter(
-        this.activeFilePath,
-        this.selection.start.line,
-        this.selection.start.character
-      )
-      if (!result) {
-        return
-      }
+      const result = await client().getTypeFromPos.query({
+        filePath: this.activeFilePath,
+        line: this.selection.start.line,
+        character: this.selection.start.character,
+      })
+
       this.selectedType = {
         declareName: result.declareName,
-        type: result.type,
+        type: deserializeTypeObject(result.type),
       }
 
       if (this.selectedType) {
         this.refresh()
       }
     } catch (error) {
-      const typedError = error as unknown as Error
-      vscode.window.showErrorMessage(typedError.message)
+      const typedError = error as Error
+      logger.error("UPDATE_SELECTION_ERROR", {
+        message: typedError.message,
+        stack: typedError.stack,
+      })
+
+      if (!(error instanceof TRPCClientError)) {
+        vscode.window.showErrorMessage(typedError.message)
+      }
     }
   }
 
@@ -251,7 +252,6 @@ function toTypeText(type: TypeObject): string {
 
 class ExpandableTypeItem extends vscode.TreeItem {
   public static options: TypeExpandProviderOptions
-  public static apiClient: ApiClient
 
   constructor(
     private type: TypeObject,
@@ -330,14 +330,13 @@ class ExpandableTypeItem extends vscode.TreeItem {
     }
 
     if (this.type.__type === "ObjectTO") {
-      const data = await ExpandableTypeItem.apiClient.getObjectProps(
-        this.type.storeKey
-      )
-      if (data === undefined) return []
+      const props = await client().getObjectProps.query({
+        storeKey: this.type.storeKey,
+      })
 
-      return data.props.map(
+      return props.map(
         ({ propName, type }) =>
-          new ExpandableTypeItem(type, {
+          new ExpandableTypeItem(deserializeTypeObject(type), {
             aliasName: propName,
             parent: this.type,
           })

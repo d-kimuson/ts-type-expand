@@ -1,52 +1,61 @@
-import type { server } from "typescript/lib/tsserverlibrary"
+import { LanguageServiceMode, server } from "typescript/lib/tsserverlibrary"
 import type { Server } from "http"
 import express from "express"
-
-import type { PluginConfiguration } from "./types"
+import { PluginConfiguration, pluginConfigurationSchema } from "./schema"
 import { registerApp } from "./server/app"
+import { logger } from "./logger"
+import { setCreateInfo } from "./server/context"
 
 const factory: server.PluginModuleFactory = (mod) => {
   let server: Server | undefined
   let start: ((port: number) => void) | undefined
+  let isInitialized: boolean = false
 
   return {
     create(info) {
-      /*
-       * TODO: info.languageService.getProgram() をファイルが変更されるたびに更新する必要があるはず
-       * だけどやってないので、あとからやる
-       *
-       * getProgram がメソッドになってるってことは info を保持しておいて毎回叩く or onType で updateProgram するエンドポイントを叩く
-       */
+      logger.info("CALLED_CREATE_INFO", {
+        serverMode: info.project.projectService.serverMode,
+        config: info.config,
+      })
 
-      if (info.project.projectService.serverMode !== 0) {
+      if (isInitialized) {
         return info.languageService
       }
 
-      const config = info.config as Partial<PluginConfiguration> | undefined
+      setCreateInfo(info)
+      const app = express()
+      registerApp(app)
 
       start = (port) => {
-        server?.close()
-        server = app.listen(port, () => {
-          console.log(`Start Ts Type Expand Plugin listening on port ${port}`)
+        logger.info(`START_TS_EXPAND_PLUGIN`, {
+          port: port,
         })
+
+        server?.close()
+        server = app.listen(port)
       }
 
-      const app = express()
-      app.use(express.json())
-      registerApp(app, info).then(() => {
-        if (start && config?.port) {
-          start(config.port)
-        }
-      })
+      isInitialized = true
 
-      return {
-        ...info.languageService,
-      }
+      return info.languageService
     },
-    onConfigurationChanged(config: Partial<PluginConfiguration>) {
-      if (config.port && start) {
-        start(config.port)
+    onConfigurationChanged(config: PluginConfiguration) {
+      const parsed = pluginConfigurationSchema.safeParse(config)
+      if (!parsed.success) {
+        logger.error("INVALID_PLUGIN_CONFIGURATION", {
+          data: config,
+          error: parsed.error.issues,
+        })
+        return
       }
+
+      logger.info("ON_UPDATE_CONF", config)
+      if (start === undefined) {
+        logger.error("BEFORE_INITIALIZE", {})
+        return
+      }
+
+      start(config.port)
     },
   }
 }

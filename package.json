@@ -20,9 +20,7 @@
       "**/ts-type-expand",
       "**/ts-type-expand/**",
       "**/ts-type-expand-beta",
-      "**/ts-type-expand-beta/**",
-      "**/shared",
-      "**/shared/**"
+      "**/ts-type-expand-beta/**"
     ]
   },
   "scripts": {
