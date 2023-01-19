@@ -13,8 +13,6 @@ You can install this extension from the [ts-type-expand - Visual Studio Marketpl
 
 There is nothing additional that needs to be installed.
 
-If `tsconfig.json` is not directly under your workspace, specify the path with the `ts-type-expand.tsconfigPath` option. See [Configure](#Configure) for other valid options.
-
 ## Supports
 
 ### Expansion
