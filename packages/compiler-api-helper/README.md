@@ -6,5 +6,4 @@ Helper library for extracting type information from compiler API nodes
 
 ```bash
 $ yarn install
-$ yarn patch
 ```

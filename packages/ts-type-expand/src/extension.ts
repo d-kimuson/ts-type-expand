@@ -1,5 +1,6 @@
 import vscode, { TextEditorSelectionChangeKind } from "vscode"
 import getPorts from "get-port"
+import { mkdirSync } from "fs"
 
 import {
   getCurrentFileLanguageId,
@@ -12,6 +13,7 @@ import {
 } from "~/vsc/type-expand-provider"
 import { client, updatePortNumber } from "./api-client"
 import { logger } from "./utils/logger"
+import { resolve } from "node:path"
 
 type TypescriptLanguageFeatures = {
   getAPI(n: number): {
@@ -148,6 +150,18 @@ const extensionClosure = () => {
   // exports
   const activate = async (context: vscode.ExtensionContext): Promise<void> => {
     try {
+      const HOME_DIR = process.env["HOME"]
+      if (HOME_DIR === undefined) {
+        throw new Error("UnExpected")
+      }
+
+      mkdirSync(resolve(HOME_DIR, ".ts-type-expand", "logs", "plugin"), {
+        recursive: true,
+      })
+      mkdirSync(resolve(HOME_DIR, ".ts-type-expand", "logs", "extension"), {
+        recursive: true,
+      })
+
       const tsFeatureExtension =
         vscode.extensions.getExtension<TypescriptLanguageFeatures>(
           "vscode.typescript-language-features"

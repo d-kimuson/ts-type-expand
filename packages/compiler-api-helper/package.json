@@ -18,7 +18,6 @@
     "build:alias": "tsc-alias -p tsconfig.json",
     "test": "jest",
     "test:watch": "jest --watch",
-    "patch": "patch-package",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {

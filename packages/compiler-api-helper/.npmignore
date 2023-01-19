@@ -2,7 +2,6 @@
 /src
 /tests
 /example
-/patches
 /.vscode
 tsconfig.json
 /.github

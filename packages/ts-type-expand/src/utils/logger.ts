@@ -11,6 +11,11 @@ type ILogger = {
   ) => void
 }
 
+const HOME_DIR = process.env["HOME"]
+if (HOME_DIR === undefined) {
+  throw new Error("UnExpected")
+}
+
 const winstonLogger = createLogger({
   format: format.json(),
   defaultMeta: {
@@ -22,22 +27,31 @@ const winstonLogger = createLogger({
     }),
     new transports.File({
       filename: resolve(
-        "/Users/kaito/Playground/ts-type-expand/packages/ts-type-expand",
-        "logs/info.log"
+        HOME_DIR,
+        ".ts-type-expand",
+        "logs",
+        "extension",
+        "info.log"
       ),
       level: "info",
     }),
     new transports.File({
       filename: resolve(
-        "/Users/kaito/Playground/ts-type-expand/packages/ts-type-expand",
-        "logs/warn.log"
+        HOME_DIR,
+        ".ts-type-expand",
+        "logs",
+        "extension",
+        "warn.log"
       ),
       level: "warn",
     }),
     new transports.File({
       filename: resolve(
-        "/Users/kaito/Playground/ts-type-expand/packages/ts-type-expand",
-        "logs/error.log"
+        HOME_DIR,
+        ".ts-type-expand",
+        "logs",
+        "extension",
+        "error.log"
       ),
       level: "error",
     }),

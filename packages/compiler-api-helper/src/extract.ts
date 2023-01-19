@@ -1,6 +1,6 @@
-import { Declaration, ExportSpecifier, Symbol, __String } from "typescript"
-import { Node, Type } from "typescript"
-import { VariableDeclaration } from "typescript"
+import type { Declaration, ExportSpecifier, Symbol, __String } from "typescript"
+import type { Node, Type } from "typescript"
+import type { VariableDeclaration } from "typescript"
 
 export class ExtractError extends Error {
   public constructor(public fn: string) {
