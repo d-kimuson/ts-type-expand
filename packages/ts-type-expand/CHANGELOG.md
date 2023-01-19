@@ -8,7 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 
-- Date, Promise type support
+- Date, Promise, Symbol, PromiseLike type support
 - Add `validate` option to allow the target languageId to be specified.
 
 ### Changed
