@@ -48,8 +48,8 @@ Types are calculated by the [CompilerAPI](https://github.com/Microsoft/TypeScrip
 
 ### Others
 
-- Vue is not supported (not tried)
-- React also works, but there can be problems with component types
+- SFC for Vue is not supported
+- React is supported.
 
 ## Configure
 
