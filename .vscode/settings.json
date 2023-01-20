@@ -3,6 +3,12 @@
   "editor.tabSize": 2,
   // typescript
   "typescript.tsdk": "node_modules/typescript/lib",
+  "ts-type-expand.validate": [
+    "typescript",
+    "typescriptreact",
+    "javascript",
+    "javascriptreact"
+  ],
   // ESLint
   "eslint.workingDirectories": ["./packages/*"],
   "eslint.alwaysShowStatus": true,

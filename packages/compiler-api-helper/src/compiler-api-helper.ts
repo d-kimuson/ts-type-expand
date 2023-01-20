@@ -259,7 +259,12 @@ export class CompilerApiHelper {
           : undefined
 
         return {
-          propName: String(symbol.escapedName),
+          propName: String(
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            symbol === undefined
+              ? "UNEXPECTED_UNDEFINED_SYMBOL"
+              : symbol.escapedName
+          ),
           type:
             typeNode && ts.isArrayTypeNode(typeNode)
               ? {
@@ -422,7 +427,8 @@ export class CompilerApiHelper {
       )
       .case<to.ArrayTO>(
         ({ type, typeText }) =>
-          typeText.endsWith("[]") || type.symbol.escapedName === "Array",
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          typeText.endsWith("[]") || type.symbol?.escapedName === "Array",
         ({ type, typeText }) => ({
           __type: "ArrayTO",
           typeName: typeText,
@@ -441,7 +447,8 @@ export class CompilerApiHelper {
       )
       .case<to.PromiseTO>(
         ({ type }) =>
-          (typeof type.symbol.escapedName !== "undefined"
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          (typeof type.symbol?.escapedName !== "undefined"
             ? unescapeLeadingUnderscores(type.symbol.escapedName)
             : "") === "Promise",
         ({ type }) => {
@@ -461,7 +468,8 @@ export class CompilerApiHelper {
       )
       .case<to.PromiseLikeTO>(
         ({ type }) =>
-          (typeof type.symbol.escapedName !== "undefined"
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          (typeof type.symbol?.escapedName !== "undefined"
             ? unescapeLeadingUnderscores(type.symbol.escapedName)
             : "") === "PromiseLike",
         ({ type }) => {

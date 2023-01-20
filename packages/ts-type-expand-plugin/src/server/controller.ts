@@ -58,8 +58,13 @@ export const getTypeFromPos = requiredProgramProcedure
         // | to.ObjectTO,
       }
     } catch (err) {
-      logger.error("UNEXPECTED_GET_TYPE_ERROR", err as Record<string, unknown>)
       if (err instanceof Error) {
+        logger.error("UNEXPECTED_GET_TYPE_ERROR", {
+          name: err.name,
+          message: err.message,
+          stack: err.stack,
+        })
+
         throw new TRPCError({
           message: `error: ${err.toString()}`,
           code: "INTERNAL_SERVER_ERROR",
