@@ -4,3 +4,4 @@
 .history
 out
 src/test
+jest.config.ts
