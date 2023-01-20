@@ -214,7 +214,7 @@ function toTypeText(type: TypeObject): string {
   throw new Error("unreachable here")
 }
 
-class ExpandableTypeItem extends vscode.TreeItem {
+export class ExpandableTypeItem extends vscode.TreeItem {
   public static options: TypeExpandProviderOptions
 
   public constructor(
@@ -250,7 +250,7 @@ class ExpandableTypeItem extends vscode.TreeItem {
     this.tooltip = toTypeText(type)
   }
 
-  public static updateOptions(options: TypeExpandProviderOptions) {
+  public static updateOptions(options: TypeExpandProviderOptions): void {
     ExpandableTypeItem.options = options
   }
 

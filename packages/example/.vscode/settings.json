@@ -1,5 +1,4 @@
 {
-  "ts-type-expand.tsconfigPath": "tsconfig.json",
   "ts-type-expand.compactPropertyLength": 100,
   "ts-type-expand.compactOptionalType": true,
   "ts-type-expand.directExpandArray": true
