@@ -55,6 +55,7 @@
     "pino",
     "postbuild",
     "TRPC",
-    "tsserverlibrary"
+    "tsserverlibrary",
+    "Varibale"
   ]
 }

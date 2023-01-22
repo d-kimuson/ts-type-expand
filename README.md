@@ -1,5 +1,7 @@
 # ts-type-expand for VSCode
 
+:memo: ts-type-expand is now v1 and the mechanism behind it has changed. You can downgrade to v0.12 if you find it inconvenient.
+
 VSCode extension that allows you to expand TypeScript type definitions.
 
 - Displays the type information of the selected node

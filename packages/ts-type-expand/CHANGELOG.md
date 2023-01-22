@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [1.0.0] - 2023-01-22
+
 ### Added
 
 - Date, Promise, Symbol, PromiseLike type support
