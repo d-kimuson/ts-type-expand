@@ -32,11 +32,14 @@ jobs:
       run: |
         yarn install
 
-    - name: check source codes (typecheck & eslint & prettier)
+    - name: check source codes (linter)
       run: |
-        yarn typecheck
         yarn lint
+
+    - name: build check
+      run: |
+        yarn build
 
     - name: test
       run: |
-        yarn test:jest
+        yarn test

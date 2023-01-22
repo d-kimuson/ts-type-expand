@@ -1,0 +1,7 @@
+*.js
+*.cjs
+*.(c|m)js
+.history
+out
+src/test
+jest.config.ts
