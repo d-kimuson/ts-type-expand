@@ -1,3 +1,4 @@
+import { unescapeLeadingUnderscores } from "typescript"
 import type { Declaration, ExportSpecifier, Symbol, __String } from "typescript"
 import type { Node, Type } from "typescript"
 import type { VariableDeclaration } from "typescript"
@@ -6,6 +7,17 @@ export class ExtractError extends Error {
   public constructor(public fn: string) {
     super()
   }
+}
+
+export const dangerouslySymbolToEscapedName = (
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  symbol: Symbol | undefined
+): string | undefined => {
+  if (symbol !== undefined && "escapedName" in symbol) {
+    return unescapeLeadingUnderscores(symbol.escapedName)
+  }
+
+  return undefined
 }
 
 export const dangerouslyDeclareToEscapedText = (

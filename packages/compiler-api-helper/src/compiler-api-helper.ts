@@ -1,3 +1,4 @@
+import { pipe } from "fp-ts/function"
 import * as ts from "typescript"
 import { forEachChild, unescapeLeadingUnderscores } from "typescript"
 import { v4 as generateUuid } from "uuid"
@@ -8,6 +9,7 @@ import {
   dangerouslyDeclareToEscapedText,
   dangerouslyExportSpecifierToEscapedName,
   dangerouslyNodeToSymbol,
+  dangerouslySymbolToEscapedName,
   dangerouslyTypeToNode,
   dangerouslyTypeToResolvedTypeArguments,
   dangerouslyTypeToTypes,
@@ -126,10 +128,11 @@ export class CompilerApiHelper {
 
           // type declaration
           return {
-            typeName:
-              typeof dangerouslyNodeToSymbol(node)?.escapedName !== "undefined"
-                ? String(dangerouslyNodeToSymbol(node)?.escapedName)
-                : undefined,
+            typeName: pipe(
+              node,
+              dangerouslyNodeToSymbol,
+              dangerouslySymbolToEscapedName
+            ),
             type: this._convertType(this.#typeChecker.getTypeAtLocation(node)),
           }
         })
@@ -259,12 +262,9 @@ export class CompilerApiHelper {
           : undefined
 
         return {
-          propName: String(
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            symbol === undefined
-              ? "UNEXPECTED_UNDEFINED_SYMBOL"
-              : symbol.escapedName
-          ),
+          propName:
+            dangerouslySymbolToEscapedName(symbol) ??
+            "UNEXPECTED_UNDEFINED_SYMBOL",
           type:
             typeNode && ts.isArrayTypeNode(typeNode)
               ? {
@@ -428,7 +428,8 @@ export class CompilerApiHelper {
       .case<to.ArrayTO>(
         ({ type, typeText }) =>
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          typeText.endsWith("[]") || type.symbol?.escapedName === "Array",
+          typeText.endsWith("[]") ||
+          dangerouslySymbolToEscapedName(type.symbol) === "Array",
         ({ type, typeText }) => ({
           __type: "ArrayTO",
           typeName: typeText,
@@ -446,11 +447,7 @@ export class CompilerApiHelper {
           this._convertTypeFromCallableSignature(type.getCallSignatures()[0])
       )
       .case<to.PromiseTO>(
-        ({ type }) =>
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          (typeof type.symbol?.escapedName !== "undefined"
-            ? unescapeLeadingUnderscores(type.symbol.escapedName)
-            : "") === "Promise",
+        ({ type }) => dangerouslySymbolToEscapedName(type.symbol) === "Promise",
         ({ type }) => {
           const typeArgResult = this.#extractTypeArguments(type)
           const typeArg: to.TypeObject = isOk(typeArgResult)
@@ -468,10 +465,7 @@ export class CompilerApiHelper {
       )
       .case<to.PromiseLikeTO>(
         ({ type }) =>
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          (typeof type.symbol?.escapedName !== "undefined"
-            ? unescapeLeadingUnderscores(type.symbol.escapedName)
-            : "") === "PromiseLike",
+          dangerouslySymbolToEscapedName(type.symbol) === "PromiseLike",
         ({ type }) => {
           const typeArgResult = this.#extractTypeArguments(type)
           const typeArg: to.TypeObject = isOk(typeArgResult)

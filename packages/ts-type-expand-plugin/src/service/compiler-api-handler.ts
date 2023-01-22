@@ -58,13 +58,20 @@ export class CompilerHandler {
       throw new Error(`Unexpected intrinsicName Error, ${tsType.toString()}`)
       // return undefined
     }
-    const escapedName = this.checker
-      .getSymbolAtLocation(maybeNode)
-      ?.getEscapedName()
-    return [
-      escapedName ? unescapeLeadingUnderscores(escapedName) : undefined,
-      this.helper.convertType(tsType),
-    ]
+
+    try {
+      const escapedName = this.checker
+        .getSymbolAtLocation(maybeNode)
+        ?.getEscapedName()
+
+      return [
+        escapedName ? unescapeLeadingUnderscores(escapedName) : undefined,
+        this.helper.convertType(tsType),
+      ]
+    } catch (error) {
+      const message = error instanceof Error ? error.message : undefined
+      throw new Error(`DEBUG(${message})`)
+    }
   }
 
   public getObjectProps(
