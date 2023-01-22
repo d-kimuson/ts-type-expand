@@ -58,8 +58,8 @@ Types are calculated by the [CompilerAPI](https://github.com/Microsoft/TypeScrip
 Configure `ts-type-expand.*` to your vscode config to customize.
 
 | key                     | value                                                                                                   | default                                                              |
-| :---------------------- | :------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | ------ |
-| `compactOptionalType`   | display `T?` for type `T                                                                                | undefined`                                                           | `true` |
+| :---------------------- | :------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| `compactOptionalType`   | display `T?` for type `T \| undefined`                                                                  | `true`                                                               |
 | `compactPropertyLength` | Omit when the type can be expanded and the number of characters of the type is longer than this length. | `10`                                                                 |
 | `directExpandArray`     | Directly expand T for `Array<T>`                                                                        | `true`                                                               |
 | `validate`              | Validate by specifying languageId                                                                       | `["typescript", "typescriptreact", "javascript", "javascriptreact"]` |
