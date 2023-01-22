@@ -1,2 +1,2 @@
-*rc.js
-*.config.js
+*.js
+*.(c|m)js

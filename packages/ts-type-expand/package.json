@@ -1,0 +1,158 @@
+{
+  "name": "ts-type-expand",
+  "displayName": "ts-type-expand",
+  "description": "vscode extension for expand type of typescript",
+  "version": "1.0.0",
+  "license": "MIT",
+  "publisher": "kimuson",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/d-kimuson/ts-type-expand"
+  },
+  "keywords": [
+    "typescript",
+    "ts",
+    "compilerAPI",
+    "expand",
+    "tree"
+  ],
+  "engines": {
+    "vscode": "^1.63.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onView:typeExpand"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Ts Type Expand",
+      "type": "object",
+      "properties": {
+        "ts-type-expand.validate": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "description": "Validate by specifying languageId",
+          "default": [
+            "typescript",
+            "typescriptreact",
+            "javascript",
+            "javascriptreact"
+          ]
+        },
+        "ts-type-expand.compactOptionalType": {
+          "type": "boolean",
+          "default": true,
+          "description": "Fold optional type"
+        },
+        "ts-type-expand.compactPropertyLength": {
+          "type": "number",
+          "default": 10,
+          "description": "Display {...} if property type text is longer than this length"
+        },
+        "ts-type-expand.directExpandArray": {
+          "type": "boolean",
+          "default": true,
+          "description": "Directly expand T for Array[T]"
+        },
+        "ts-type-expand.port": {
+          "type": "number",
+          "default": 54334,
+          "description": "Port used for communication with TS server."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "ts-type-expand.restart",
+        "title": "Restart (ts-type-expand)"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "typeExpand",
+          "name": "TS Type Expand"
+        }
+      ]
+    },
+    "typescriptServerPlugins": [
+      {
+        "name": "ts-type-expand-plugin",
+        "enableForWorkspaceTypeScriptVersions": true
+      }
+    ]
+  },
+  "extensionDependencies": [
+    "vscode.typescript-language-features"
+  ],
+  "scripts": {
+    "ts:run": "ts-node -P ./tsconfig.json -r tsconfig-paths/register",
+    "vscode:prepublish": "yarn --cwd '../../' build",
+    "prebuild": "rimraf out",
+    "build": "run-s build:*",
+    "build:typedef": "tsc -p ./",
+    "build:esbuild": "node ./bin/build.mjs",
+    "build:alias": "tsc-alias -p ./tsconfig.json",
+    "watch": "run-p 'watch:*'",
+    "watch:typedef": "yarn build:typedef -watch",
+    "watch:esbuild": "IS_WATCH=true node ./bin/build.mjs",
+    "watch:alias": "tsc-alias -p ./tsconfig.json -w",
+    "typecheck": "tsc --noEmit -p .",
+    "lint:eslint": "eslint src --ext ts,js",
+    "lint:prettier": "prettier '**/*.{ts,js,json,md}' --check",
+    "lint": "run-p 'lint:*'",
+    "fix:eslint": "yarn lint:eslint --fix",
+    "fix:prettier": "prettier '**/*.{ts,js,json,md}' --write",
+    "fix": "run-p 'fix:*'",
+    "pretest": "yarn build && yarn run lint",
+    "test:vscode": "node ./out/test/vscode/runTest.js",
+    "test:jest": "jest"
+  },
+  "dependencies": {
+    "@trpc/client": "^10.9.0",
+    "axios": "^0.26.1",
+    "compiler-api-helper": "^0.0.3",
+    "get-port": "^6.1.2",
+    "node-fetch": "^3.3.0",
+    "ts-type-expand-plugin": "^0.0.2",
+    "tsc-alias": "^1.4.2",
+    "typescript": "^4.9.4",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/glob": "^7.2.0",
+    "@types/jest": "^27.0.3",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.11.11",
+    "@types/vscode": "1.62",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "esbuild": "^0.17.2",
+    "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.25.3",
+    "glob": "^7.2.0",
+    "husky": "^7.0.4",
+    "jest": "^27.4.3",
+    "lint-staged": "^12.1.2",
+    "mocha": "^9.1.3",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.5.0",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^27.0.7",
+    "ts-node": "^10.4.0",
+    "tsconfig-paths": "^3.12.0",
+    "vscode-test": "^1.6.1"
+  }
+}

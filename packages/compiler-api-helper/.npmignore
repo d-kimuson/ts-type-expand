@@ -1,0 +1,10 @@
+/node_modules
+/src
+/tests
+/example
+/.vscode
+tsconfig.json
+/.github
+/.husky
+/.eslintrc.js
+/jest.config.js

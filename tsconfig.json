@@ -1,20 +1,14 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "es6",
-    "outDir": "out",
-    "lib": ["es6"],
-    "sourceMap": true,
-    "rootDir": "src",
-    "baseUrl": "src",
-    "paths": {
-      "~/*": ["*"]
+  "files": [],
+  "references": [
+    { "path": "./packages/ts-type-expand/tsconfig.json" },
+    { "path": "./packages/ts-type-expand/tsconfig.test.json" },
+    { "path": "./packages/compiler-api-helper/tsconfig.json" },
+    { "path": "./packages/compiler-api-helper/tests/tsconfig.json" },
+    {
+      "path": "./packages/compiler-api-helper/tests/test-project/tsconfig.json"
     },
-    "strict": true,
-    "moduleResolution": "node",
-    "noEmit": false,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "exclude": ["node_modules", ".vscode-test", "example"]
+    { "path": "./packages/ts-type-expand-plugin/tsconfig.json" },
+    { "path": "./packages/example/tsconfig.json" }
+  ]
 }

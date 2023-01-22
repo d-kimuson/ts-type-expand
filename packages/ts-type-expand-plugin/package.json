@@ -1,0 +1,44 @@
+{
+  "name": "ts-type-expand-plugin",
+  "version": "0.0.2",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc -p . --noEmit",
+    "build": "run-s build:*",
+    "build:types": "tsc -p .",
+    "build:esbuild": "node ./bin/build.mjs",
+    "prebuild": "rm -rf dist",
+    "watch": "run-p watch:*",
+    "watch:types": "yarn build:types --watch",
+    "watch:esbuild": "IS_WATCH=true yarn build:esbuild",
+    "lint:eslint": "eslint src --ext ts,js",
+    "lint:prettier": "prettier '**/*.{ts,js,json,md}' --check",
+    "lint": "run-p 'lint:*'",
+    "fix:eslint": "yarn lint:eslint --fix",
+    "fix:prettier": "prettier '**/*.{ts,js,json,md}' --write",
+    "fix": "run-p 'fix:*'",
+    "prepublish": "yarn build"
+  },
+  "dependencies": {
+    "@trpc/server": "^10.9.0",
+    "compiler-api-helper": "^0.0.3",
+    "express": "^4.17.3",
+    "winston": "^3.8.2",
+    "zod": "^3.20.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "esbuild": "^0.17.2",
+    "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.25.3",
+    "npm-run-all": "^4.1.5",
+    "open-typescript": "^4.5.0-dev.20210906",
+    "prettier": "^2.5.0"
+  }
+}

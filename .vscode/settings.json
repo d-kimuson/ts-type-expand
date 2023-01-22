@@ -1,13 +1,16 @@
 // Place your settings in this file to overwrite default and user settings.
 {
   "editor.tabSize": 2,
+  // typescript
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "ts-type-expand.validate": [
+    "typescript",
+    "typescriptreact",
+    "javascript",
+    "javascriptreact"
+  ],
   // ESLint
-  "eslint.workingDirectories": ["./"],
-  "eslint.options": {
-    "configFile": ".eslintrc.js",
-    "extensions": ["ts", "js"]
-  },
-  "eslint.validate": ["javascript", "typescript"],
+  "eslint.workingDirectories": ["./packages/*"],
   "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
@@ -42,5 +45,17 @@
     "out": true // set this to false to include "out" folder in search results
   },
   // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-  "typescript.tsc.autoDetect": "off"
+  "typescript.tsc.autoDetect": "off",
+  "cSpell.words": [
+    "decycle",
+    "encycle",
+    "esbuild",
+    "kimuson",
+    "outdir",
+    "pino",
+    "postbuild",
+    "TRPC",
+    "tsserverlibrary",
+    "Varibale"
+  ]
 }

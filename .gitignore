@@ -5,3 +5,8 @@ node_modules
 *.vsix
 
 src/run.ts
+
+.history
+yarn-error.log
+
+logs
