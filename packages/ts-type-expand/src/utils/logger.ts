@@ -11,7 +11,7 @@ type ILogger = {
   ) => void
 }
 
-const HOME_DIR = process.env["HOME"]
+const HOME_DIR = process.env[process.platform == "win32" ? "USERPROFILE" : "HOME"]
 if (HOME_DIR === undefined) {
   throw new Error("UnExpected")
 }
