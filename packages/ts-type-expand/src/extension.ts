@@ -1,4 +1,5 @@
 import { mkdirSync } from "fs"
+import { homedir } from "node:os"
 import { resolve } from "node:path"
 import { TRPCClientError } from "@trpc/client"
 import getPorts from "get-port"
@@ -203,11 +204,7 @@ const extensionClosure = () => {
   // exports
   const activate = async (context: vscode.ExtensionContext): Promise<void> => {
     try {
-      const HOME_DIR = process.env["HOME"]
-      if (HOME_DIR === undefined) {
-        throw new Error("UnExpected")
-      }
-
+      const HOME_DIR = homedir()
       mkdirSync(resolve(HOME_DIR, ".ts-type-expand", "logs", "plugin"), {
         recursive: true,
       })
