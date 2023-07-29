@@ -60,29 +60,38 @@ const convertLogObject = (kind: string, obj: Record<string, unknown>) => {
   }
 }
 
-/**
- * pino で標準出力に向けてもデバッグコンソールに出力されないっぽい
- * production はさておき、開発中は console.log を使うべき
- */
+const ignoreLoggingError = (cb: () => void) => {
+  try {
+    cb()
+  } catch (err) {
+    console.error(err)
+  }
+}
 
 export const logger = ((): ILogger => {
   return {
     info: (kind, obj, message) => {
-      winstonLogger.info({
-        message,
-        ...convertLogObject(kind, obj),
+      ignoreLoggingError(() => {
+        winstonLogger.info({
+          message,
+          ...convertLogObject(kind, obj),
+        })
       })
     },
     warn: (kind, obj, message) => {
-      winstonLogger.warn({
-        message,
-        ...convertLogObject(kind, obj),
+      ignoreLoggingError(() => {
+        winstonLogger.warn({
+          message,
+          ...convertLogObject(kind, obj),
+        })
       })
     },
     error: (kind, obj, message) => {
-      winstonLogger.error({
-        message,
-        ...convertLogObject(kind, obj),
+      ignoreLoggingError(() => {
+        winstonLogger.error({
+          message,
+          ...convertLogObject(kind, obj),
+        })
       })
     },
   }
