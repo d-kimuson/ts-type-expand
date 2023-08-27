@@ -23,3 +23,6 @@ git tag -a $new_version -m "$new_version release"
 touch yarn.lock
 vsce publish --yarn
 rm yarn.lock
+
+git push origin HEAD
+git push origin --tags
