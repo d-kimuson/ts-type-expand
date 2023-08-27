@@ -19,7 +19,7 @@ if [ -f package.json-e ]; then
     rm package.json-e
 fi
 git add package.json && git commit -m "$new_version release"
-git tag -a $new_version -m "$new_version release"
+git tag -a "v$new_version" -m "$new_version release"
 touch yarn.lock
 vsce publish --yarn
 rm yarn.lock
