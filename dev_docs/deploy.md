@@ -1,5 +1,17 @@
 # デプロイ手順
 
+## CHANGELOG の作成
+
+```markdown
+## [x.x.x] - 202X-XX-XX
+
+### Added
+
+### Changed
+
+### Removed
+```
+
 ## Web での操作
 
 - [vsce のページ](https://dev.azure.com/kimuson/vsce) へ行く
@@ -22,3 +34,8 @@ which version to update ? >> 1.0.3
 # ...
  DONE  Published kimuson.ts-type-expand v1.0.3.
 ```
+
+## release の作成
+
+- title: `vx.x.x release`
+- CHANGELOG の説明を持ってくる
