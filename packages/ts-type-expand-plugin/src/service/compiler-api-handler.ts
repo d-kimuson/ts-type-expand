@@ -1,6 +1,5 @@
 import CompilerApiHelper from "compiler-api-helper"
 import {
-  forEachChild,
   getPositionOfLineAndCharacter,
   unescapeLeadingUnderscores,
 } from "typescript"
@@ -97,7 +96,7 @@ export class CompilerHandler {
       return getValidChildNodeRecursively(validChild)
     }
 
-    forEachChild(sourceFile, (node) => {
+    sourceFile.forEachChild((node) => {
       if (node.pos <= pos && pos <= node.end) {
         result = getValidChildNodeRecursively(node)
       }
