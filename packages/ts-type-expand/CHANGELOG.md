@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [1.0.5] - 2023-08-27
+
+### Changed
+
+- bug fixed for error that cannot display anything #353
+
 ## [1.0.0] - 2023-01-22
 
 ### Added
