@@ -203,6 +203,10 @@ function toTypeText(type: TypeObject): string {
   }
 
   if (type.__type === "LiteralTO") {
+    if (typeof type.value === "string") {
+      return `"${type.value}"`
+    }
+
     return String(type.value)
   }
 
