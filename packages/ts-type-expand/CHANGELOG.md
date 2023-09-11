@@ -6,6 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Default value of string length to be displayed is 80
 - For literals of type string, display the value enclosed in double quotes so that we can identify between `"string"` and `string`.
 
 ## [1.0.5] - 2023-08-27

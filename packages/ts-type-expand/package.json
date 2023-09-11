@@ -55,7 +55,7 @@
         },
         "ts-type-expand.compactPropertyLength": {
           "type": "number",
-          "default": 10,
+          "default": 80,
           "description": "Display {...} if property type text is longer than this length"
         },
         "ts-type-expand.directExpandArray": {
