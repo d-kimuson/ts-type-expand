@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [1.0.6] - 2023-09-14
+
+### Changed
+
 - Default value of string length to be displayed is 80
 - For literals of type string, display the value enclosed in double quotes so that we can identify between `"string"` and `string`.
 - The first type information displayed when a node is selected should be expanded.
