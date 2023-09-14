@@ -16,6 +16,7 @@ export class TypeExpandProvider
     type: TypeObject
   }
   private activeFilePath: string | undefined
+  private isAlreadyShowTopElement = false
 
   public constructor(private options: TypeExpandProviderOptions) {
     this.updateOptions(options)
@@ -44,6 +45,16 @@ export class TypeExpandProvider
   }
 
   public getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
+    // The bottom layer element is not expandable
+    if (element.collapsibleState === vscode.TreeItemCollapsibleState.None) {
+      return element
+    }
+
+    // Expand only the top layer element
+    if (!this.isAlreadyShowTopElement) {
+      element.collapsibleState = vscode.TreeItemCollapsibleState.Expanded
+      this.isAlreadyShowTopElement = true
+    }
     return element
   }
 
@@ -77,6 +88,7 @@ export class TypeExpandProvider
     }
 
     this.selection = selection
+    this.isAlreadyShowTopElement = false
 
     const result = await client().getTypeFromPos.query({
       filePath: this.activeFilePath,
