@@ -54,6 +54,7 @@
     "outdir",
     "pino",
     "postbuild",
+    "preinstall",
     "TRPC",
     "tsserverlibrary",
     "Varibale"

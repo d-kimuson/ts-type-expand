@@ -1,0 +1,13 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  compiler-api-helper:
+    specifier: workspace:*
+    version: link:../compiler-api-helper
+  ts-type-expand-plugin:
+    specifier: workspace:*
+    version: link:../ts-type-expand-plugin

@@ -96,13 +96,13 @@
   ],
   "scripts": {
     "build": "run-s build:*",
-    "build:build": "yarn --cwd '../..' build",
+    "build:build": "pnpm --cwd '../..' build",
     "build:copy": "cp -r ../../packages/ts-type-expand/out ./",
     "prebuild": "rm -rf ./out",
-    "vscode:prepublish": "yarn build"
+    "vscode:prepublish": "pnpm build"
   },
   "dependencies": {
-    "compiler-api-helper": "^0.0.3",
-    "ts-type-expand-plugin": "^0.0.2"
+    "compiler-api-helper": "workspace:*",
+    "ts-type-expand-plugin": "workspace:*"
   }
 }
