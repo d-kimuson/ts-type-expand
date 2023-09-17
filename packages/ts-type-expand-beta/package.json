@@ -2,7 +2,7 @@
   "name": "ts-type-expand-beta",
   "displayName": "ts-type-expand-beta",
   "description": "vscode extension for expand type of typescript",
-  "version": "0.0.39",
+  "version": "0.0.40",
   "license": "MIT",
   "publisher": "kimuson",
   "repository": {
@@ -104,5 +104,8 @@
   "dependencies": {
     "compiler-api-helper": "workspace:*",
     "ts-type-expand-plugin": "workspace:*"
+  },
+  "devDependencies": {
+    "vsce": "^2.15.0"
   }
 }
