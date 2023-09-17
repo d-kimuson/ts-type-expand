@@ -2,7 +2,7 @@
   "name": "ts-type-expand-beta",
   "displayName": "ts-type-expand-beta",
   "description": "vscode extension for expand type of typescript",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "license": "MIT",
   "publisher": "kimuson",
   "repository": {
@@ -96,7 +96,7 @@
   ],
   "scripts": {
     "build": "run-s build:*",
-    "build:build": "pnpm --cwd '../..' build",
+    "build:build": "pnpm --filter 'ts-type-expand-repo' build",
     "build:copy": "cp -r ../../packages/ts-type-expand/out ./",
     "prebuild": "rm -rf ./out",
     "vscode:prepublish": "pnpm build"
