@@ -14,7 +14,8 @@
     "tsserverlibrary",
     "Varibale",
     "lefthook",
-    "typecheck"
+    "typecheck",
+    "tsup"
   ],
   "ignorePaths": ["pnpm-lock.yaml", ".vscode/settings.json"]
 }

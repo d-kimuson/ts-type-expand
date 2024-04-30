@@ -11,5 +11,7 @@ yarn-error.log
 
 logs
 
+.eslintcache
 .cspellcache
+
 .turbo

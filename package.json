@@ -7,24 +7,8 @@
     "type": "git",
     "url": "https://github.com/d-kimuson/ts-type-expand"
   },
+  "packageManager": "pnpm@9.0.4",
   "private": true,
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ],
-    "nohoist": [
-      "**/compiler-api-helper",
-      "**/compiler-api-helper/**",
-      "**/ts-type-expand-plugin",
-      "**/ts-type-expand-plugin/**",
-      "**/ts-type-expand",
-      "**/ts-type-expand/**",
-      "**/ts-type-expand-beta",
-      "**/ts-type-expand-beta/**",
-      "**/example",
-      "**/example/**"
-    ]
-  },
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
@@ -37,37 +21,15 @@
     "fix:packages": "turbo fix",
     "run:prettier": "prettier . --ignore-unknown --no-error-on-unmatched-pattern --cache",
     "test": "turbo test",
+    "typecheck": "turbo typecheck",
     "prepare": "lefthook install",
-    "deploy": "./bin/deploy.sh",
-    "refresh:remove": "rm -rf packages/ts-type-expand/out && rm -rf packages/ts-type-expand-plugin/dist/** && rm -rf packages/compiler-api-helper/dist/**"
+    "deploy": "./bin/deploy.sh"
   },
   "devDependencies": {
-    "@types/glob": "^7.2.0",
-    "@types/jest": "^27.4.1",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "^16.11.13",
-    "@types/vscode": "1.66",
-    "@typescript-eslint/eslint-plugin": "^5.23.0",
-    "@typescript-eslint/parser": "^5.22.0",
     "commitizen": "^4.2.4",
     "cspell": "^8.7.0",
-    "eslint": "^8.14.0",
-    "eslint-config-prettier": "^8.5.0",
-    "glob": "^7.2.0",
-    "jest": "^27.5.1",
     "lefthook": "^1.6.10",
-    "mocha": "^9.2.2",
-    "npm-run-all": "^4.1.5",
     "prettier": "^2.6.2",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^27.1.4",
-    "ts-node": "^10.7.0",
-    "tsconfig-paths": "^3.14.2",
-    "turbo": "^1.13.3",
-    "vscode-test": "^1.6.1"
-  },
-  "dependencies": {
-    "tsc-alias": "^1.6.7",
-    "typescript": "^4.9.4"
+    "turbo": "^1.13.3"
   }
 }
