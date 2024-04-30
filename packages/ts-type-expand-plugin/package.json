@@ -10,9 +10,9 @@
     "build:types": "tsc -p .",
     "build:esbuild": "node ./bin/build.mjs",
     "prebuild": "rm -rf dist",
-    "watch": "run-p watch:*",
-    "watch:types": "yarn build:types --watch",
-    "watch:esbuild": "IS_WATCH=true yarn build:esbuild",
+    "dev": "run-p dev:*",
+    "dev:types": "yarn build:types --watch",
+    "dev:esbuild": "IS_WATCH=true yarn build:esbuild",
     "lint:eslint": "eslint src --ext ts,js",
     "lint:prettier": "prettier '**/*.{ts,js,json,md}' --check",
     "lint": "run-p 'lint:*'",
@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@trpc/server": "^10.9.0",
-    "compiler-api-helper": "^0.0.3",
+    "compiler-api-helper": "workspace:*",
     "express": "^4.17.3",
     "winston": "^3.8.2",
     "zod": "^3.20.2"

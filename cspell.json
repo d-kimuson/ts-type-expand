@@ -13,7 +13,8 @@
     "TRPC",
     "tsserverlibrary",
     "Varibale",
-    "lefthook"
+    "lefthook",
+    "typecheck"
   ],
   "ignorePaths": ["pnpm-lock.yaml", ".vscode/settings.json"]
 }

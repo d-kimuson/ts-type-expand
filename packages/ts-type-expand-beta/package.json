@@ -102,7 +102,7 @@
     "vscode:prepublish": "yarn build"
   },
   "dependencies": {
-    "compiler-api-helper": "^0.0.3",
-    "ts-type-expand-plugin": "^0.0.2"
+    "compiler-api-helper": "workspace:*",
+    "ts-type-expand-plugin": "workspace:*"
   }
 }
