@@ -20,7 +20,7 @@ pre-commit:
       glob: "*.{tsx,ts,mts,mcs}"
       staged_fixed: true
       run: |
-        pnpm --filter ts-type-expand exec eslint --ignore-unknown --cache --fix {staged_files}
+        pnpm --filter ts-type-expand exec eslint --no-error-on-unmatched-pattern --cache --fix {staged_files}
       skip:
         - merge
         - rebase
