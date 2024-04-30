@@ -1,5 +1,4 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
 
 first_line=$(head -n1 $1)
 if [ "${first_line}" != "" ]; then

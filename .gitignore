@@ -10,3 +10,5 @@ src/run.ts
 yarn-error.log
 
 logs
+
+.cspellcache

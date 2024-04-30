@@ -1,0 +1,19 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "commitizen",
+    "decycle",
+    "encycle",
+    "esbuild",
+    "kimuson",
+    "outdir",
+    "pino",
+    "postbuild",
+    "TRPC",
+    "tsserverlibrary",
+    "Varibale",
+    "lefthook"
+  ],
+  "ignorePaths": ["pnpm-lock.yaml", ".vscode/settings.json"]
+}
