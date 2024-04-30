@@ -25,7 +25,7 @@
   "activationEvents": [
     "onView:typeExpand"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
       "title": "Ts Type Expand",
@@ -95,11 +95,8 @@
     "vscode.typescript-language-features"
   ],
   "scripts": {
-    "build": "run-s build:*",
-    "build:build": "yarn --cwd '../..' build",
-    "build:copy": "cp -r ../../packages/ts-type-expand/out ./",
-    "prebuild": "rm -rf ./out",
-    "vscode:prepublish": "yarn build"
+    "build": "pnpm --filter ts-type-expand build && rm -rf ./dist && cp -r ../../packages/ts-type-expand/dist ./",
+    "vscode:prepublish": "cd ../.. && pnpm build"
   },
   "dependencies": {
     "compiler-api-helper": "workspace:*",

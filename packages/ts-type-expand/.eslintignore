@@ -5,3 +5,4 @@
 out
 src/test
 jest.config.ts
+tsup.config.ts
