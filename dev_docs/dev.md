@@ -7,5 +7,5 @@
 
 ## 開発するには
 
-- launch.json に書いてあるのは指定のトランスパイル済みファイルを見てねってことだけなので、watch は自前で立てる必要あり
-  - root の `yarn dev` で起動する
+- 開発モードでの拡張機能の起動は launch.json に書かれいている `Run Extension` で起動する
+  - preLaunchTask で defaultBuildTask が指定されており、tasks.json に `npm run dev` がデフォルトタスクとして追加されているので launch されれば開発サーバーが起動した状態で拡張機能を試せる
