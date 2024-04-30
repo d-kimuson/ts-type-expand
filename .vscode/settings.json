@@ -11,9 +11,8 @@
   ],
   // ESLint
   "eslint.workingDirectories": ["./packages/*"],
-  "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   // prettier
   "prettier.configPath": "./.prettierrc.js",
