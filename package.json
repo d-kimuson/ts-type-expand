@@ -8,23 +8,6 @@
     "url": "https://github.com/d-kimuson/ts-type-expand"
   },
   "private": true,
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ],
-    "nohoist": [
-      "**/compiler-api-helper",
-      "**/compiler-api-helper/**",
-      "**/ts-type-expand-plugin",
-      "**/ts-type-expand-plugin/**",
-      "**/ts-type-expand",
-      "**/ts-type-expand/**",
-      "**/ts-type-expand-beta",
-      "**/ts-type-expand-beta/**",
-      "**/example",
-      "**/example/**"
-    ]
-  },
   "scripts": {
     "dev": "run-p dev:*",
     "dev:ts-type-expand": "yarn --cwd './packages/ts-type-expand' watch",
