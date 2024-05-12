@@ -28,7 +28,7 @@ Personal Access Token for publisher 'kimuson': *********************************
 
 The Personal Access Token verification succeeded for the publisher 'kimuson'.
 
-$ ./bin/deploy.sh
+$ ./scripts/release.sh
 current version is 1.0.2
 which version to update ? >> 1.0.3
 # ...

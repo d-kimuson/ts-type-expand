@@ -31,7 +31,6 @@
     "lint-staged": "lint-staged --allow-empty -r",
     "prepare:husky": "husky install",
     "prepare": "run-s 'prepare:*'",
-    "deploy": "./bin/deploy.sh",
     "refresh:remove": "rm -rf packages/ts-type-expand/out && rm -rf packages/ts-type-expand-plugin/dist/** && rm -rf packages/compiler-api-helper/dist/**"
   },
   "devDependencies": {

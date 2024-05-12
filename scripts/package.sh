@@ -5,7 +5,7 @@ set -eux
 
 REPOSITORY_DIR=$(git rev-parse --show-toplevel)
 EXTENSION_TMP_DIR=${REPOSITORY_DIR}/extension-tmp
-VERSION=1.0.8
+VERSION=$1
 
 cd ${REPOSITORY_DIR}
 
@@ -31,6 +31,3 @@ cp -r ./packages/ts-type-expand/out ${EXTENSION_TMP_DIR}
 pushd ${EXTENSION_TMP_DIR}
 npm i $ts_type_expand_plugin_packed
 pnpm vsce package --no-yarn
-
-# pnpm vsce publish -i ./extension-tmp/ts-type-expand-beta-0.0.39.vsix
-# code --install-extension ./extension-tmp/ts-type-expand-beta-0.0.39.vsix
