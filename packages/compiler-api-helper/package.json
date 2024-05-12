@@ -8,7 +8,6 @@
     "dev": "pnpm /^dev:.*/",
     "dev:tsc": "pnpm build:tsc --watch",
     "dev:alias": "pnpm build:alias --watch",
-    "typecheck": "tsc -p . --noEmit",
     "lint": "pnpm /^lint:.*/",
     "lint:eslint": "eslint . --ext ts",
     "fix": "pnpm /^fix:.*/",
@@ -16,6 +15,7 @@
     "build": "pnpm /^build:.*/",
     "build:tsc": "tsc -p .",
     "build:alias": "tsc-alias -p tsconfig.json",
+    "typecheck": "tsc -p . --noEmit",
     "test": "jest",
     "test:watch": "jest --watch"
   },
@@ -39,11 +39,8 @@
     "eslint-import-resolver-typescript": "^2.5.0",
     "eslint-plugin-import": "^2.25.3",
     "jest": "^27.3.1",
-    "postinstall-postinstall": "^2.1.0",
     "ts-jest": "^27.0.7",
-    "ts-node": "^10.4.0",
     "tsc-alias": "^1.4.0",
-    "tsconfig-paths": "^3.14.2",
     "tsd": "^0.18.0"
   }
 }

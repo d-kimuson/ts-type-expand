@@ -22,7 +22,7 @@
     "emitDeclarationOnly": false,
     "noEmit": true,
     "preserveSymlinks": true,
-    "moduleResolution": "node16",
+    "moduleResolution": "Node16",
     "noErrorTruncation": true
   },
   "include": ["src", "bin"],

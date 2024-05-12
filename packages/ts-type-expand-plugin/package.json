@@ -10,25 +10,24 @@
       "types": "./dist/index.d.ts"
     },
     "./server": {
-      "import": "./dist/server/index.ts",
+      "import": "./dist/server/index.js",
       "types": "./dist/server/index.d.ts"
     }
   },
   "scripts": {
-    "typecheck": "tsc -p . --noEmit",
     "dev": "pnpm /^dev:.*/",
     "dev:types": "pnpm build:types --watch",
     "dev:esbuild": "IS_WATCH=true pnpm build:esbuild",
     "build": "pnpm /^build:.*/",
     "build:types": "tsc -p .",
     "build:esbuild": "node ./bin/build.mjs",
-    "prebuild": "rm -rf dist",
     "lint:eslint": "eslint src --ext ts,js",
     "lint:prettier": "prettier '**/*.{ts,js,json,md}' --check",
     "lint": "pnpm /^lint:.*/",
     "fix:eslint": "pnpm lint:eslint --fix",
     "fix:prettier": "prettier '**/*.{ts,js,json,md}' --write",
     "fix": "pnpm /^fix:.*/",
+    "typecheck": "tsc -p . --noEmit",
     "prepublish": "pnpm build"
   },
   "dependencies": {
@@ -46,8 +45,6 @@
     "eslint": "^8.3.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-plugin-import": "^2.25.3",
-    "open-typescript": "^4.5.0-dev.20210906",
-    "prettier": "^2.5.0"
+    "eslint-plugin-import": "^2.25.3"
   }
 }

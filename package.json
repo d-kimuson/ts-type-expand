@@ -15,6 +15,7 @@
     "lint": "turbo lint",
     "fix": "turbo fix",
     "test": "turbo test",
+    "typecheck": "turbo typecheck",
     "prepare": "lefthook install"
   },
   "devDependencies": {
@@ -36,8 +37,6 @@
     "prettier": "^2.8.8",
     "rimraf": "^3.0.2",
     "ts-jest": "^27.1.4",
-    "ts-node": "^10.7.0",
-    "tsconfig-paths": "^3.14.2",
     "turbo": "^1.13.3",
     "vscode-test": "^1.6.1",
     "zx": "^8.0.2"

@@ -69,12 +69,6 @@ importers:
       ts-jest:
         specifier: ^27.1.4
         version: 27.1.5(@babel/core@7.20.12)(@types/jest@27.5.2)(babel-jest@27.5.1(@babel/core@7.20.12))(jest@27.5.1(ts-node@10.9.1(@types/node@16.18.11)(typescript@4.9.4)))(typescript@4.9.4)
-      ts-node:
-        specifier: ^10.7.0
-        version: 10.9.1(@types/node@16.18.11)(typescript@4.9.4)
-      tsconfig-paths:
-        specifier: ^3.14.2
-        version: 3.14.2
       turbo:
         specifier: ^1.13.3
         version: 1.13.3
@@ -139,21 +133,12 @@ importers:
       jest:
         specifier: ^27.3.1
         version: 27.5.1(ts-node@10.9.1(@types/node@16.18.96)(typescript@4.9.4))
-      postinstall-postinstall:
-        specifier: ^2.1.0
-        version: 2.1.0
       ts-jest:
         specifier: ^27.0.7
         version: 27.1.5(@babel/core@7.20.12)(@types/jest@27.5.2)(babel-jest@27.5.1(@babel/core@7.20.12))(esbuild@0.17.3)(jest@27.5.1(ts-node@10.9.1(@types/node@16.18.96)(typescript@4.9.4)))(typescript@4.9.4)
-      ts-node:
-        specifier: ^10.4.0
-        version: 10.9.1(@types/node@16.18.96)(typescript@4.9.4)
       tsc-alias:
         specifier: ^1.4.0
         version: 1.8.2
-      tsconfig-paths:
-        specifier: ^3.14.2
-        version: 3.15.0
       tsd:
         specifier: ^0.18.0
         version: 0.18.0
@@ -270,27 +255,12 @@ importers:
       mocha:
         specifier: ^9.1.3
         version: 9.2.2
-      prettier:
-        specifier: ^2.5.0
-        version: 2.8.3
-      rimraf:
-        specifier: ^3.0.2
-        version: 3.0.2
       ts-jest:
         specifier: ^27.0.7
         version: 27.1.5(@babel/core@7.20.12)(@types/jest@27.5.2)(babel-jest@27.5.1(@babel/core@7.20.12))(esbuild@0.17.3)(jest@27.5.1(ts-node@10.9.1(@types/node@16.18.96)(typescript@4.9.4)))(typescript@4.9.4)
-      ts-node:
-        specifier: ^10.4.0
-        version: 10.9.1(@types/node@16.18.96)(typescript@4.9.4)
-      tsconfig-paths:
-        specifier: ^3.14.2
-        version: 3.14.2
       vscode-test:
         specifier: ^1.6.1
         version: 1.6.1
-      zx:
-        specifier: ^8.0.2
-        version: 8.0.2
 
   packages/ts-type-expand-plugin:
     dependencies:
@@ -334,12 +304,6 @@ importers:
       eslint-plugin-import:
         specifier: ^2.25.3
         version: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@2.7.1)(eslint@8.57.0)
-      open-typescript:
-        specifier: ^4.5.0-dev.20210906
-        version: 4.9.4
-      prettier:
-        specifier: ^2.5.0
-        version: 2.8.8
 
 packages:
 
@@ -3727,9 +3691,6 @@ packages:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
     engines: {node: '>=6'}
 
-  open-typescript@4.9.4:
-    resolution: {integrity: sha512-KXYhMzNz8yYejOowI+N3XhutdsRi2ThvSEJQkTIVeSEytWWT50WuBqdq4iTd246KVYBZaoAxd1AjVxUbXCQrZg==}
-
   optionator@0.8.3:
     resolution: {integrity: sha512-+IW9pACdk3XWmmTXG8m3upGUJst5XRGzxMRjXzAuJ1XnIFNvfhjjIuYkDvysnPQ7qzqVzLt78BCruntqRhWQbA==}
     engines: {node: '>= 0.8.0'}
@@ -3861,9 +3822,6 @@ packages:
     resolution: {integrity: sha512-d7Uw+eZoloe0EHDIYoe+bQ5WXnGMOpmiZFTuMWCwpjzzkL2nTjcKiAk4hh8TjnGye2TwWOk3UXucZ+3rbmBa8Q==}
     engines: {node: '>= 0.4'}
 
-  postinstall-postinstall@2.1.0:
-    resolution: {integrity: sha512-7hQX6ZlZXIoRiWNrbMQaLzUUfH+sSx39u8EJ9HYuDc1kLo9IXKWjM5RSquZN1ad5GnH8CGFM78fsAAQi3OKEEQ==}
-
   prelude-ls@1.1.2:
     resolution: {integrity: sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w==}
     engines: {node: '>= 0.8.0'}
@@ -3871,11 +3829,6 @@ packages:
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
-
-  prettier@2.8.3:
-    resolution: {integrity: sha512-tJ/oJ4amDihPoufT5sM0Z1SKEuKay8LfVAMlbbhnnkvt6BUserZylqo2PN+p9KeljLr0OHa2rXHU1T8reeoTrw==}
-    engines: {node: '>=10.13.0'}
-    hasBin: true
 
   prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
@@ -4451,9 +4404,6 @@ packages:
   tsc-alias@1.8.2:
     resolution: {integrity: sha512-ukBkcNekOgwtnSWYLD5QsMX3yQWg7JviAs8zg3qJGgu4LGtY3tsV4G6vnqvOXIDkbC+XL9vbhObWSpRA5/6wbg==}
     hasBin: true
-
-  tsconfig-paths@3.14.2:
-    resolution: {integrity: sha512-o/9iXgCYc5L/JxCHPe3Hvh8Q/2xm5Z+p18PESBU6Ff33695QnCHBEjcytY2q19ua7Mbl/DavtBOLq+oG0RCL+g==}
 
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
@@ -5456,6 +5406,7 @@ snapshots:
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
+    optional: true
 
   '@dabh/diagnostics@2.0.3':
     dependencies:
@@ -5850,6 +5801,7 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
+    optional: true
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -5879,13 +5831,17 @@ snapshots:
 
   '@trpc/server@10.45.2': {}
 
-  '@tsconfig/node10@1.0.9': {}
+  '@tsconfig/node10@1.0.9':
+    optional: true
 
-  '@tsconfig/node12@1.0.11': {}
+  '@tsconfig/node12@1.0.11':
+    optional: true
 
-  '@tsconfig/node14@1.0.3': {}
+  '@tsconfig/node14@1.0.3':
+    optional: true
 
-  '@tsconfig/node16@1.0.3': {}
+  '@tsconfig/node16@1.0.3':
+    optional: true
 
   '@tsd/typescript@4.4.4': {}
 
@@ -6437,7 +6393,8 @@ snapshots:
 
   acorn-walk@7.2.0: {}
 
-  acorn-walk@8.2.0: {}
+  acorn-walk@8.2.0:
+    optional: true
 
   acorn@7.4.1: {}
 
@@ -6498,7 +6455,8 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  arg@4.1.3: {}
+  arg@4.1.3:
+    optional: true
 
   argparse@1.0.10:
     dependencies:
@@ -7029,7 +6987,8 @@ snapshots:
       typescript: 4.9.4
     optional: true
 
-  create-require@1.1.1: {}
+  create-require@1.1.1:
+    optional: true
 
   cross-spawn@6.0.5:
     dependencies:
@@ -7259,7 +7218,8 @@ snapshots:
 
   diff-sequences@27.5.1: {}
 
-  diff@4.0.2: {}
+  diff@4.0.2:
+    optional: true
 
   diff@5.0.0: {}
 
@@ -9402,8 +9362,6 @@ snapshots:
     dependencies:
       mimic-fn: 2.1.0
 
-  open-typescript@4.9.4: {}
-
   optionator@0.8.3:
     dependencies:
       deep-is: 0.1.4
@@ -9526,13 +9484,9 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postinstall-postinstall@2.1.0: {}
-
   prelude-ls@1.1.2: {}
 
   prelude-ls@1.2.1: {}
-
-  prettier@2.8.3: {}
 
   prettier@2.8.8: {}
 
@@ -10132,7 +10086,7 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.3
       '@types/node': 16.18.11
-      acorn: 8.8.1
+      acorn: 8.11.3
       acorn-walk: 8.2.0
       arg: 4.1.3
       create-require: 1.1.1
@@ -10141,6 +10095,7 @@ snapshots:
       typescript: 4.9.4
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+    optional: true
 
   ts-node@10.9.1(@types/node@16.18.96)(typescript@4.9.4):
     dependencies:
@@ -10150,7 +10105,7 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.3
       '@types/node': 16.18.96
-      acorn: 8.8.1
+      acorn: 8.11.3
       acorn-walk: 8.2.0
       arg: 4.1.3
       create-require: 1.1.1
@@ -10159,6 +10114,7 @@ snapshots:
       typescript: 4.9.4
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+    optional: true
 
   ts-toolbelt@6.15.5: {}
 
@@ -10170,13 +10126,6 @@ snapshots:
       mylas: 2.1.13
       normalize-path: 3.0.0
       plimit-lit: 1.5.0
-
-  tsconfig-paths@3.14.2:
-    dependencies:
-      '@types/json5': 0.0.29
-      json5: 1.0.2
-      minimist: 1.2.7
-      strip-bom: 3.0.0
 
   tsconfig-paths@3.15.0:
     dependencies:
@@ -10379,7 +10328,8 @@ snapshots:
 
   uuid@8.3.2: {}
 
-  v8-compile-cache-lib@3.0.1: {}
+  v8-compile-cache-lib@3.0.1:
+    optional: true
 
   v8-to-istanbul@8.1.1:
     dependencies:
@@ -10543,7 +10493,8 @@ snapshots:
       y18n: 5.0.8
       yargs-parser: 20.2.9
 
-  yn@3.1.1: {}
+  yn@3.1.1:
+    optional: true
 
   yocto-queue@0.1.0: {}
 

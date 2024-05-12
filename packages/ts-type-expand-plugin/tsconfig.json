@@ -6,7 +6,7 @@
     "moduleResolution": "node",
     "declaration": true,
     // "declarationMap": true,
-    // "emitDeclarationOnly": true,
+    "emitDeclarationOnly": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
