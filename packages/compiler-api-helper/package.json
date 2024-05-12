@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "tsup --watch --clean=false --minify=false",
-    "build": "tsup",
+    "dev": "tsup --watch",
+    "build": "tsup --minify --clean",
     "lint": "eslint . --ext ts",
     "fix": "pnpm lint:eslint --fix",
     "typecheck": "tsc -p . --noEmit",

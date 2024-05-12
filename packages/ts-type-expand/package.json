@@ -95,8 +95,8 @@
     "vscode.typescript-language-features"
   ],
   "scripts": {
-    "dev": "tsup --watch --clean=false --minify=false",
-    "build": "tsup",
+    "dev": "tsup --watch",
+    "build": "tsup --clean --minify",
     "typecheck": "tsc --noEmit -p .",
     "lint": "eslint src --ext ts,js",
     "fix": "pnpm lint:eslint --fix",

@@ -6,8 +6,8 @@ export default defineConfig({
   sourcemap: "inline",
   target: "node16",
   format: ["cjs"],
-  clean: true,
   tsconfig: "tsconfig.json",
   external: ["typescript"],
-  minify: true,
+  clean: false,
+  minify: false,
 });

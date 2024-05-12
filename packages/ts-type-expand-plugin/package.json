@@ -18,8 +18,8 @@
     }
   },
   "scripts": {
-    "dev": "tsup --watch --clean=false --minify=false",
-    "build": "tsup",
+    "dev": "tsup --watch",
+    "build": "tsup --clean --minify",
     "lint": "eslint src --ext ts,js",
     "fix": "pnpm lint:eslint --fix",
     "typecheck": "tsc -p . --noEmit --emitDeclarationOnly false"
