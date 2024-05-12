@@ -5,7 +5,7 @@ pre-commit:
       glob: "*.{tsx,ts,mts,mcs,mjs,cjs,js,json,md,yml,yaml}"
       run: |
         pnpm prettier --write --ignore-unknown --no-error-on-unmatched-pattern --cache {staged_files}
-      staged_fixed: true
+      stage_fixed: true
       skip:
         - merge
         - rebase
@@ -18,7 +18,7 @@ pre-commit:
     eslint-ts-type-expand:
       root: "packages/ts-type-expand/"
       glob: "*.{tsx,ts,mts,mcs}"
-      staged_fixed: true
+      stage_fixed: true
       run: |
         pnpm --filter ts-type-expand exec eslint --no-error-on-unmatched-pattern --cache --fix {staged_files}
       skip:
