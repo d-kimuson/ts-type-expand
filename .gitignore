@@ -13,3 +13,5 @@ logs
 
 extension-tmp/**
 .cspellcache
+
+.turbo

@@ -16,18 +16,20 @@ jobs:
       with:
         node-version-file: .node-version
 
+    - uses: pnpm/action-setup@v4
+
     - name: install dependencies
       run: |
-        yarn install
+        pnpm i
 
     - name: check source codes (linter)
       run: |
-        yarn lint
+        pnpm lint
 
     - name: build check
       run: |
-        yarn build
+        pnpm build
 
     - name: test
       run: |
-        yarn test
+        pnpm test

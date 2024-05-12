@@ -16,20 +16,20 @@
   },
   "scripts": {
     "typecheck": "tsc -p . --noEmit",
-    "build": "run-s build:*",
+    "dev": "pnpm /^dev:.*/",
+    "dev:types": "pnpm build:types --watch",
+    "dev:esbuild": "IS_WATCH=true pnpm build:esbuild",
+    "build": "pnpm /^build:.*/",
     "build:types": "tsc -p .",
     "build:esbuild": "node ./bin/build.mjs",
     "prebuild": "rm -rf dist",
-    "watch": "run-p watch:*",
-    "watch:types": "yarn build:types --watch",
-    "watch:esbuild": "IS_WATCH=true yarn build:esbuild",
     "lint:eslint": "eslint src --ext ts,js",
     "lint:prettier": "prettier '**/*.{ts,js,json,md}' --check",
-    "lint": "run-p 'lint:*'",
-    "fix:eslint": "yarn lint:eslint --fix",
+    "lint": "pnpm /^lint:.*/",
+    "fix:eslint": "pnpm lint:eslint --fix",
     "fix:prettier": "prettier '**/*.{ts,js,json,md}' --write",
-    "fix": "run-p 'fix:*'",
-    "prepublish": "yarn build"
+    "fix": "pnpm /^fix:.*/",
+    "prepublish": "pnpm build"
   },
   "dependencies": {
     "@trpc/server": "^10.9.0",
@@ -47,9 +47,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-typescript": "^2.5.0",
     "eslint-plugin-import": "^2.25.3",
-    "npm-run-all": "^4.1.5",
     "open-typescript": "^4.5.0-dev.20210906",
-    "prettier": "^2.5.0",
-    "ts-type-expand-plugin": "workspace:*"
+    "prettier": "^2.5.0"
   }
 }
