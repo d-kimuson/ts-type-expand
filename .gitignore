@@ -13,5 +13,6 @@ logs
 
 extension-tmp/**
 .cspellcache
+.eslintcache
 
 .turbo
