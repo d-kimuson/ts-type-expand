@@ -1,6 +1,8 @@
 #!/bin/bash
 
-cd $(git rev-parse --show-toplevel)/packages/ts-type-expand-beta
+set -eux
+
+pushd $(git rev-parse --show-toplevel)/packages/ts-type-expand
 
 current_version=$(cat package.json | grep version | cut -f 4 -d '"')
 echo "current version is ${current_version}"
@@ -13,9 +15,16 @@ fi
 
 # deploy
 sed -i -e "s/"$current_version"/"$new_version"/g" package.json  # for mac
-\rm package.json-e
+if [ -f package.json-e ]; then
+    rm package.json-e
+fi
 git add package.json && git commit -m "$new_version release"
-git tag -a $new_version -m "$new_version release"
-touch yarn.lock
-vsce publish --yarn
-rm yarn.lock
+git tag -a "v$new_version" -m "$new_version release"
+
+popd
+
+./scripts/package.sh $new_version
+pnpm vsce publish -i ./extension-tmp/ts-type-expand-beta-$new_version.vsix
+
+git push origin HEAD
+git push origin --tags

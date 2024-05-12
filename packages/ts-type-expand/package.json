@@ -96,7 +96,6 @@
   ],
   "scripts": {
     "ts:run": "ts-node -P ./tsconfig.json -r tsconfig-paths/register",
-    "vscode:prepublish": "yarn --cwd '../../' build",
     "prebuild": "rimraf out",
     "build": "run-s build:*",
     "build:typedef": "tsc -p ./",
@@ -120,15 +119,17 @@
   "dependencies": {
     "@trpc/client": "^10.9.0",
     "axios": "^0.26.1",
-    "compiler-api-helper": "^0.0.3",
+    "compiler-api-helper": "workspace:*",
     "get-port": "^6.1.2",
     "node-fetch": "^3.3.0",
-    "ts-type-expand-plugin": "^0.0.2",
+    "ts-type-expand-plugin": "workspace:*",
     "tsc-alias": "^1.4.2",
     "typescript": "^4.9.4",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "winston-transport": "^4.7.0"
   },
   "devDependencies": {
+    "@trpc/server": "^10.9.0",
     "@types/axios": "^0.14.0",
     "@types/glob": "^7.2.0",
     "@types/jest": "^27.0.3",
@@ -153,6 +154,7 @@
     "ts-jest": "^27.0.7",
     "ts-node": "^10.4.0",
     "tsconfig-paths": "^3.14.2",
-    "vscode-test": "^1.6.1"
+    "vscode-test": "^1.6.1",
+    "zx": "^8.0.2"
   }
 }

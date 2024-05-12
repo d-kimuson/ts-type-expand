@@ -11,6 +11,7 @@ vsc-extension-quickstart.md
 example
 src/**/*.ts
 
+ts-type-expand-plugin-*.tgz
+
 **/node_modules
-!node_modules/ts-type-expand-plugin/dist/*.js
-!node_modules/ts-type-expand-plugin/package.json
+!node_modules/ts-type-expand-plugin

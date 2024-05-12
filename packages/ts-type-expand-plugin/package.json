@@ -4,6 +4,16 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server/index.ts",
+      "types": "./dist/server/index.d.ts"
+    }
+  },
   "scripts": {
     "typecheck": "tsc -p . --noEmit",
     "build": "run-s build:*",
@@ -23,7 +33,7 @@
   },
   "dependencies": {
     "@trpc/server": "^10.9.0",
-    "compiler-api-helper": "^0.0.3",
+    "compiler-api-helper": "workspace:*",
     "express": "^4.17.3",
     "winston": "^3.8.2",
     "zod": "^3.20.2"
@@ -39,6 +49,7 @@
     "eslint-plugin-import": "^2.25.3",
     "npm-run-all": "^4.1.5",
     "open-typescript": "^4.5.0-dev.20210906",
-    "prettier": "^2.5.0"
+    "prettier": "^2.5.0",
+    "ts-type-expand-plugin": "workspace:*"
   }
 }

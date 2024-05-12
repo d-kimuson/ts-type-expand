@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "Node16",
     "target": "es6",
     "outDir": "out",
     "lib": ["es6"],
@@ -11,16 +11,19 @@
       "~/*": ["src/*"]
     },
     "strict": true,
-    "moduleResolution": "node",
-    "noEmit": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "declaration": true,
-    "declarationMap": true,
-    "emitDeclarationOnly": true
+    // temporary
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "noEmit": true,
+    "preserveSymlinks": true,
+    "moduleResolution": "node16",
+    "noErrorTruncation": true
   },
   "include": ["src", "bin"],
   "exclude": [
