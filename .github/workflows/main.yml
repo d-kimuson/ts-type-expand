@@ -10,26 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: .node-version
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
 
-    - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
 
-    - name: install dependencies
-      run: |
-        pnpm i
+      - name: install dependencies
+        run: |
+          pnpm i
 
-    - name: check source codes (linter)
-      run: |
-        pnpm lint
+      - name: check source codes (linter)
+        run: |
+          pnpm lint
 
-    - name: build check
-      run: |
-        pnpm build
+      - name: build check
+        run: |
+          pnpm build
 
-    - name: test
-      run: |
-        pnpm test
+      - name: test
+        run: |
+          pnpm test

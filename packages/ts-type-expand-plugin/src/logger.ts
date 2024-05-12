@@ -1,18 +1,18 @@
-import { homedir } from "node:os"
-import { resolve } from "node:path"
-import { createLogger, format, transports } from "winston"
+import { homedir } from "node:os";
+import { resolve } from "node:path";
+import { createLogger, format, transports } from "winston";
 
-type LogLevel = "info" | "warn" | "error"
+type LogLevel = "info" | "warn" | "error";
 
 type ILogger = {
   [K in LogLevel]: (
     kind: string,
     obj: Record<string, unknown>,
     message?: string
-  ) => void
-}
+  ) => void;
+};
 
-const HOME_DIR = homedir()
+const HOME_DIR = homedir();
 
 const winstonLogger = createLogger({
   format: format.json(),
@@ -51,22 +51,22 @@ const winstonLogger = createLogger({
       level: "error",
     }),
   ],
-})
+});
 
 const convertLogObject = (kind: string, obj: Record<string, unknown>) => {
   return {
     kind,
     ...obj,
-  }
-}
+  };
+};
 
 const ignoreLoggingError = (cb: () => void) => {
   try {
-    cb()
+    cb();
   } catch (err) {
-    console.error(err)
+    console.error(err);
   }
-}
+};
 
 export const logger = ((): ILogger => {
   return {
@@ -75,24 +75,24 @@ export const logger = ((): ILogger => {
         winstonLogger.info({
           message,
           ...convertLogObject(kind, obj),
-        })
-      })
+        });
+      });
     },
     warn: (kind, obj, message) => {
       ignoreLoggingError(() => {
         winstonLogger.warn({
           message,
           ...convertLogObject(kind, obj),
-        })
-      })
+        });
+      });
     },
     error: (kind, obj, message) => {
       ignoreLoggingError(() => {
         winstonLogger.error({
           message,
           ...convertLogObject(kind, obj),
-        })
-      })
+        });
+      });
     },
-  }
-})()
+  };
+})();

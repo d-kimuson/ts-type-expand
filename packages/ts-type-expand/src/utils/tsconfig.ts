@@ -1,15 +1,15 @@
-import { readConfigFile, parseJsonConfigFileContent, sys } from "typescript"
-import type { ParsedCommandLine } from "typescript"
+import { readConfigFile, parseJsonConfigFileContent, sys } from "typescript";
+import type { ParsedCommandLine } from "typescript";
 
 export function loadTsConfig(
   filePath: string,
   basePath: string
 ): ParsedCommandLine {
-  const configFile = readConfigFile(filePath, sys.readFile)
+  const configFile = readConfigFile(filePath, sys.readFile);
   if (typeof configFile.error !== "undefined") {
     throw new Error(
       `Failed to load tsconfig (${filePath}): ${configFile.error}`
-    )
+    );
   }
 
   return parseJsonConfigFileContent(
@@ -21,5 +21,5 @@ export function loadTsConfig(
       useCaseSensitiveFileNames: true,
     },
     basePath
-  )
+  );
 }

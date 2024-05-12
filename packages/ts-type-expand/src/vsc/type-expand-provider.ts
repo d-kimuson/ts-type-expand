@@ -1,68 +1,68 @@
-import { deserializeTypeObject } from "compiler-api-helper/src/serialize"
-import vscode from "vscode"
-import type { TypeObject } from "compiler-api-helper"
-import { client, updatePortNumber } from "~/api-client"
-import type { ExtensionOption } from "~/types/option"
-import { getCurrentFileLanguageId } from "~/utils/vscode"
+import { deserializeTypeObject } from "compiler-api-helper/src/serialize";
+import vscode from "vscode";
+import type { TypeObject } from "compiler-api-helper";
+import { client, updatePortNumber } from "~/api-client";
+import type { ExtensionOption } from "~/types/option";
+import { getCurrentFileLanguageId } from "~/utils/vscode";
 
-export type TypeExpandProviderOptions = ExtensionOption
+export type TypeExpandProviderOptions = ExtensionOption;
 
 export class TypeExpandProvider
   implements vscode.TreeDataProvider<ExpandableTypeItem>
 {
-  private selection?: vscode.Range
+  private selection?: vscode.Range;
   private selectedType?: {
-    declareName?: string
-    type: TypeObject
-  }
-  private activeFilePath: string | undefined
-  private isAlreadyShowTopElement = false
+    declareName?: string;
+    type: TypeObject;
+  };
+  private activeFilePath: string | undefined;
+  private isAlreadyShowTopElement = false;
 
   public constructor(private options: TypeExpandProviderOptions) {
-    this.updateOptions(options)
+    this.updateOptions(options);
   }
 
   public updateOptions(options: TypeExpandProviderOptions): void {
-    ExpandableTypeItem.updateOptions(options)
+    ExpandableTypeItem.updateOptions(options);
     if (this.options.port !== options.port) {
-      updatePortNumber(options.port)
+      updatePortNumber(options.port);
     }
 
-    this.options = options
+    this.options = options;
   }
 
   private isCurrentFileValidated(): boolean {
-    const languageId = getCurrentFileLanguageId()
+    const languageId = getCurrentFileLanguageId();
     if (languageId === undefined) {
-      return false
+      return false;
     }
 
-    return this.options.validate.includes(languageId)
+    return this.options.validate.includes(languageId);
   }
 
   public restart(): void {
-    this.refresh()
+    this.refresh();
   }
 
   public getTreeItem(element: ExpandableTypeItem): vscode.TreeItem {
     // The bottom layer element is not expandable
     if (element.collapsibleState === vscode.TreeItemCollapsibleState.None) {
-      return element
+      return element;
     }
 
     // Expand only the top layer element
     if (!this.isAlreadyShowTopElement) {
-      element.collapsibleState = vscode.TreeItemCollapsibleState.Expanded
-      this.isAlreadyShowTopElement = true
+      element.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+      this.isAlreadyShowTopElement = true;
     }
-    return element
+    return element;
   }
 
   public getChildren(
     element?: ExpandableTypeItem
   ): Thenable<ExpandableTypeItem[]> {
     if (!this.selectedType) {
-      return Promise.resolve([])
+      return Promise.resolve([]);
     }
 
     return element
@@ -71,59 +71,59 @@ export class TypeExpandProvider
           new ExpandableTypeItem(this.selectedType.type, {
             aliasName: this.selectedType.declareName,
           }),
-        ])
+        ]);
   }
 
   public async updateSelection(selection: vscode.Selection): Promise<void> {
     if (!this.activeFilePath) {
       vscode.window.showWarningMessage(
         "The file you are editing cannot be found."
-      )
-      return
+      );
+      return;
     }
 
     if (this.selection === selection) {
       // selected node has not changed.
-      return
+      return;
     }
 
-    this.selection = selection
-    this.isAlreadyShowTopElement = false
+    this.selection = selection;
+    this.isAlreadyShowTopElement = false;
 
     const result = await client().getTypeFromPos.query({
       filePath: this.activeFilePath,
       line: this.selection.start.line,
       character: this.selection.start.character,
-    })
+    });
 
     this.selectedType = {
       declareName: result.declareName,
       type: deserializeTypeObject(result.type),
-    }
+    };
 
-    this.refresh()
+    this.refresh();
   }
 
   public updateActiveFile(activeFilePath: string | undefined): void {
-    this.activeFilePath = activeFilePath
-    this.resetSelection()
-    this.refresh()
+    this.activeFilePath = activeFilePath;
+    this.resetSelection();
+    this.refresh();
   }
 
   private resetSelection() {
-    this.selection = undefined
-    this.selectedType = undefined
+    this.selection = undefined;
+    this.selectedType = undefined;
   }
 
   private _onDidChangeTreeData: vscode.EventEmitter<
     ExpandableTypeItem | undefined | null | void
-  > = new vscode.EventEmitter<ExpandableTypeItem | undefined | null | void>()
+  > = new vscode.EventEmitter<ExpandableTypeItem | undefined | null | void>();
   public readonly onDidChangeTreeData: vscode.Event<
     ExpandableTypeItem | undefined | null | void
-  > = this._onDidChangeTreeData.event
+  > = this._onDidChangeTreeData.event;
 
   public refresh(): void {
-    this._onDidChangeTreeData.fire()
+    this._onDidChangeTreeData.fire();
   }
 
   public close(): void {
@@ -131,25 +131,25 @@ export class TypeExpandProvider
   }
 }
 
-type Kind = "Union" | "Properties" | "Function" | "Array" | "Enum" | undefined
+type Kind = "Union" | "Properties" | "Function" | "Array" | "Enum" | undefined;
 
 function getKindText(type: TypeObject): Kind {
   if (type.__type === "UnionTO") {
-    return "Union"
+    return "Union";
   }
   if (type.__type === "EnumTO") {
-    return "Enum"
+    return "Enum";
   }
   if (type.__type === "CallableTO") {
-    return "Function"
+    return "Function";
   }
   if (type.__type === "ArrayTO") {
-    return "Array"
+    return "Array";
   }
   if (type.__type === "ObjectTO") {
-    return "Properties"
+    return "Properties";
   }
-  return undefined
+  return undefined;
 }
 
 function isExpandable(type: TypeObject): boolean {
@@ -160,25 +160,25 @@ function isExpandable(type: TypeObject): boolean {
     type.__type === "ArrayTO" ||
     type.__type === "CallableTO" ||
     type.__type === "PromiseTO"
-  )
+  );
 }
 
 function getLabelText(type: TypeObject): string {
-  const typeText = toTypeText(type)
+  const typeText = toTypeText(type);
 
   return typeText.length > ExpandableTypeItem.options.compactPropertyLength
     ? typeText.slice(0, ExpandableTypeItem.options.compactPropertyLength) +
         "..."
-    : typeText
+    : typeText;
 }
 
 function getCompatLabelText(type: TypeObject): string {
-  const labelText = getLabelText(type)
+  const labelText = getLabelText(type);
 
   return labelText.length > ExpandableTypeItem.options.compactPropertyLength
     ? labelText.slice(0, ExpandableTypeItem.options.compactPropertyLength) +
         "..."
-    : labelText
+    : labelText;
 }
 
 function toTypeText(type: TypeObject): string {
@@ -189,56 +189,56 @@ function toTypeText(type: TypeObject): string {
     type.__type === "ObjectTO" ||
     type.__type === "EnumTO"
   ) {
-    return type.typeName
+    return type.typeName;
   }
 
   if (type.__type === "UnsupportedTO") {
-    return type.typeText ?? "unsupported"
+    return type.typeText ?? "unsupported";
   }
 
   if (type.__type === "CallableTO") {
     return `(${type.argTypes
       .map(({ name, type }) => `${name}: ${toTypeText(type)}`)
-      .join(", ")}) => ${toTypeText(type.returnType)}`
+      .join(", ")}) => ${toTypeText(type.returnType)}`;
   }
 
   if (type.__type === "PromiseTO") {
-    return `Promise<${toTypeText(type.child)}>`
+    return `Promise<${toTypeText(type.child)}>`;
   }
 
   if (type.__type === "PromiseLikeTO") {
-    return `PromiseLike<${toTypeText(type.child)}>`
+    return `PromiseLike<${toTypeText(type.child)}>`;
   }
 
   if (type.__type === "PrimitiveTO") {
-    return type.kind
+    return type.kind;
   }
 
   if (type.__type === "LiteralTO") {
     if (typeof type.value === "string") {
-      return `"${type.value}"`
+      return `"${type.value}"`;
     }
 
-    return String(type.value)
+    return String(type.value);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (type.__type === "SpecialTO") {
-    return type.kind
+    return type.kind;
   }
 
-  throw new Error("unreachable here")
+  throw new Error("unreachable here");
 }
 
 export class ExpandableTypeItem extends vscode.TreeItem {
-  public static options: TypeExpandProviderOptions
+  public static options: TypeExpandProviderOptions;
 
   public constructor(
     private type: TypeObject,
     meta?: {
-      parent?: TypeObject
-      aliasName?: string
-      desc?: string
+      parent?: TypeObject;
+      aliasName?: string;
+      desc?: string;
     }
   ) {
     super(
@@ -250,9 +250,9 @@ export class ExpandableTypeItem extends vscode.TreeItem {
       isExpandable(type)
         ? vscode.TreeItemCollapsibleState.Collapsed
         : vscode.TreeItemCollapsibleState.None
-    )
+    );
 
-    const kind = getKindText(this.type)
+    const kind = getKindText(this.type);
     this.description = [
       meta?.desc,
       kind,
@@ -262,12 +262,12 @@ export class ExpandableTypeItem extends vscode.TreeItem {
         : undefined,
     ]
       .filter((temp) => typeof temp !== "undefined")
-      .join(" ")
-    this.tooltip = toTypeText(type)
+      .join(" ");
+    this.tooltip = toTypeText(type);
   }
 
   public static updateOptions(options: TypeExpandProviderOptions): void {
-    ExpandableTypeItem.options = options
+    ExpandableTypeItem.options = options;
   }
 
   public async getChildrenItems(): Promise<ExpandableTypeItem[]> {
@@ -285,34 +285,34 @@ export class ExpandableTypeItem extends vscode.TreeItem {
           parent: this.type,
           desc: "ReturnType",
         }),
-      ]
+      ];
     }
 
     if (this.type.__type === "ArrayTO") {
-      const childItem = new ExpandableTypeItem(this.type.child)
+      const childItem = new ExpandableTypeItem(this.type.child);
 
       return ExpandableTypeItem.options.directExpandArray
         ? childItem.getChildrenItems()
-        : [childItem]
+        : [childItem];
     }
 
     if (this.type.__type === "EnumTO") {
       return this.type.enums.map(
         ({ type, name }) =>
           new ExpandableTypeItem(type, { parent: this.type, desc: name })
-      )
+      );
     }
 
     if (this.type.__type === "UnionTO") {
       return (this.type.unions as TypeObject[]).map(
         (type) => new ExpandableTypeItem(type, { parent: type })
-      )
+      );
     }
 
     if (this.type.__type === "ObjectTO") {
       const props = await client().getObjectProps.query({
         storeKey: this.type.storeKey,
-      })
+      });
 
       return props.map(
         ({ propName, type }) =>
@@ -320,14 +320,14 @@ export class ExpandableTypeItem extends vscode.TreeItem {
             aliasName: propName,
             parent: this.type,
           })
-      )
+      );
     }
 
     if (this.type.__type === "PromiseTO") {
-      const childItem = new ExpandableTypeItem(this.type.child)
-      return [childItem]
+      const childItem = new ExpandableTypeItem(this.type.child);
+      return [childItem];
     }
 
-    return []
+    return [];
   }
 }
