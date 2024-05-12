@@ -25,7 +25,7 @@
   "activationEvents": [
     "onView:typeExpand"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
       "title": "Ts Type Expand",
@@ -95,37 +95,15 @@
     "vscode.typescript-language-features"
   ],
   "scripts": {
-    "build": "pnpm /^build:.*/",
-    "build:typedef": "tsc -p ./",
-    "build:esbuild": "node ./bin/build.mjs",
-    "build:alias": "tsc-alias -p ./tsconfig.json",
-    "dev": "pnpm /^dev:.*/",
-    "dev:typedef": "pnpm build:typedef -watch",
-    "dev:esbuild": "IS_WATCH=true node ./bin/build.mjs",
-    "dev:alias": "tsc-alias -p ./tsconfig.json -w",
+    "dev": "tsup --watch --clean=false --minify=false",
+    "build": "tsup",
     "typecheck": "tsc --noEmit -p .",
-    "lint:eslint": "eslint src --ext ts,js",
-    "lint:prettier": "prettier '**/*.{ts,js,json,md}' --check",
-    "lint": "pnpm /^lint:.*/",
-    "fix:eslint": "pnpm lint:eslint --fix",
-    "fix:prettier": "prettier '**/*.{ts,js,json,md}' --write",
-    "fix": "pnpm /^fix:.*/",
-    "pretest": "pnpm build && pnpm run lint",
-    "test:vscode": "node ./out/test/vscode/runTest.js",
-    "test:jest": "jest"
+    "lint": "eslint src --ext ts,js",
+    "fix": "pnpm lint:eslint --fix",
+    "test": "jest",
+    "test:vscode": "node ./dist/test/vscode/runTest.js"
   },
-  "dependencies": {
-    "@trpc/client": "^10.9.0",
-    "axios": "^0.26.1",
-    "compiler-api-helper": "workspace:*",
-    "get-port": "^6.1.2",
-    "node-fetch": "^3.3.0",
-    "ts-type-expand-plugin": "workspace:*",
-    "tsc-alias": "^1.4.2",
-    "typescript": "^4.9.4",
-    "winston": "^3.8.2",
-    "winston-transport": "^4.7.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@trpc/server": "^10.9.0",
     "@types/axios": "^0.14.0",
@@ -136,7 +114,15 @@
     "@types/vscode": "1.62",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
-    "esbuild": "^0.17.2",
+    "@trpc/client": "^10.9.0",
+    "axios": "^0.26.1",
+    "compiler-api-helper": "workspace:*",
+    "get-port": "^6.1.2",
+    "node-fetch": "^3.3.0",
+    "ts-type-expand-plugin": "workspace:*",
+    "typescript": "^4.9.4",
+    "winston": "^3.8.2",
+    "winston-transport": "^4.7.0",
     "eslint": "^8.3.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-typescript": "^2.5.0",
@@ -145,6 +131,7 @@
     "jest": "^27.4.3",
     "mocha": "^9.1.3",
     "ts-jest": "^27.0.7",
+    "tsup": "^8.0.2",
     "vscode-test": "^1.6.1"
   }
 }
