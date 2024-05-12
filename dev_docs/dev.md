@@ -11,13 +11,11 @@
 
 ## 開発するには
 
-- launch.json に書いてあるのは指定のトランスパイル済みファイルを見てねってことだけなので、watch は自前で立てる必要あり
-  - root の `yarn dev` で起動する
-- 実際にリリースする前の確認は
+- 開発モードでの拡張機能の起動は launch.json に書かれいている `Run Extension` で起動する
+  - preLaunchTask で `pnpm dev` が起動されるほっとリロードが効く状態で拡張機能を試せる(拡張機能側への反映には再読み込みは必要)
 
 ### リリース前の動作確認
 
 ```bash
-$ ./scripts/package.sh 0.0.0
-$ code --install-extension ./extension-tmp/ts-type-expand-0.0.0.vsix
+$ ./scripts/local-trial.sh
 ```
