@@ -2,19 +2,13 @@
   "name": "compiler-api-helper",
   "version": "0.0.3",
   "license": "MIT",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "pnpm /^dev:.*/",
-    "dev:tsc": "pnpm build:tsc --watch",
-    "dev:alias": "pnpm build:alias --watch",
-    "lint": "pnpm /^lint:.*/",
-    "lint:eslint": "eslint . --ext ts",
-    "fix": "pnpm /^fix:.*/",
-    "fix:eslint": "pnpm lint:eslint --fix",
-    "build": "pnpm /^build:.*/",
-    "build:tsc": "tsc -p .",
-    "build:alias": "tsc-alias -p tsconfig.json",
+    "dev": "tsup --watch --clean=false --minify=false",
+    "build": "tsup",
+    "lint": "eslint . --ext ts",
+    "fix": "pnpm lint:eslint --fix",
     "typecheck": "tsc -p . --noEmit",
     "test": "jest",
     "test:watch": "jest --watch"
@@ -32,7 +26,6 @@
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
-    "esbuild": "^0.17.2",
     "esbuild-jest": "^0.5.0",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "^8.3.0",
@@ -40,7 +33,7 @@
     "eslint-plugin-import": "^2.25.3",
     "jest": "^27.3.1",
     "ts-jest": "^27.0.7",
-    "tsc-alias": "^1.4.0",
-    "tsd": "^0.18.0"
+    "tsd": "^0.18.0",
+    "tsup": "^8.0.2"
   }
 }
