@@ -1,0 +1,33 @@
+pre-commit:
+  parallel: true
+  commands:
+    prettier:
+      glob: "*.{tsx,ts,mts,mcs,mjs,cjs,js,json,md,yml,yaml}"
+      run: |
+        pnpm prettier --write --ignore-unknown --no-error-on-unmatched-pattern --cache {staged_files}
+      staged_fixed: true
+      skip:
+        - merge
+        - rebase
+    cspell:
+      glob: "*.{tsx,ts,mts,mcs,mjs,cjs,js,json,md,yml,yaml}"
+      run: pnpm cspell lint --no-must-find-files --gitignore --cache {staged_files}
+      skip:
+        - merge
+        - rebase
+    eslint-ts-type-expand:
+      root: "packages/ts-type-expand/"
+      glob: "*.{tsx,ts,mts,mcs}"
+      staged_fixed: true
+      run: |
+        pnpm --filter ts-type-expand exec eslint --no-error-on-unmatched-pattern --cache --fix {staged_files}
+      skip:
+        - merge
+        - rebase
+
+prepare-commit-msg:
+  parallel: true
+  scripts:
+    "commitizen.sh":
+      interactive: true
+      runner: sh

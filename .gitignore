@@ -12,3 +12,4 @@ yarn-error.log
 logs
 
 extension-tmp/**
+.cspellcache
