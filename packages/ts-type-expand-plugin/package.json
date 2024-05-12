@@ -30,7 +30,7 @@
     "fix:eslint": "pnpm lint:eslint --fix",
     "fix:prettier": "prettier '**/*.{ts,js,json,md}' --write",
     "fix": "pnpm /^fix:.*/",
-    "typecheck": "tsc -p . --noEmit",
+    "typecheck": "tsc -p . --noEmit --emitDeclarationOnly false",
     "prepublish": "pnpm build"
   },
   "dependencies": {
