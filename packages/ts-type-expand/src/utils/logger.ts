@@ -20,9 +20,7 @@ const winstonLogger = createLogger({
     context: "ts-type-expand",
   },
   transports: [
-    new transports.Console({
-      format: format.json(),
-    }),
+    new transports.Console(),
     new transports.File({
       filename: resolve(
         HOME_DIR,

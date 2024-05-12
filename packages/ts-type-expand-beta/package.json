@@ -55,7 +55,7 @@
         },
         "ts-type-expand.compactPropertyLength": {
           "type": "number",
-          "default": 10,
+          "default": 80,
           "description": "Display {...} if property type text is longer than this length"
         },
         "ts-type-expand.directExpandArray": {
@@ -65,7 +65,7 @@
         },
         "ts-type-expand.port": {
           "type": "number",
-          "default": 3264,
+          "default": 54334,
           "description": "Port used for communication with TS server."
         }
       }
@@ -102,7 +102,7 @@
     "vscode:prepublish": "yarn build"
   },
   "dependencies": {
-    "compiler-api-helper": "^0.0.3",
-    "ts-type-expand-plugin": "^0.0.2"
+    "compiler-api-helper": "workspace:*",
+    "ts-type-expand-plugin": "workspace:*"
   }
 }

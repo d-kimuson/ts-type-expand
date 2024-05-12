@@ -2,7 +2,6 @@ import { mkdirSync } from "fs"
 import { homedir } from "node:os"
 import { resolve } from "node:path"
 import { TRPCClientError } from "@trpc/client"
-import getPorts from "get-port"
 import vscode, { TextEditorSelectionChangeKind } from "vscode"
 import type { TreeView } from "vscode"
 import {
@@ -105,6 +104,7 @@ const extensionClosure = () => {
       throw new TypeError("postNum should not be NaN.")
     }
 
+    const getPorts = await import("get-port").then((mod) => mod.default)
     const portNumber = await getPorts({
       port: defaultPort,
     })
