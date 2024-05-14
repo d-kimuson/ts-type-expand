@@ -1,0 +1,70 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  common_checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+
+      - name: Setup pnpm
+        uses: ./.github/actions/setup_pnpm
+
+      - name: check source codes (linter)
+        run: |
+          pnpm lint
+
+      - name: typecheck
+        run: |
+          pnpm typecheck
+
+      - name: build check
+        run: |
+          pnpm build
+
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        node_version: [16.x, 18.x, 20.x]
+        typescript_version: [4.9.5, 5.0, 5.1, 5.2, 5.3, 5.4]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node_version }}
+
+      - name: Setup pnpm
+        uses: ./.github/actions/setup_pnpm
+
+      - name: override typescript version
+        shell: bash
+        run: |
+          pnpm --filter '*' i -D typescript@${{ matrix.typescript_version }}
+
+      - name: unit tests
+        run: |
+          pnpm test
+
+      # TODO: add e2e test
