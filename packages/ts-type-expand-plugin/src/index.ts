@@ -62,4 +62,4 @@ const factory: server.PluginModuleFactory = (_mod) => {
   }
 }
 
-export = factory
+module.exports = factory

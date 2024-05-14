@@ -5,7 +5,7 @@ export default defineConfig({
   dts: true,
   sourcemap: 'inline',
   target: 'node16',
-  format: ['cjs'],
+  format: ['cjs', 'esm'],
   tsconfig: 'tsconfig.json',
   external: ['typescript'],
   clean: false,

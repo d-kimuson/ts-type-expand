@@ -1,4 +1,4 @@
-import { deserializeTypeObject } from 'compiler-api-helper/src/serialize'
+import { deserializeTypeObject } from 'compiler-api-helper'
 import vscode from 'vscode'
 import type { TypeObject } from 'compiler-api-helper'
 import { client, updatePortNumber } from '~/api-client'

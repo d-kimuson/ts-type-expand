@@ -2,8 +2,8 @@
   "compilerOptions": {
     "strict": true,
     "target": "es6",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "declaration": true,
     // "declarationMap": true,
     "emitDeclarationOnly": true,

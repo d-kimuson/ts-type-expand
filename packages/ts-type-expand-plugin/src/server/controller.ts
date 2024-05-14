@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { serializeTypeObject } from 'compiler-api-helper/src/serialize'
+import { serializeTypeObject } from 'compiler-api-helper'
 import { z } from 'zod'
 import type { CompilerHandler } from '../service/compiler-api-handler'
 import { logger } from '../logger'

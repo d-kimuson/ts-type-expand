@@ -14,4 +14,6 @@ export type {
   CallableTO,
   PromiseTO,
 } from './type-object'
+
+export { serializeTypeObject, deserializeTypeObject } from './serialize'
 export default CompilerApiHelper
