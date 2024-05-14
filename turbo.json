@@ -10,9 +10,17 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist"]
     },
-    "lint": {},
-    "fix": {},
-    "typecheck": {},
-    "test": {}
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "fix": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    }
   }
 }
