@@ -21,6 +21,7 @@ $ pnpm dev # starting dev server
 
 - To start the extension in development mode, use `Run Extension` in launch.json.
 - The preLaunchTask runs `pnpm dev`, enabling hot reload. However, a reload is still needed to reflect changes in the extension.
+- To start the debugger in a plain environment, you must enable `Workbench > Experimental > Settings Profile`. This setting does not exist in the per-workspace settings, only in the user settings, and must be set individually by the developer.
 
 ## How to debug with installation
 
@@ -31,3 +32,13 @@ $ ./scripts/local-trial.sh
 ```
 
 This script will generate the .vsix file in `extension-tmp/ts-type-expand-2.0.0.vsix` and install it locally as version 2.0.0. You can then run and verify the extension.
+
+## Tips
+
+### Log symlinks
+
+For debugging purposes, it is recommended to put a symbolic link to the directory where the logs are written.
+
+```bash
+$ ln -s ~/.ts-type-expand/logs ./logs
+```

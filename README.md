@@ -1,11 +1,9 @@
 # ts-type-expand for VSCode
 
-:memo: ts-type-expand is now v1 and the mechanism behind it has changed. You can downgrade to v0.12 if you find it inconvenient.
-
 VSCode extension that allows you to expand TypeScript type definitions.
 
 - Displays the type information of the selected node
-- This is especially useful for hard-to-read types, such as those automatically generated from GraphQL schemas.
+- This is especially useful for hard-to-read types, such as those automatically generated from GraphQL schemas, ...etc.
 
 ![](https://user-images.githubusercontent.com/37296661/119652128-b18edd80-be60-11eb-87b7-aca155ac1210.gif)
 
@@ -48,6 +46,12 @@ The following are the destination nodes that support type expansion. More nodes 
 
 Types are calculated by the [CompilerAPI](https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API), so all types supported by TypeScript are supported in this extension.
 
+### Platforms
+
+This extension supports Node.js environments, specifically versions v18 and v20. For TypeScript, versions 4.9 through 5.4 are supported. While other versions might work, some features could be unstable or broken.
+
+Outside of Node, the extension is compatible with [bun](https://bun.sh/) but not with [deno](https://deno.com/). This is because deno does not support the required language service plugin. Therefore, we have no plans to support deno in the future.
+
 ### Others
 
 - SFC for Vue is not supported
@@ -79,13 +83,3 @@ MIT
 ## Contribute
 
 Welcome.
-
-### :memo:
-
-For debugging purposes, it is recommended to put a symbolic link to the directory where the logs are written.
-
-```bash
-$ ln -s ~/.ts-type-expand/logs ./logs
-```
-
-To start the debugger in a plain environment, you must enable `Workbench > Experimental > Settings Profile`. This setting does not exist in the per-workspace settings, only in the user settings, and must be set individually by the developer.
