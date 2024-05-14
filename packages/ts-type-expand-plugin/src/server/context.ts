@@ -1,5 +1,5 @@
 import type { Program } from 'typescript'
-import type { server } from 'typescript/lib/tsserverlibrary'
+import type { server } from 'typescript/lib/tsserverlibrary.js'
 
 export type Context = {
   program: Program | undefined

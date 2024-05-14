@@ -1,9 +1,9 @@
 import { TRPCError } from '@trpc/server'
-import type { Context } from './context'
+import type { Context } from './context.js'
 import type { Program } from 'typescript'
-import { logger } from '../logger'
-import { CompilerHandler } from '../service/compiler-api-handler'
-import { t } from './trpc'
+import { logger } from '../logger.js'
+import { CompilerHandler } from '../service/compiler-api-handler.js'
+import { t } from './trpc.js'
 
 export type RequiredProgramContext = Omit<Context, 'program'> & {
   program: Program

@@ -1,11 +1,11 @@
 import express from 'express'
-import type { PluginConfiguration } from './schema'
+import type { PluginConfiguration } from './schema.js'
 import type { Server } from 'http'
-import type { server } from 'typescript/lib/tsserverlibrary'
-import { logger } from './logger'
-import { pluginConfigurationSchema } from './schema'
-import { registerApp } from './server/app'
-import { setCreateInfo } from './server/context'
+import type { server } from 'typescript/lib/tsserverlibrary.js'
+import { logger } from './logger.js'
+import { pluginConfigurationSchema } from './schema.js'
+import { registerApp } from './server/app.js'
+import { setCreateInfo } from './server/context.js'
 
 const factory: server.PluginModuleFactory = (_mod) => {
   let server: Server | undefined
