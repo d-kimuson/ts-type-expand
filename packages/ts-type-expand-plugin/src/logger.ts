@@ -1,14 +1,14 @@
-import { homedir } from "node:os"
-import { resolve } from "node:path"
-import { createLogger, format, transports } from "winston"
+import { homedir } from 'node:os'
+import { resolve } from 'node:path'
+import { createLogger, format, transports } from 'winston'
 
-type LogLevel = "info" | "warn" | "error"
+type LogLevel = 'info' | 'warn' | 'error'
 
 type ILogger = {
   [K in LogLevel]: (
     kind: string,
     obj: Record<string, unknown>,
-    message?: string
+    message?: string,
   ) => void
 }
 
@@ -17,38 +17,38 @@ const HOME_DIR = homedir()
 const winstonLogger = createLogger({
   format: format.json(),
   defaultMeta: {
-    context: "ts-type-expand-plugin",
+    context: 'ts-type-expand-plugin',
   },
   transports: [
     new transports.File({
       filename: resolve(
         HOME_DIR,
-        ".ts-type-expand",
-        "logs",
-        "plugin",
-        "info.log"
+        '.ts-type-expand',
+        'logs',
+        'plugin',
+        'info.log',
       ),
-      level: "info",
+      level: 'info',
     }),
     new transports.File({
       filename: resolve(
         HOME_DIR,
-        ".ts-type-expand",
-        "logs",
-        "plugin",
-        "warn.log"
+        '.ts-type-expand',
+        'logs',
+        'plugin',
+        'warn.log',
       ),
-      level: "warn",
+      level: 'warn',
     }),
     new transports.File({
       filename: resolve(
         HOME_DIR,
-        ".ts-type-expand",
-        "logs",
-        "plugin",
-        "error.log"
+        '.ts-type-expand',
+        'logs',
+        'plugin',
+        'error.log',
       ),
-      level: "error",
+      level: 'error',
     }),
   ],
 })

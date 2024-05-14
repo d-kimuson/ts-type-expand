@@ -1,0 +1,26 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "commitizen",
+    "decycle",
+    "encycle",
+    "esbuild",
+    "espree",
+    "hoge",
+    "kimuson",
+    "lefthook",
+    "nocheck",
+    "pino",
+    "postbuild",
+    "TRPC",
+    "tsserverlibrary",
+    "tsup",
+    "typecheck",
+    "ununsed",
+    "Varibale",
+    "vsix",
+    "corepack"
+  ],
+  "ignorePaths": ["pnpm-lock.yaml", ".vscode/settings.json"]
+}

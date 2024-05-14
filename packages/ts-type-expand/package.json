@@ -17,7 +17,8 @@
     "tree"
   ],
   "engines": {
-    "vscode": "^1.63.0"
+    "vscode": "^1.63.0",
+    "node": ">=16.0.0"
   },
   "categories": [
     "Programming Languages"
@@ -25,7 +26,7 @@
   "activationEvents": [
     "onView:typeExpand"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
       "title": "Ts Type Expand",
@@ -95,66 +96,47 @@
     "vscode.typescript-language-features"
   ],
   "scripts": {
-    "ts:run": "ts-node -P ./tsconfig.json -r tsconfig-paths/register",
-    "prebuild": "rimraf out",
-    "build": "run-s build:*",
-    "build:typedef": "tsc -p ./",
-    "build:esbuild": "node ./bin/build.mjs",
-    "build:alias": "tsc-alias -p ./tsconfig.json",
-    "watch": "run-p 'watch:*'",
-    "watch:typedef": "yarn build:typedef -watch",
-    "watch:esbuild": "IS_WATCH=true node ./bin/build.mjs",
-    "watch:alias": "tsc-alias -p ./tsconfig.json -w",
+    "dev": "tsup --watch",
+    "build": "tsup --clean --minify",
     "typecheck": "tsc --noEmit -p .",
-    "lint:eslint": "eslint src --ext ts,js",
-    "lint:prettier": "prettier '**/*.{ts,js,json,md}' --check",
-    "lint": "run-p 'lint:*'",
-    "fix:eslint": "yarn lint:eslint --fix",
-    "fix:prettier": "prettier '**/*.{ts,js,json,md}' --write",
-    "fix": "run-p 'fix:*'",
-    "pretest": "yarn build && yarn run lint",
-    "test:vscode": "node ./out/test/vscode/runTest.js",
-    "test:jest": "jest"
-  },
-  "dependencies": {
-    "@trpc/client": "^10.9.0",
-    "axios": "^0.26.1",
-    "compiler-api-helper": "workspace:*",
-    "get-port": "^6.1.2",
-    "node-fetch": "^3.3.0",
-    "ts-type-expand-plugin": "workspace:*",
-    "tsc-alias": "^1.4.2",
-    "typescript": "^4.9.4",
-    "winston": "^3.8.2",
-    "winston-transport": "^4.7.0"
+    "lint": "ESLINT_USE_FLAT_CONFIG=true eslint -c eslint.config.mjs --no-error-on-unmatched-pattern --cache .",
+    "fix": "pnpm lint --fix",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:vscode": "node ./dist/test/vscode/runTest.js"
   },
   "devDependencies": {
-    "@trpc/server": "^10.9.0",
+    "@eslint/eslintrc": "^3.0.2",
+    "@eslint/js": "^9.2.0",
+    "@trpc/client": "^10.45.2",
+    "@trpc/server": "^10.45.2",
     "@types/axios": "^0.14.0",
-    "@types/glob": "^7.2.0",
-    "@types/jest": "^27.0.3",
-    "@types/mocha": "^9.0.0",
-    "@types/node": "^16.11.11",
-    "@types/vscode": "1.62",
-    "@typescript-eslint/eslint-plugin": "^5.5.0",
-    "@typescript-eslint/parser": "^5.5.0",
-    "esbuild": "^0.17.2",
-    "eslint": "^8.3.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-plugin-import": "^2.25.3",
-    "glob": "^7.2.0",
-    "husky": "^7.0.4",
-    "jest": "^27.4.3",
-    "lint-staged": "^12.1.2",
-    "mocha": "^9.1.3",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^2.5.0",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^27.0.7",
-    "ts-node": "^10.4.0",
-    "tsconfig-paths": "^3.14.2",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.12.12",
+    "@types/vscode": "~1.89.0",
+    "@typescript-eslint/eslint-plugin": "^7.9.0",
+    "@typescript-eslint/parser": "^7.9.0",
+    "axios": "^1.6.8",
+    "compiler-api-helper": "workspace:*",
+    "eslint": "^9.2.0",
+    "eslint-config": "workspace:*",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-unused-imports": "^3.2.0",
+    "get-port": "^7.1.0",
+    "glob": "^10.3.15",
+    "globals": "^15.2.0",
+    "mocha": "^10.4.0",
+    "node-fetch": "^3.3.2",
+    "ts-type-expand-plugin": "workspace:*",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.9.0",
+    "vitest": "^1.6.0",
     "vscode-test": "^1.6.1",
-    "zx": "^8.0.2"
+    "winston": "^3.13.0",
+    "winston-transport": "^4.7.0"
   }
 }

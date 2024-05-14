@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "Node16",
     "target": "es6",
-    "outDir": "out",
+    "outDir": "dist",
     "lib": ["es6"],
     "sourceMap": true,
     "rootDir": ".",
@@ -22,7 +22,7 @@
     "emitDeclarationOnly": false,
     "noEmit": true,
     "preserveSymlinks": true,
-    "moduleResolution": "node16",
+    "moduleResolution": "Node16",
     "noErrorTruncation": true
   },
   "include": ["src", "bin"],

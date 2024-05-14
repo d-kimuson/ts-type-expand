@@ -1,7 +1,3 @@
-// A launch configuration that compiles the extension and then opens it inside a new window
-// Use IntelliSense to learn about possible attributes.
-// Hover to view descriptions of existing attributes.
-// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
   "version": "0.2.0",
   "configurations": [
@@ -13,8 +9,8 @@
         "--profile-temp",
         "--extensionDevelopmentPath=${workspaceFolder}/packages/ts-type-expand"
       ],
-      "outFiles": ["${workspaceFolder}/packages/ts-type-expand/out/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "outFiles": ["${workspaceFolder}/packages/ts-type-expand/dist/**/*.js"],
+      "preLaunchTask": "extension-dev"
     },
     {
       "name": "Extension Tests",
@@ -25,9 +21,9 @@
         "--extensionTestsPath=${workspaceFolder}/packages/ts-type-expand/out/test/suite/index"
       ],
       "outFiles": [
-        "${workspaceFolder}/packages/ts-type-expand/out/test/**/*.js"
+        "${workspaceFolder}/packages/ts-type-expand/dist/test/**/*.js"
       ],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "extension-build"
     }
   ]
 }

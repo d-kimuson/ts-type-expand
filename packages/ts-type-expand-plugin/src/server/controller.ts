@@ -1,10 +1,10 @@
-import { TRPCError } from "@trpc/server"
-import { serializeTypeObject } from "compiler-api-helper/src/serialize"
-import { z } from "zod"
-import type { CompilerHandler } from "../service/compiler-api-handler"
-import { logger } from "../logger"
-import { procedure, requiredProgramProcedure } from "./procedure"
-import { t } from "./trpc"
+import { TRPCError } from '@trpc/server'
+import { serializeTypeObject } from 'compiler-api-helper'
+import { z } from 'zod'
+import type { CompilerHandler } from '../service/compiler-api-handler.js'
+import { logger } from '../logger.js'
+import { procedure, requiredProgramProcedure } from './procedure.js'
+import { t } from './trpc.js'
 
 export const isServerActivated = procedure.query(() => ({
   success: true,
@@ -19,7 +19,7 @@ export const getTypeFromPos = requiredProgramProcedure
       filePath: z.string(),
       line: z.number(),
       character: z.number(),
-    })
+    }),
   )
   .query(({ input, ctx }) => {
     try {
@@ -29,14 +29,14 @@ export const getTypeFromPos = requiredProgramProcedure
       const maybeType = compilerHandler.getTypeFromLineAndCharacter(
         filePath,
         line,
-        character
+        character,
       )
 
       if (!maybeType) {
-        logger.error("MAYBE_TYPE_IS_NOT_DEFINED", {})
+        logger.error('MAYBE_TYPE_IS_NOT_DEFINED', {})
         throw new TRPCError({
-          message: "maybeType is not defined",
-          code: "INTERNAL_SERVER_ERROR",
+          message: 'maybeType is not defined',
+          code: 'INTERNAL_SERVER_ERROR',
         })
       }
 
@@ -59,7 +59,7 @@ export const getTypeFromPos = requiredProgramProcedure
       }
     } catch (err) {
       if (err instanceof Error) {
-        logger.error("UNEXPECTED_GET_TYPE_ERROR", {
+        logger.error('UNEXPECTED_GET_TYPE_ERROR', {
           name: err.name,
           message: err.message,
           stack: err.stack,
@@ -67,13 +67,13 @@ export const getTypeFromPos = requiredProgramProcedure
 
         throw new TRPCError({
           message: `error: ${err.toString()}`,
-          code: "INTERNAL_SERVER_ERROR",
+          code: 'INTERNAL_SERVER_ERROR',
         })
       }
 
       throw new TRPCError({
-        message: "Unexpected",
-        code: "INTERNAL_SERVER_ERROR",
+        message: 'Unexpected',
+        code: 'INTERNAL_SERVER_ERROR',
       })
     }
   })
@@ -82,7 +82,7 @@ export const getObjectProps = requiredProgramProcedure
   .input(
     z.object({
       storeKey: z.string(),
-    })
+    }),
   )
   .query(({ input, ctx }) => {
     try {
@@ -95,18 +95,18 @@ export const getObjectProps = requiredProgramProcedure
         type: serializeTypeObject(type),
       }))
     } catch (err) {
-      logger.error("UNEXPECTED_GET_TYPE_ERROR", err as Record<string, unknown>)
+      logger.error('UNEXPECTED_GET_TYPE_ERROR', err as Record<string, unknown>)
 
       if (err instanceof Error) {
         throw new TRPCError({
           message: `error: ${err.toString()}`,
-          code: "INTERNAL_SERVER_ERROR",
+          code: 'INTERNAL_SERVER_ERROR',
         })
       }
 
       throw new TRPCError({
-        message: "Unexpected",
-        code: "INTERNAL_SERVER_ERROR",
+        message: 'Unexpected',
+        code: 'INTERNAL_SERVER_ERROR',
       })
     }
   })

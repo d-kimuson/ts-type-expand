@@ -1,4 +1,4 @@
-import type ts from "typescript"
+import type ts from 'typescript'
 
 // doesn't exist public type def
 export type MyType = ts.Type & {
@@ -45,11 +45,11 @@ export type ArrayType = BaseType & {
 
 // TODO: 他の型も __typename を見るようにしたい
 export type EnumType = BaseType & {
-  __typename: "EnumType"
+  __typename: 'EnumType'
   members: EnumMemberType[]
 }
 
 export type EnumMemberType = BaseType & {
-  __typename: "EnumMemberType"
+  __typename: 'EnumMemberType'
   value: unknown
 }

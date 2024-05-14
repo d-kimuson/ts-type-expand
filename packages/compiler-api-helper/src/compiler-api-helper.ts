@@ -1,9 +1,9 @@
-import { pipe } from "fp-ts/function"
-import * as ts from "typescript"
-import { forEachChild, unescapeLeadingUnderscores } from "typescript"
-import { v4 as generateUuid } from "uuid"
-import type * as to from "./type-object"
-import type { ArrayAtLeastN, Result } from "./util"
+import { pipe } from 'fp-ts/function'
+import * as ts from 'typescript'
+import { forEachChild, unescapeLeadingUnderscores } from 'typescript'
+import { v4 as generateUuid } from 'uuid'
+import type * as to from './type-object'
+import type { ArrayAtLeastN, Result } from './util'
 import {
   dangerouslyDeclarationToType,
   dangerouslyDeclareToEscapedText,
@@ -13,9 +13,9 @@ import {
   dangerouslyTypeToNode,
   dangerouslyTypeToResolvedTypeArguments,
   dangerouslyTypeToTypes,
-} from "./extract"
-import { primitive, special } from "./type-object"
-import { ok, ng, switchExpression, isOk, isNg } from "./util"
+} from './extract'
+import { primitive, special } from './type-object'
+import { ok, ng, switchExpression, isOk, isNg } from './util'
 
 type TypeDeclaration = { typeName: string | undefined; type: to.TypeObject }
 type TypeHasCallSignature = {
@@ -42,33 +42,33 @@ export class CompilerApiHelper {
 
   public extractTypes(
     filePath: string,
-    isSkipUnresolved = true
+    isSkipUnresolved = true,
   ): Result<
     { typeName: string | undefined; type: to.TypeObject }[],
-    | { reason: "fileNotFound" }
+    | { reason: 'fileNotFound' }
     | {
-        reason: "exportError"
+        reason: 'exportError'
         meta:
-          | "fileNotFound"
-          | "resolvedModulesNotFound"
-          | "moduleNotFound"
-          | "moduleFileNotFound"
-          | "notNamedExport"
-          | "unknown"
+          | 'fileNotFound'
+          | 'resolvedModulesNotFound'
+          | 'moduleNotFound'
+          | 'moduleFileNotFound'
+          | 'notNamedExport'
+          | 'unknown'
       }
   > {
     const sourceFile = this.#program.getSourceFile(filePath)
 
     if (!sourceFile) {
       return ng({
-        reason: "fileNotFound",
+        reason: 'fileNotFound',
       })
     }
 
     const nodes = this.#extractNodes(sourceFile)
       .filter(
         (
-          node
+          node,
         ): node is
           | ts.TypeAliasDeclaration
           | ts.InterfaceDeclaration
@@ -83,14 +83,14 @@ export class CompilerApiHelper {
           ((ts.isInterfaceDeclaration(node) ||
             ts.isTypeAliasDeclaration(node)) &&
             // @ts-expect-error exclude not exported type def
-            typeof node.localSymbol !== "undefined")
+            typeof node.localSymbol !== 'undefined'),
       )
       .filter(
         (node) =>
           !isSkipUnresolved ||
           this.#isTypeParametersResolved(
-            this.#typeChecker.getTypeAtLocation(node)
-          )
+            this.#typeChecker.getTypeAtLocation(node),
+          ),
       )
 
     return ok(
@@ -103,7 +103,7 @@ export class CompilerApiHelper {
               return nodes.ok
             } else {
               return ng({
-                reason: "exportError" as const,
+                reason: 'exportError' as const,
                 meta: nodes.ng.reason,
               })
             }
@@ -114,14 +114,14 @@ export class CompilerApiHelper {
             const declare = node.declarationList.declarations[0]
             if (declare === undefined) {
               throw new TypeError(
-                "In variable statement, declarations must have at least 1 item."
+                'In variable statement, declarations must have at least 1 item.',
               )
             }
 
             return {
               typeName: dangerouslyDeclareToEscapedText(declare),
               type: this._convertType(
-                this.#typeChecker.getTypeAtLocation(declare)
+                this.#typeChecker.getTypeAtLocation(declare),
               ),
             }
           }
@@ -131,51 +131,66 @@ export class CompilerApiHelper {
             typeName: pipe(
               node,
               dangerouslyNodeToSymbol,
-              dangerouslySymbolToEscapedName
+              dangerouslySymbolToEscapedName,
             ),
             type: this._convertType(this.#typeChecker.getTypeAtLocation(node)),
           }
         })
         .filter(
           (
-            result
+            result,
           ): result is {
             typeName: string | undefined
             type: to.TypeObject
           } => {
-            if ("__type" in result && isNg(result)) {
+            if ('__type' in result && isNg(result)) {
               return false
             }
 
             return true
-          }
-        )
+          },
+        ),
     )
   }
 
   // Only support named-export
   public extractTypesFromExportDeclaration(
-    declare: ts.ExportDeclaration
+    declare: ts.ExportDeclaration,
   ): Result<
     TypeDeclaration[],
     {
       reason:
-        | "fileNotFound"
-        | "resolvedModulesNotFound"
-        | "moduleNotFound"
-        | "moduleFileNotFound"
-        | "notNamedExport"
-        | "unknown"
+        | 'fileNotFound'
+        | 'resolvedModulesNotFound'
+        | 'moduleNotFound'
+        | 'moduleFileNotFound'
+        | 'notNamedExport'
+        | 'unknown'
     }
   > {
     const path = declare.moduleSpecifier?.getText()
     if (!path) {
       return ng({
-        reason: "fileNotFound",
+        reason: 'fileNotFound',
       })
     }
 
     const sourceFile = declare.getSourceFile()
+
+    // for >= TS 5.0
+    const symbol: ts.Symbol | undefined =
+      // @ts-expect-error: type def wrong
+      declare.exportClause?.elements?.at(0)?.symbol
+    if (symbol !== undefined) {
+      const tsType = this.#typeChecker.getDeclaredTypeOfSymbol(symbol)
+      const typeDeclaration: TypeDeclaration = {
+        typeName: ts.unescapeLeadingUnderscores(symbol.getEscapedName()),
+        type: this._convertType(tsType),
+      }
+      return ok([typeDeclaration])
+    }
+
+    // for < TS 5.0
     const moduleMap =
       // @ts-expect-error: type def wrong
       sourceFile.resolvedModules as
@@ -184,29 +199,30 @@ export class CompilerApiHelper {
 
     if (!moduleMap) {
       return ng({
-        reason: "resolvedModulesNotFound",
+        reason: 'resolvedModulesNotFound',
       })
     }
 
     const module = moduleMap.get(
-      ts.escapeLeadingUnderscores(path.replace(/'/g, "").replace(/"/g, ""))
+      ts.escapeLeadingUnderscores(path.replace(/'/g, '').replace(/"/g, '')),
     )
 
     if (!module) {
       return ng({
-        reason: "moduleNotFound",
+        reason: 'moduleNotFound',
       })
     }
 
     const types = this.extractTypes(module.resolvedFileName)
     if (isNg(types)) {
-      return ng({ reason: "moduleFileNotFound" })
+      console.log('ここなんだね...？')
+      return ng({ reason: 'moduleFileNotFound' })
     }
 
     const clause = declare.exportClause
     if (!clause) {
       return ng({
-        reason: "unknown",
+        reason: 'unknown',
       })
     }
 
@@ -215,32 +231,32 @@ export class CompilerApiHelper {
         clause.elements
           .map(dangerouslyExportSpecifierToEscapedName)
           .flatMap((str) =>
-            typeof str === "undefined"
+            typeof str === 'undefined'
               ? []
               : types.ok.find(
                   ({ typeName }) =>
-                    typeName === ts.unescapeLeadingUnderscores(str)
-                ) ?? []
-          )
+                    typeName === ts.unescapeLeadingUnderscores(str),
+                ) ?? [],
+          ),
       )
     }
 
     return ng({
-      reason: "notNamedExport",
+      reason: 'notNamedExport',
     })
   }
 
   public getObjectProps(
-    storeKey: string
+    storeKey: string,
   ): { propName: string; type: to.TypeObject }[] {
     const storedTsType = this.#objectPropsStore[storeKey]
     if (storedTsType === undefined) {
       return [
         {
-          propName: "debug2 storedTsType not found",
+          propName: 'debug2 storedTsType not found',
           type: {
-            __type: "UnsupportedTO",
-            kind: "enumValNotFound", // 適当
+            __type: 'UnsupportedTO',
+            kind: 'enumValNotFound', // 適当
           },
         },
       ]
@@ -248,7 +264,7 @@ export class CompilerApiHelper {
 
     return this.#typeChecker.getPropertiesOfType(storedTsType).map(
       (
-        symbol
+        symbol,
       ): {
         propName: string
         type: to.TypeObject
@@ -264,28 +280,28 @@ export class CompilerApiHelper {
         return {
           propName:
             dangerouslySymbolToEscapedName(symbol) ??
-            "UNEXPECTED_UNDEFINED_SYMBOL",
+            'UNEXPECTED_UNDEFINED_SYMBOL',
           type:
             typeNode && ts.isArrayTypeNode(typeNode)
               ? {
-                  __type: "ArrayTO",
+                  __type: 'ArrayTO',
                   typeName: this.#typeToString(
-                    this.#typeChecker.getTypeFromTypeNode(typeNode)
+                    this.#typeChecker.getTypeFromTypeNode(typeNode),
                   ),
                   child: this.#extractArrayTFromTypeNode(typeNode),
                 }
               : type
-              ? this.#isCallable(type)
-                ? this._convertTypeFromCallableSignature(
-                    type.getCallSignatures()[0]
-                  )
-                : this._convertType(type)
-              : {
-                  __type: "UnsupportedTO",
-                  kind: "prop",
-                },
+                ? this.#isCallable(type)
+                  ? this._convertTypeFromCallableSignature(
+                      type.getCallSignatures()[0],
+                    )
+                  : this._convertType(type)
+                : {
+                    __type: 'UnsupportedTO',
+                    kind: 'prop',
+                  },
         }
-      }
+      },
     )
   }
 
@@ -304,17 +320,17 @@ export class CompilerApiHelper {
         ({ type }) =>
           type.isUnion() &&
           type.types.length > 0 &&
-          typeof type.symbol !== "undefined", // only enum declare have symbol
+          typeof type.symbol !== 'undefined', // only enum declare have symbol
         ({ type, typeText }) => {
-          const enums: to.EnumTO["enums"] = []
+          const enums: to.EnumTO['enums'] = []
           type.symbol.exports?.forEach((symbol, key) => {
             const valueDeclare = symbol.valueDeclaration
             if (valueDeclare) {
               const valType = this._convertType(
-                this.#typeChecker.getTypeAtLocation(valueDeclare)
+                this.#typeChecker.getTypeAtLocation(valueDeclare),
               )
 
-              if (valType.__type === "LiteralTO") {
+              if (valType.__type === 'LiteralTO') {
                 enums.push({
                   name: unescapeLeadingUnderscores(key),
                   type: valType,
@@ -324,203 +340,206 @@ export class CompilerApiHelper {
           })
 
           return {
-            __type: "EnumTO",
+            __type: 'EnumTO',
             typeName: typeText,
             enums,
           }
-        }
+        },
       )
       .case<to.UnionTO>(
         ({ type }) => type.isUnion() && type.types.length > 0,
         ({ typeText }) => ({
-          __type: "UnionTO",
+          __type: 'UnionTO',
           typeName: typeText,
           unions: dangerouslyTypeToTypes(type).map((type) =>
-            this._convertType(type)
+            this._convertType(type),
           ) as ArrayAtLeastN<to.TypeObject, 2>,
-        })
+        }),
       )
       .case<to.UnsupportedTO>(
         ({ type }) => type.isTypeParameter(),
         ({ typeText }) => ({
-          __type: "UnsupportedTO",
-          kind: "unresolvedTypeParameter",
+          __type: 'UnsupportedTO',
+          kind: 'unresolvedTypeParameter',
           typeText,
-        })
+        }),
       )
       .case<to.TupleTO, { typeNode: ts.TupleTypeNode }>(
         ({ typeNode }) =>
-          typeof typeNode !== "undefined" && ts.isTupleTypeNode(typeNode),
+          typeof typeNode !== 'undefined' && ts.isTupleTypeNode(typeNode),
         ({ typeText, typeNode }) => ({
-          __type: "TupleTO",
+          __type: 'TupleTO',
           typeName: typeText,
           items: typeNode.elements.map((typeNode) =>
-            this._convertType(this.#typeChecker.getTypeFromTypeNode(typeNode))
+            this._convertType(this.#typeChecker.getTypeFromTypeNode(typeNode)),
           ),
-        })
+        }),
       )
       .case<to.LiteralTO>(
         ({ type }) => type.isLiteral(),
         ({ type }) => ({
-          __type: "LiteralTO",
+          __type: 'LiteralTO',
           value: type.isLiteral() ? type.value : undefined,
-        })
+        }),
       )
       .case<to.LiteralTO>(
-        ({ typeText }) => ["true", "false"].includes(typeText),
+        ({ typeText }) => ['true', 'false'].includes(typeText),
         ({ typeText }) => ({
-          __type: "LiteralTO",
-          value: typeText === "true" ? true : false,
-        })
+          __type: 'LiteralTO',
+          value: typeText === 'true' ? true : false,
+        }),
       )
       .case<to.PrimitiveTO>(
-        ({ typeText }) => typeText === "string",
-        () => primitive("string")
+        ({ typeText }) => typeText === 'string',
+        () => primitive('string'),
       )
       .case<to.PrimitiveTO>(
-        ({ typeText }) => typeText === "number",
-        () => primitive("number")
+        ({ typeText }) => typeText === 'number',
+        () => primitive('number'),
       )
       .case<to.PrimitiveTO>(
-        ({ typeText }) => typeText === "bigint",
-        () => primitive("bigint")
+        ({ typeText }) => typeText === 'bigint',
+        () => primitive('bigint'),
       )
       .case<to.PrimitiveTO>(
-        ({ typeText }) => typeText === "boolean",
-        () => primitive("boolean")
+        ({ typeText }) => typeText === 'boolean',
+        () => primitive('boolean'),
       )
       .case<to.SpecialTO>(
-        ({ typeText }) => typeText === "null",
-        () => special("null")
+        ({ typeText }) => typeText === 'null',
+        () => special('null'),
       )
       .case<to.SpecialTO>(
-        ({ typeText }) => typeText === "undefined",
-        () => special("undefined")
+        ({ typeText }) => typeText === 'undefined',
+        () => special('undefined'),
       )
       .case<to.SpecialTO>(
-        ({ typeText }) => typeText === "void",
-        () => special("void")
+        ({ typeText }) => typeText === 'void',
+        () => special('void'),
       )
       .case<to.SpecialTO>(
-        ({ typeText }) => typeText === "any",
-        () => special("any")
+        ({ typeText }) => typeText === 'any',
+        () => special('any'),
       )
       .case<to.SpecialTO>(
-        ({ typeText }) => typeText === "unknown",
-        () => special("unknown")
+        ({ typeText }) => typeText === 'unknown',
+        () => special('unknown'),
       )
       .case<to.SpecialTO>(
-        ({ typeText }) => typeText === "never",
-        () => special("never")
+        ({ typeText }) => typeText === 'never',
+        () => special('never'),
       )
       .case<to.SpecialTO>(
-        ({ typeText }) => typeText === "Date",
-        () => special("Date")
+        ({ typeText }) => typeText === 'Date',
+        () => special('Date'),
       )
       .case<to.SpecialTO>(
-        ({ typeText }) => typeText === "unique symbol",
-        () => special("unique symbol")
+        ({ typeText }) => typeText === 'unique symbol',
+        () => special('unique symbol'),
       )
       .case<to.SpecialTO>(
-        ({ typeText }) => typeText === "Symbol",
-        () => special("Symbol")
+        ({ typeText }) => typeText === 'Symbol',
+        () => special('Symbol'),
+      )
+      .case<to.SpecialTO>(
+        ({ typeText }) => typeText === 'symbol',
+        () => special('Symbol'),
       )
       .case<to.ArrayTO>(
         ({ type, typeText }) =>
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          typeText.endsWith("[]") ||
-          dangerouslySymbolToEscapedName(type.symbol) === "Array",
+          typeText.endsWith('[]') ||
+          dangerouslySymbolToEscapedName(type.symbol) === 'Array',
         ({ type, typeText }) => ({
-          __type: "ArrayTO",
+          __type: 'ArrayTO',
           typeName: typeText,
           child: ((): to.TypeObject => {
             const resultT = this.#extractArrayT(type)
             return isOk(resultT)
               ? resultT.ok
-              : ({ __type: "UnsupportedTO", kind: "arrayT" } as const)
+              : ({ __type: 'UnsupportedTO', kind: 'arrayT' } as const)
           })(),
-        })
+        }),
       )
       .case<to.CallableTO, { type: TypeHasCallSignature }>(
         ({ type }) => this.#isCallable(type),
         ({ type }) =>
-          this._convertTypeFromCallableSignature(type.getCallSignatures()[0])
+          this._convertTypeFromCallableSignature(type.getCallSignatures()[0]),
       )
       .case<to.PromiseTO>(
-        ({ type }) => dangerouslySymbolToEscapedName(type.symbol) === "Promise",
+        ({ type }) => dangerouslySymbolToEscapedName(type.symbol) === 'Promise',
         ({ type }) => {
           const typeArgResult = this.#extractTypeArguments(type)
           const typeArg: to.TypeObject = isOk(typeArgResult)
             ? typeArgResult.ok[0]
             : {
-                __type: "UnsupportedTO",
-                kind: "promiseNoArgument",
+                __type: 'UnsupportedTO',
+                kind: 'promiseNoArgument',
               }
 
           return {
-            __type: "PromiseTO",
+            __type: 'PromiseTO',
             child: typeArg,
           }
-        }
+        },
       )
       .case<to.PromiseLikeTO>(
         ({ type }) =>
-          dangerouslySymbolToEscapedName(type.symbol) === "PromiseLike",
+          dangerouslySymbolToEscapedName(type.symbol) === 'PromiseLike',
         ({ type }) => {
           const typeArgResult = this.#extractTypeArguments(type)
           const typeArg: to.TypeObject = isOk(typeArgResult)
             ? typeArgResult.ok[0]
             : {
-                __type: "UnsupportedTO",
-                kind: "promiseNoArgument",
+                __type: 'UnsupportedTO',
+                kind: 'promiseNoArgument',
               }
 
           return {
-            __type: "PromiseLikeTO",
+            __type: 'PromiseLikeTO',
             child: typeArg,
           }
-        }
+        },
       )
       .case<to.ObjectTO>(
         ({ type }) => this.#typeChecker.getPropertiesOfType(type).length !== 0,
         ({ type }) => {
           return this.#createObjectType(type)
-        }
+        },
       )
       .default<to.UnsupportedTO>(({ typeText }) => {
         return {
-          __type: "UnsupportedTO",
-          kind: "convert",
+          __type: 'UnsupportedTO',
+          kind: 'convert',
           typeText,
         }
       })
   }
 
   public _convertTypeFromCallableSignature(
-    signature: ts.Signature
+    signature: ts.Signature,
   ): to.CallableTO {
     return {
-      __type: "CallableTO",
+      __type: 'CallableTO',
       argTypes: signature
         .getParameters()
         .map((argSymbol): to.CallableArgument | undefined => {
           const declare = (argSymbol.getDeclarations() ?? [])[0]
 
-          return typeof declare !== "undefined"
+          return typeof declare !== 'undefined'
             ? {
                 name: argSymbol.getName(),
                 type: this._convertType(
                   this.#typeChecker.getTypeOfSymbolAtLocation(
                     argSymbol,
-                    declare
-                  )
+                    declare,
+                  ),
                 ),
               }
             : undefined
         })
         .filter((arg): arg is to.CallableArgument => arg !== undefined),
       returnType: this._convertType(
-        this.#typeChecker.getReturnTypeOfSignature(signature)
+        this.#typeChecker.getReturnTypeOfSignature(signature),
       ),
     }
   }
@@ -539,7 +558,7 @@ export class CompilerApiHelper {
     const key = generateUuid()
     this.#objectPropsStore[key] = tsType
     return {
-      __type: "ObjectTO",
+      __type: 'ObjectTO',
       typeName,
       storeKey: key,
     }
@@ -547,20 +566,20 @@ export class CompilerApiHelper {
 
   #extractArrayTFromTypeNode(typeNode: ts.ArrayTypeNode): to.TypeObject {
     return this._convertType(
-      this.#typeChecker.getTypeAtLocation(typeNode.elementType)
+      this.#typeChecker.getTypeAtLocation(typeNode.elementType),
     )
   }
 
   #extractArrayT(
-    type: ts.Type
+    type: ts.Type,
   ): Result<
     to.TypeObject,
-    { reason: "node_not_defined" | "not_array_type_node" | "cannot_resolve" }
+    { reason: 'node_not_defined' | 'not_array_type_node' | 'cannot_resolve' }
   > {
     const maybeArrayT = dangerouslyTypeToResolvedTypeArguments(type)[0]
     if (
-      type.symbol.getEscapedName() === "Array" &&
-      typeof maybeArrayT !== "undefined"
+      type.symbol.getEscapedName() === 'Array' &&
+      typeof maybeArrayT !== 'undefined'
     ) {
       return ok(this._convertType(maybeArrayT))
     }
@@ -568,7 +587,7 @@ export class CompilerApiHelper {
     const maybeNode = dangerouslyTypeToNode(type)
     if (!maybeNode) {
       return ng({
-        reason: "node_not_defined",
+        reason: 'node_not_defined',
       })
     }
 
@@ -576,16 +595,16 @@ export class CompilerApiHelper {
     if (ts.isTypeReferenceNode(maybeNode)) {
       const [typeArg1] = this.#extractTypeArgumentsFromTypeRefNode(maybeNode)
 
-      return typeof typeArg1 !== "undefined"
+      return typeof typeArg1 !== 'undefined'
         ? ok(typeArg1)
         : ng({
-            reason: "cannot_resolve",
+            reason: 'cannot_resolve',
           })
     }
 
     if (!ts.isArrayTypeNode(maybeNode)) {
       return ng({
-        reason: "not_array_type_node",
+        reason: 'not_array_type_node',
       })
     }
 
@@ -593,15 +612,15 @@ export class CompilerApiHelper {
   }
 
   #extractTypeArguments(
-    type: ts.Type
+    type: ts.Type,
   ): Result<
     [to.TypeObject, ...to.TypeObject[]],
-    { reason: "node_not_found" | "not_type_ref_node" | "no_type_argument" }
+    { reason: 'node_not_found' | 'not_type_ref_node' | 'no_type_argument' }
   > {
     const resolvedTypeArguments = dangerouslyTypeToResolvedTypeArguments(type)
     if (resolvedTypeArguments.length !== 0) {
       const typeArgs = resolvedTypeArguments.map((tsType) =>
-        this._convertType(tsType)
+        this._convertType(tsType),
       )
       if (typeArgs.length >= 1) {
         return ok(typeArgs as ArrayAtLeastN<to.TypeObject, 1>)
@@ -615,13 +634,13 @@ export class CompilerApiHelper {
 
     if (!maybeTypeRefNode) {
       return ng({
-        reason: "node_not_found",
+        reason: 'node_not_found',
       })
     }
 
     if (!ts.isTypeReferenceNode(maybeTypeRefNode)) {
       return ng({
-        reason: "not_type_ref_node",
+        reason: 'not_type_ref_node',
       })
     }
 
@@ -630,45 +649,45 @@ export class CompilerApiHelper {
     return args.length > 0
       ? ok(args as [to.TypeObject, ...to.TypeObject[]])
       : ng({
-          reason: "no_type_argument",
+          reason: 'no_type_argument',
         })
   }
 
   #extractTypeArgumentsFromTypeRefNode(
-    node: ts.TypeReferenceNode
+    node: ts.TypeReferenceNode,
   ): to.TypeObject[] {
     return Array.from(node.typeArguments ?? []).map((arg) =>
-      this._convertType(this.#typeChecker.getTypeFromTypeNode(arg))
+      this._convertType(this.#typeChecker.getTypeFromTypeNode(arg)),
     )
   }
 
   #hasUnresolvedTypeParameter(type: to.TypeObject): boolean {
-    if (!("typeName" in type)) {
+    if (!('typeName' in type)) {
       return (
-        type.__type === "UnsupportedTO" &&
-        type.kind === "unresolvedTypeParameter"
+        type.__type === 'UnsupportedTO' &&
+        type.kind === 'unresolvedTypeParameter'
       )
     }
 
     const deps = (
-      type.__type === "ObjectTO"
+      type.__type === 'ObjectTO'
         ? this.getObjectProps(type.storeKey).map((prop) => prop.type)
-        : type.__type === "ArrayTO"
-        ? [type.child]
-        : type.__type === "UnionTO"
-        ? type.unions
-        : []
+        : type.__type === 'ArrayTO'
+          ? [type.child]
+          : type.__type === 'UnionTO'
+            ? type.unions
+            : []
     ) as to.TypeObject[]
 
     return deps.reduce(
       (s: boolean, t: to.TypeObject) =>
         s ||
-        (t.__type === "UnsupportedTO" &&
-          t.kind === "unresolvedTypeParameter") ||
-        ("typeName" in t &&
+        (t.__type === 'UnsupportedTO' &&
+          t.kind === 'unresolvedTypeParameter') ||
+        ('typeName' in t &&
           t.typeName !== type.typeName &&
           this.#hasUnresolvedTypeParameter(t)),
-      false
+      false,
     )
   }
 
@@ -676,15 +695,15 @@ export class CompilerApiHelper {
     return type.getCallSignatures().length > 0
   }
 
-  #getMembers(type: ts.Type): ts.Symbol[] {
-    const members: ts.Symbol[] = []
+  // #getMembers(type: ts.Type): ts.Symbol[] {
+  //   const members: ts.Symbol[] = []
 
-    type.getSymbol()?.members?.forEach((memberSymbol) => {
-      members.push(memberSymbol)
-    })
+  //   type.getSymbol()?.members?.forEach((memberSymbol) => {
+  //     members.push(memberSymbol)
+  //   })
 
-    return members
-  }
+  //   return members
+  // }
 
   #isTypeParametersResolved(type: ts.Type): boolean {
     return (
@@ -695,6 +714,6 @@ export class CompilerApiHelper {
   }
 
   #typeToString(type: ts.Type): string {
-    return this.#typeChecker.typeToString(type).replace("typeof ", "")
+    return this.#typeChecker.typeToString(type).replace('typeof ', '')
   }
 }

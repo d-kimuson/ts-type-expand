@@ -1,11 +1,11 @@
-import { TRPCError } from "@trpc/server"
-import type { Context } from "./context"
-import type { Program } from "typescript"
-import { logger } from "../logger"
-import { CompilerHandler } from "../service/compiler-api-handler"
-import { t } from "./trpc"
+import { TRPCError } from '@trpc/server'
+import type { Context } from './context.js'
+import type { Program } from 'typescript'
+import { logger } from '../logger.js'
+import { CompilerHandler } from '../service/compiler-api-handler.js'
+import { t } from './trpc.js'
 
-export type RequiredProgramContext = Omit<Context, "program"> & {
+export type RequiredProgramContext = Omit<Context, 'program'> & {
   program: Program
   compilerHandler: CompilerHandler
 }
@@ -22,9 +22,9 @@ const { setCompilerHandler, getCompilerHandler } = (() => {
 })()
 
 export const requiredProgramMiddleware = t.middleware(({ ctx, next }) => {
-  if (typeof ctx.program === "undefined") {
+  if (typeof ctx.program === 'undefined') {
     throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
+      code: 'INTERNAL_SERVER_ERROR',
     })
   }
 
@@ -52,7 +52,7 @@ export const requiredProgramMiddleware = t.middleware(({ ctx, next }) => {
 export const loggingMiddleware = t.middleware(async ({ path, type, next }) => {
   const start = Date.now()
 
-  logger.info("START_REQUEST", {
+  logger.info('START_REQUEST', {
     path,
     type,
   })
@@ -60,7 +60,7 @@ export const loggingMiddleware = t.middleware(async ({ path, type, next }) => {
   const result = await next()
   const durationMs = Date.now() - start
 
-  logger.info("SERVER_RESPONSE", {
+  logger.info('SERVER_RESPONSE', {
     path,
     type,
     durationMs,

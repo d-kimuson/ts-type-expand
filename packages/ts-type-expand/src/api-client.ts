@@ -1,13 +1,12 @@
-import { createTRPCProxyClient, httpLink } from "@trpc/client"
-import type { AppRouter } from "ts-type-expand-plugin/server"
+import { createTRPCProxyClient, httpLink } from '@trpc/client'
+import type { AppRouter } from 'ts-type-expand-plugin/server'
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const createClient = async (port: number) =>
   createTRPCProxyClient<AppRouter>({
     links: [
       httpLink({
         url: `http://localhost:${port}/trpc`,
-        fetch: await import("node-fetch").then((mod) => mod.default),
+        fetch: await import('node-fetch').then((mod) => mod.default),
       }),
     ],
   })
@@ -33,7 +32,7 @@ export const { updatePortNumber, client } = ((): ApiClientClosure => {
     },
     client: () => {
       if (clientCache === undefined) {
-        throw new Error("port number must initialized by updatePortNumber")
+        throw new Error('port number must initialized by updatePortNumber')
       }
 
       return clientCache

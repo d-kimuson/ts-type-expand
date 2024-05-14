@@ -1,0 +1,8 @@
+{
+  "name": "eslint-config",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {},
+  "private": true
+}

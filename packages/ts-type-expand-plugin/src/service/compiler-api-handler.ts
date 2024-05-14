@@ -1,10 +1,10 @@
-import CompilerApiHelper from "compiler-api-helper"
+import CompilerApiHelper from 'compiler-api-helper'
 import {
   getPositionOfLineAndCharacter,
   unescapeLeadingUnderscores,
-} from "typescript"
-import type { TypeObject } from "compiler-api-helper"
-import type * as ts from "typescript"
+} from 'typescript'
+import type { TypeObject } from 'compiler-api-helper'
+import type * as ts from 'typescript'
 
 export class CompilerHandler {
   private checker: ts.TypeChecker
@@ -23,9 +23,9 @@ export class CompilerHandler {
 
   private checkProgram() {
     // Should be called all public method
-    if (typeof this.program === "undefined") {
+    if (typeof this.program === 'undefined') {
       throw new Error(
-        "Program should not be undefined (you must run startWatch before using or initializeWithoutWatch)"
+        'Program should not be undefined (you must run startWatch before using or initializeWithoutWatch)',
       )
     }
   }
@@ -33,13 +33,13 @@ export class CompilerHandler {
   public getTypeFromLineAndCharacter(
     filePath: string,
     lineNumber: number,
-    character: number
+    character: number,
   ): [string | undefined, TypeObject] | undefined {
     this.checkProgram()
 
     const sourceFile = this.program.getSourceFile(filePath)
     if (!sourceFile) {
-      if (filePath.endsWith(".ts") || filePath.endsWith(".tsx")) {
+      if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
         throw new Error(`SourceFile not found: ${filePath}`)
       } else {
         throw new Error(`File extension is not supported: ${filePath}`)
@@ -49,11 +49,11 @@ export class CompilerHandler {
     const maybeNode = this.getNodeFromPos(sourceFile, pos)
 
     if (!maybeNode) {
-      throw new Error("Node is not defined")
+      throw new Error('Node is not defined')
     }
 
     const tsType = this.checker.getTypeAtLocation(maybeNode)
-    if ("intrinsicName" in tsType && tsType.intrinsicName === "error") {
+    if ('intrinsicName' in tsType && tsType.intrinsicName === 'error') {
       throw new Error(`Unexpected intrinsicName Error, ${tsType.toString()}`)
       // return undefined
     }
@@ -74,14 +74,14 @@ export class CompilerHandler {
   }
 
   public getObjectProps(
-    storeKey: string
+    storeKey: string,
   ): { propName: string; type: TypeObject }[] {
     return this.helper.getObjectProps(storeKey)
   }
 
   private getNodeFromPos(
     sourceFile: ts.SourceFile,
-    pos: number
+    pos: number,
   ): ts.Node | undefined {
     let result: ts.Node | undefined = undefined
 

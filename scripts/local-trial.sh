@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eu
+
 TRIAL_VERSION=2.0.0
 
 ./scripts/package.sh $TRIAL_VERSION

@@ -13,6 +13,7 @@ cd ${REPOSITORY_DIR}
 rm -rf ${EXTENSION_TMP_DIR} && mkdir -p ${EXTENSION_TMP_DIR}
 
 # 全体ビルド
+pnpm typecheck
 pnpm build
 
 # ts-type-expand-plugin の pack
@@ -25,7 +26,7 @@ node -e "console.log(JSON.stringify({...require('./packages/ts-type-expand/packa
   >> ${EXTENSION_TMP_DIR}/package.json
 cp ./packages/ts-type-expand/.vscodeignore ${EXTENSION_TMP_DIR}
 cp ./packages/ts-type-expand/LICENSE ${EXTENSION_TMP_DIR}
-cp -r ./packages/ts-type-expand/out ${EXTENSION_TMP_DIR}
+cp -r ./packages/ts-type-expand/dist ${EXTENSION_TMP_DIR}
 
 # pack した ts-type-expand-plugin をローカルインストール
 pushd ${EXTENSION_TMP_DIR}

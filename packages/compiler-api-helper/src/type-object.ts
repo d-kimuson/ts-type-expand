@@ -1,4 +1,4 @@
-import type { ArrayAtLeastN } from "./util"
+import type { ArrayAtLeastN } from './util'
 
 export type TypeObject =
   | PrimitiveTO
@@ -19,51 +19,51 @@ type WithTypeName = {
 }
 
 export type PrimitiveTO = {
-  __type: "PrimitiveTO"
-  kind: "string" | "number" | "bigint" | "boolean"
+  __type: 'PrimitiveTO'
+  kind: 'string' | 'number' | 'bigint' | 'boolean'
 }
 
 export type SpecialTO = {
-  __type: "SpecialTO"
+  __type: 'SpecialTO'
   kind:
-    | "null"
-    | "undefined"
-    | "any"
-    | "unknown"
-    | "never"
-    | "void"
-    | "Date"
-    | "unique symbol"
-    | "Symbol"
+    | 'null'
+    | 'undefined'
+    | 'any'
+    | 'unknown'
+    | 'never'
+    | 'void'
+    | 'Date'
+    | 'unique symbol'
+    | 'Symbol'
 }
 
 export type LiteralTO = {
-  __type: "LiteralTO"
+  __type: 'LiteralTO'
   value: unknown
 }
 
 export type ArrayTO = WithTypeName & {
-  __type: "ArrayTO"
+  __type: 'ArrayTO'
   child: TypeObject
 }
 
 export type TupleTO = WithTypeName & {
-  __type: "TupleTO"
+  __type: 'TupleTO'
   items: TypeObject[]
 }
 
 export type ObjectTO = WithTypeName & {
-  __type: "ObjectTO"
+  __type: 'ObjectTO'
   storeKey: string
 }
 
 export type UnionTO = WithTypeName & {
-  __type: "UnionTO"
+  __type: 'UnionTO'
   unions: ArrayAtLeastN<TypeObject, 2>
 }
 
 export type EnumTO = WithTypeName & {
-  __type: "EnumTO"
+  __type: 'EnumTO'
   enums: {
     name: string
     type: LiteralTO
@@ -76,7 +76,7 @@ export type CallableArgument = {
 }
 
 export type CallableTO = {
-  __type: "CallableTO"
+  __type: 'CallableTO'
   argTypes: {
     name: string
     type: TypeObject
@@ -86,12 +86,12 @@ export type CallableTO = {
 }
 
 export type PromiseLikeTO = {
-  __type: "PromiseLikeTO"
+  __type: 'PromiseLikeTO'
   child: TypeObject
 }
 
 export type PromiseTO = {
-  __type: "PromiseTO"
+  __type: 'PromiseTO'
   child: TypeObject
 }
 
@@ -99,28 +99,28 @@ export type PromiseTO = {
  * @property kind -- identifier of why converted as unsupported
  */
 export type UnsupportedTO = {
-  __type: "UnsupportedTO"
+  __type: 'UnsupportedTO'
   kind:
-    | "arrayT"
-    | "prop"
-    | "convert"
-    | "function"
-    | "unresolvedTypeParameter"
-    | "promiseNoArgument"
-    | "enumValNotFound"
+    | 'arrayT'
+    | 'prop'
+    | 'convert'
+    | 'function'
+    | 'unresolvedTypeParameter'
+    | 'promiseNoArgument'
+    | 'enumValNotFound'
   typeText?: string
 }
 
-export function primitive(kind: PrimitiveTO["kind"]): PrimitiveTO {
+export function primitive(kind: PrimitiveTO['kind']): PrimitiveTO {
   return {
-    __type: "PrimitiveTO",
+    __type: 'PrimitiveTO',
     kind,
   }
 }
 
-export function special(kind: SpecialTO["kind"]): SpecialTO {
+export function special(kind: SpecialTO['kind']): SpecialTO {
   return {
-    __type: "SpecialTO",
+    __type: 'SpecialTO',
     kind,
   }
 }

@@ -4,10 +4,11 @@ export type ExtensionOption = {
   directExpandArray: boolean
   port: number
   validate: (
-    | "typescript"
-    | "typescriptreact"
-    | "javascript"
-    | "javascriptreact"
+    | 'typescript'
+    | 'typescriptreact'
+    | 'javascript'
+    | 'javascriptreact'
+    // eslint-disable-next-line @typescript-eslint/ban-types
     | (string & {})
   )[]
 }

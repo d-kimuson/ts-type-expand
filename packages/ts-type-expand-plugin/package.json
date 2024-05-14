@@ -1,55 +1,49 @@
 {
   "name": "ts-type-expand-plugin",
   "version": "0.0.2",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "type": "module",
   "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.cts"
     },
     "./server": {
-      "import": "./dist/server/index.ts",
-      "types": "./dist/server/index.d.ts"
+      "require": "./dist/server/index.cjs",
+      "types": "./dist/server/index.d.cts"
     }
   },
   "scripts": {
-    "typecheck": "tsc -p . --noEmit",
-    "build": "run-s build:*",
-    "build:types": "tsc -p .",
-    "build:esbuild": "node ./bin/build.mjs",
-    "prebuild": "rm -rf dist",
-    "watch": "run-p watch:*",
-    "watch:types": "yarn build:types --watch",
-    "watch:esbuild": "IS_WATCH=true yarn build:esbuild",
-    "lint:eslint": "eslint src --ext ts,js",
-    "lint:prettier": "prettier '**/*.{ts,js,json,md}' --check",
-    "lint": "run-p 'lint:*'",
-    "fix:eslint": "yarn lint:eslint --fix",
-    "fix:prettier": "prettier '**/*.{ts,js,json,md}' --write",
-    "fix": "run-p 'fix:*'",
-    "prepublish": "yarn build"
-  },
-  "dependencies": {
-    "@trpc/server": "^10.9.0",
-    "compiler-api-helper": "workspace:*",
-    "express": "^4.17.3",
-    "winston": "^3.8.2",
-    "zod": "^3.20.2"
+    "dev": "tsup --watch",
+    "build": "tsup --clean --minify",
+    "lint": "eslint --no-error-on-unmatched-pattern --cache .",
+    "fix": "pnpm lint --fix",
+    "typecheck": "tsc -p . --noEmit --emitDeclarationOnly false"
   },
   "devDependencies": {
-    "@types/express": "^4.17.13",
-    "@typescript-eslint/eslint-plugin": "^5.5.0",
-    "@typescript-eslint/parser": "^5.5.0",
-    "esbuild": "^0.17.2",
-    "eslint": "^8.3.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-plugin-import": "^2.25.3",
-    "npm-run-all": "^4.1.5",
-    "open-typescript": "^4.5.0-dev.20210906",
-    "prettier": "^2.5.0",
-    "ts-type-expand-plugin": "workspace:*"
+    "@eslint/eslintrc": "^3.0.2",
+    "@eslint/js": "^9.2.0",
+    "@trpc/server": "^10.45.2",
+    "@types/express": "^4.17.21",
+    "@typescript-eslint/eslint-plugin": "^7.9.0",
+    "@typescript-eslint/parser": "^7.9.0",
+    "compiler-api-helper": "workspace:*",
+    "eslint": "^9.2.0",
+    "eslint-config": "workspace:*",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-unused-imports": "^3.2.0",
+    "express": "^4.19.2",
+    "globals": "^15.2.0",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.9.0",
+    "winston": "^3.13.0",
+    "zod": "^3.23.8"
   }
 }

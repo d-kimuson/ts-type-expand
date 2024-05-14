@@ -1,5 +1,5 @@
 export enum OS {
-  winsows,
+  windows,
   mac,
   ubuntu,
 }
@@ -10,6 +10,6 @@ type ILogger = {
   [K in 'info' | 'warn']: (
     kind: string,
     obj: Record<string, unknown>,
-    message?: string
+    message?: string,
   ) => void
 }

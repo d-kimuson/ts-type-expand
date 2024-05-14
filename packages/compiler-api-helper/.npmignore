@@ -5,6 +5,6 @@
 /.vscode
 tsconfig.json
 /.github
-/.husky
-/.eslintrc.js
-/jest.config.js
+/.lefthook
+/eslint.config.js
+/vitest.config.ts
