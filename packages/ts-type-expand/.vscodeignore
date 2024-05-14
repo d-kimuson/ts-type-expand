@@ -5,7 +5,7 @@ src/**
 .gitignore
 vsc-extension-quickstart.md
 **/tsconfig.json
-**/.eslintrc.json
+**/eslint.config.js
 **/*.map
 example
 src/**/*.ts
