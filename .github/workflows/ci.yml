@@ -39,14 +39,13 @@ jobs:
         run: |
           pnpm build
 
-  tests:
+  tests_with_node_versions:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     strategy:
       matrix:
         node_version: [18.x, 20.x]
-        typescript_version: [4.9.5, 5.0, 5.1, 5.2, 5.3, 5.4]
 
     steps:
       - uses: actions/checkout@v4
@@ -54,6 +53,30 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
+
+      - name: Setup pnpm
+        uses: ./.github/actions/setup_pnpm
+
+      - name: unit tests
+        run: |
+          pnpm test
+
+      # TODO: add e2e test
+
+  tests_with_typescript_versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        typescript_version: [4.9.5, 5.0, 5.1, 5.2, 5.3, 5.4]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
 
       - name: Setup pnpm
         uses: ./.github/actions/setup_pnpm
