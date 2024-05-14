@@ -17,7 +17,8 @@
     "tree"
   ],
   "engines": {
-    "vscode": "^1.63.0"
+    "vscode": "^1.63.0",
+    "node": ">=16.0.0"
   },
   "categories": [
     "Programming Languages"

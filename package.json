@@ -1,14 +1,18 @@
 {
-  "name": "ts-type-expand-repo",
-  "displayName": "ts-type-expand",
+  "name": "ts-type-expand-project",
   "description": "vscode extension for expand type of typescript",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/d-kimuson/ts-type-expand"
   },
-  "private": true,
   "packageManager": "pnpm@9.0.4",
+  "engines": {
+    "node": "20.11.1",
+    "npm": "forbidden, use pnpm",
+    "yarn": "forbidden, use pnpm",
+    "pnpm": ">=9.0.4"
+  },
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
@@ -21,29 +25,16 @@
     "run:prettier": "prettier --ignore-unknown --no-error-on-unmatched-pattern --cache .",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
-    "prepare": "lefthook install"
+    "prepare": "pnpm /^setup:.*/",
+    "setup:check-manager": "npx -y only-allow pnpm",
+    "setup:lefthook": "lefthook install"
   },
   "devDependencies": {
-    "@types/glob": "^7.2.0",
-    "@types/jest": "^27.4.1",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "^16.11.13",
-    "@types/vscode": "1.66",
     "commitizen": "^4.3.0",
     "cspell": "^8.8.1",
-    "glob": "^7.2.0",
-    "jest": "^27.5.1",
     "lefthook": "^1.6.10",
-    "mocha": "^9.2.2",
     "prettier": "^3.2.5",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^27.1.4",
     "turbo": "^1.13.3",
-    "vscode-test": "^1.6.1",
     "zx": "^8.0.2"
-  },
-  "dependencies": {
-    "tsc-alias": "^1.6.7",
-    "typescript": "^4.9.4"
   }
 }
