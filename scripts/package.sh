@@ -13,6 +13,7 @@ cd ${REPOSITORY_DIR}
 rm -rf ${EXTENSION_TMP_DIR} && mkdir -p ${EXTENSION_TMP_DIR}
 
 # 全体ビルド
+pnpm typecheck
 pnpm build
 
 # ts-type-expand-plugin の pack
