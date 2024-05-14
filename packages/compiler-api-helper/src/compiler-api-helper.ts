@@ -425,6 +425,10 @@ export class CompilerApiHelper {
         ({ typeText }) => typeText === 'Symbol',
         () => special('Symbol'),
       )
+      .case<to.SpecialTO>(
+        ({ typeText }) => typeText === 'symbol',
+        () => special('Symbol'),
+      )
       .case<to.ArrayTO>(
         ({ type, typeText }) =>
           typeText.endsWith('[]') ||

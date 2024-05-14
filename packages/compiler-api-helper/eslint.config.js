@@ -17,7 +17,7 @@ const compat = new FlatCompat({
 
 const config = tsEslint.config(
   {
-    ignores: ['dist', 'tests', 'jest.config.js', 'tsup.config.ts'],
+    ignores: ['dist', 'test-project', 'vitest.config.ts', 'tsup.config.ts'],
   },
   jsEslint.configs.recommended,
   ...tsEslint.configs.recommended,

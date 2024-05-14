@@ -7,5 +7,6 @@
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true
-  }
+  },
+  "include": ["."]
 }

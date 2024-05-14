@@ -1,11 +1,12 @@
-import { resolve } from 'path'
-import type { TypeObject } from 'dist/src'
+import { resolve } from 'node:path'
+import type { TypeObject } from '.'
 import { CompilerApiHelper } from '~/compiler-api-helper'
 import { isOk } from '~/util'
-import { createProgram } from './helpers/program'
+import { createProgram } from './test-helpers/program'
+import { describe, it, expect } from 'vitest'
 
 const absolutePath = (path: string) =>
-  resolve(__dirname, './test-project', path)
+  resolve(__dirname, '../test-project', path)
 
 const program = createProgram(absolutePath('./tsconfig.json'))
 const helper = new CompilerApiHelper(program)

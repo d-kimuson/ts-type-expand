@@ -16,34 +16,31 @@
     "lint": "eslint --no-error-on-unmatched-pattern --cache .",
     "fix": "pnpm lint --fix",
     "typecheck": "tsc -p . --noEmit",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "vitest --run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.0.2",
     "@eslint/js": "^9.2.0",
-    "@types/jest": "^27.0.2",
     "@types/node": "^16.11.7",
     "@types/ramda": "^0.27.49",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^7.8.0",
     "@typescript-eslint/parser": "^7.8.0",
-    "esbuild-jest": "^0.5.0",
     "eslint": "^9.2.0",
+    "eslint-config": "workspace:*",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-unused-imports": "^3.2.0",
     "fp-ts": "^2.13.1",
-    "ramda": "^0.27.1",
-    "uuid": "^8.3.2",
     "globals": "^15.2.0",
-    "jest": "^27.3.1",
-    "ts-jest": "^27.0.7",
+    "ramda": "^0.27.1",
     "tsd": "^0.18.0",
     "tsup": "^8.0.2",
     "typescript": "^4.9.4",
     "typescript-eslint": "^7.8.0",
-    "eslint-config": "workspace:*"
+    "uuid": "^8.3.2",
+    "vitest": "^1.6.0"
   }
 }
