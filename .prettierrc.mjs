@@ -3,7 +3,7 @@ const prettierConfig = {
   semi: false,
   singleQuote: true,
   jsxSingleQuote: false,
-  trailingComma: "all",
+  trailingComma: 'all',
 }
 
 export default prettierConfig

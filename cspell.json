@@ -7,15 +7,17 @@
     "encycle",
     "esbuild",
     "kimuson",
+    "lefthook",
     "pino",
     "postbuild",
     "TRPC",
     "tsserverlibrary",
-    "Varibale",
-    "lefthook",
-    "typecheck",
     "tsup",
-    "kimuson"
+    "typecheck",
+    "ununsed",
+    "Varibale",
+    "espree",
+    "nocheck"
   ],
   "ignorePaths": ["pnpm-lock.yaml", ".vscode/settings.json"]
 }

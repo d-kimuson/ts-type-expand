@@ -23,17 +23,13 @@ const { options } = parseJsonConfigFileContent(
 
 module.exports = {
   roots: ['<rootDir>'],
-  testMatch: ['**/tests/**/?(*.)+(spec|test).+(ts|tsx|js)'],
-  testPathIgnorePatterns: ['<rootDir>/example/'],
+  testMatch: ['<rootDir>/src/test/jest/**/?(*.)+(spec|test).+(ts)'],
   globals: {
     'ts-jest': {
-      tsconfig: 'tests/tsconfig.json',
+      tsconfig: './tsconfig.test.json',
     },
   },
-  transform: {
-    // "^.+\\.(t|j)s$": "ts-jest",  // for debug
-    '^.+\\.(t|j)s$': 'esbuild-jest',
-  },
+  preset: 'ts-jest',
   moduleNameMapper: pathsToModuleNameMapper(options.paths, {
     prefix: '<rootDir>',
   }),

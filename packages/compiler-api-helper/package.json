@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup --minify --clean",
-    "lint": "eslint . --ext ts",
-    "fix": "pnpm lint:eslint --fix",
+    "lint": "ESLINT_USE_FLAT_CONFIG=true eslint -c eslint.config.mjs --no-error-on-unmatched-pattern --cache .",
+    "fix": "pnpm lint --fix",
     "typecheck": "tsc -p . --noEmit",
     "test": "jest",
     "test:watch": "jest --watch"
@@ -16,24 +16,30 @@
   "dependencies": {
     "fp-ts": "^2.13.1",
     "ramda": "^0.27.1",
-    "typescript": "^4.9.4",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.0.2",
+    "@eslint/js": "^9.2.0",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.7",
     "@types/ramda": "^0.27.49",
     "@types/uuid": "^8.3.4",
-    "@typescript-eslint/eslint-plugin": "^5.3.1",
-    "@typescript-eslint/parser": "^5.3.1",
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/parser": "^7.8.0",
     "esbuild-jest": "^0.5.0",
-    "eslint": "^8.2.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-plugin-import": "^2.25.3",
+    "eslint": "^9.2.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-unused-imports": "^3.2.0",
+    "globals": "^15.2.0",
     "jest": "^27.3.1",
     "ts-jest": "^27.0.7",
     "tsd": "^0.18.0",
-    "tsup": "^8.0.2"
+    "tsup": "^8.0.2",
+    "typescript": "^4.9.4",
+    "typescript-eslint": "^7.8.0",
+    "eslint-config": "workspace:*"
   }
 }
