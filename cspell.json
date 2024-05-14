@@ -6,8 +6,11 @@
     "decycle",
     "encycle",
     "esbuild",
+    "espree",
+    "hoge",
     "kimuson",
     "lefthook",
+    "nocheck",
     "pino",
     "postbuild",
     "TRPC",
@@ -16,9 +19,8 @@
     "typecheck",
     "ununsed",
     "Varibale",
-    "espree",
-    "nocheck",
-    "hoge"
+    "vsix",
+    "corepack"
   ],
   "ignorePaths": ["pnpm-lock.yaml", ".vscode/settings.json"]
 }

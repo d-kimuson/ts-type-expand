@@ -1,4 +1,4 @@
-# デプロイ手順
+# How to Release
 
 ## CHANGELOG の作成
 
