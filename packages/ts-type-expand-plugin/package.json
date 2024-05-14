@@ -28,9 +28,9 @@
     "@eslint/eslintrc": "^3.0.2",
     "@eslint/js": "^9.2.0",
     "@trpc/server": "^10.45.2",
-    "@types/express": "^4.17.13",
-    "@typescript-eslint/eslint-plugin": "^7.8.0",
-    "@typescript-eslint/parser": "^7.8.0",
+    "@types/express": "^4.17.21",
+    "@typescript-eslint/eslint-plugin": "^7.9.0",
+    "@typescript-eslint/parser": "^7.9.0",
     "compiler-api-helper": "workspace:*",
     "eslint": "^9.2.0",
     "eslint-config": "workspace:*",
@@ -38,12 +38,12 @@
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-unused-imports": "^3.2.0",
-    "express": "^4.17.3",
+    "express": "^4.19.2",
     "globals": "^15.2.0",
     "tsup": "^8.0.2",
-    "typescript": "^4.9.4",
-    "typescript-eslint": "^7.8.0",
-    "winston": "^3.8.2",
-    "zod": "^3.20.2"
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.9.0",
+    "winston": "^3.13.0",
+    "zod": "^3.23.8"
   }
 }

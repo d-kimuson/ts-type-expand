@@ -32,9 +32,9 @@
   "devDependencies": {
     "commitizen": "^4.3.0",
     "cspell": "^8.8.1",
-    "lefthook": "^1.6.10",
+    "lefthook": "^1.6.11",
     "prettier": "^3.2.5",
     "turbo": "^1.13.3",
-    "zx": "^8.0.2"
+    "zx": "^8.1.0"
   }
 }
