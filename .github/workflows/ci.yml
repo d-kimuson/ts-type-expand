@@ -45,7 +45,7 @@ jobs:
 
     strategy:
       matrix:
-        node_version: [16.x, 18.x, 20.x]
+        node_version: [18.x, 20.x]
         typescript_version: [4.9.5, 5.0, 5.1, 5.2, 5.3, 5.4]
 
     steps:
