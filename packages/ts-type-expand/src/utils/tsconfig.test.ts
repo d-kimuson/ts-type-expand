@@ -1,10 +1,11 @@
-import path from 'path'
+import path from 'node:path'
 import { ModuleKind, ScriptTarget } from 'typescript'
 import { loadTsConfig } from '~/utils/tsconfig'
+import { it, expect } from 'vitest'
 
-const exampleDir = path.resolve(__dirname, '../../../../../example')
+const exampleDir = path.resolve(__dirname, '../../../example')
 
-test('load example tsconfig', () => {
+it('load example tsconfig', () => {
   const tsConfig = loadTsConfig(
     path.resolve(exampleDir, 'tsconfig.json'),
     exampleDir,
