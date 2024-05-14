@@ -99,6 +99,7 @@ export class CompilerApiHelper {
           // export declaration
           if (ts.isExportDeclaration(node)) {
             const nodes = this.extractTypesFromExportDeclaration(node)
+            console.log('export declaration', nodes)
             if (isOk(nodes)) {
               return nodes.ok
             } else {
@@ -183,6 +184,19 @@ export class CompilerApiHelper {
         | undefined
 
     if (!moduleMap) {
+      // for >= TS 5.0
+      const symbol: ts.Symbol | undefined =
+        // @ts-expect-error: type def wrong
+        declare.exportClause?.elements?.at(0)?.symbol
+      if (symbol !== undefined) {
+        const tsType = this.#typeChecker.getDeclaredTypeOfSymbol(symbol)
+        const typeDeclaration: TypeDeclaration = {
+          typeName: ts.unescapeLeadingUnderscores(symbol.getEscapedName()),
+          type: this._convertType(tsType),
+        }
+        return ok([typeDeclaration])
+      }
+
       return ng({
         reason: 'resolvedModulesNotFound',
       })
