@@ -1,1 +1,1 @@
-export type { AppRouter } from "./controller";
+export type { AppRouter } from './controller'

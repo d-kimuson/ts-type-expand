@@ -1,4 +1,4 @@
-import { CompilerApiHelper } from "./compiler-api-helper"
+import { CompilerApiHelper } from './compiler-api-helper'
 
 export type {
   TypeObject,
@@ -13,5 +13,5 @@ export type {
   UnsupportedTO,
   CallableTO,
   PromiseTO,
-} from "./type-object"
+} from './type-object'
 export default CompilerApiHelper

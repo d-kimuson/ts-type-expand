@@ -1,11 +1,11 @@
-import { expectType } from "tsd"
+import { expectType } from 'tsd'
 
-describe("Jest", () => {
-  it("test is available", () => {
+describe('Jest', () => {
+  it('test is available', () => {
     expect(true).toBe(true)
   })
 
-  it("type test is available", () => {
+  it('type test is available', () => {
     expectType<boolean>(true)
   })
 })

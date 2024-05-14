@@ -1,7 +1,7 @@
-import { unescapeLeadingUnderscores } from "typescript"
-import type { Declaration, ExportSpecifier, Symbol, __String } from "typescript"
-import type { Node, Type } from "typescript"
-import type { VariableDeclaration } from "typescript"
+import { unescapeLeadingUnderscores } from 'typescript'
+import type { Declaration, ExportSpecifier, Symbol, __String } from 'typescript'
+import type { Node, Type } from 'typescript'
+import type { VariableDeclaration } from 'typescript'
 
 export class ExtractError extends Error {
   public constructor(public fn: string) {
@@ -11,9 +11,9 @@ export class ExtractError extends Error {
 
 export const dangerouslySymbolToEscapedName = (
   // eslint-disable-next-line @typescript-eslint/ban-types
-  symbol: Symbol | undefined
+  symbol: Symbol | undefined,
 ): string | undefined => {
-  if (symbol !== undefined && "escapedName" in symbol) {
+  if (symbol !== undefined && 'escapedName' in symbol) {
     return unescapeLeadingUnderscores(symbol.escapedName)
   }
 
@@ -21,21 +21,21 @@ export const dangerouslySymbolToEscapedName = (
 }
 
 export const dangerouslyDeclareToEscapedText = (
-  declare: VariableDeclaration
+  declare: VariableDeclaration,
 ): string => {
   if (
-    "escapedText" in declare.name &&
-    typeof declare.name["escapedText"] === "string"
+    'escapedText' in declare.name &&
+    typeof declare.name['escapedText'] === 'string'
   ) {
-    return declare.name["escapedText"]
+    return declare.name['escapedText']
   }
 
-  throw new ExtractError("dangerouslyDeclareToEscapedText")
+  throw new ExtractError('dangerouslyDeclareToEscapedText')
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const dangerouslyNodeToSymbol = (node: Node): Symbol | undefined => {
-  if ("symbol" in node) {
+  if ('symbol' in node) {
     // eslint-disable-next-line @typescript-eslint/ban-types
     return node.symbol as Symbol
   }
@@ -44,10 +44,10 @@ export const dangerouslyNodeToSymbol = (node: Node): Symbol | undefined => {
 }
 
 export const dangerouslyExportSpecifierToEscapedName = (
-  element: ExportSpecifier
+  element: ExportSpecifier,
 ): __String | undefined => {
   // @ts-expect-error -- Because the type definition side is in error.
-  if ("symbol" in element && "getEscapedName" in element["symbol"]) {
+  if ('symbol' in element && 'getEscapedName' in element['symbol']) {
     // @ts-expect-error Because the type definition side is in error.
     return element.symbol.getEscapedName() as __String
   }
@@ -56,9 +56,9 @@ export const dangerouslyExportSpecifierToEscapedName = (
 }
 
 export const dangerouslyDeclarationToType = (
-  declare: Declaration
+  declare: Declaration,
 ): Node | undefined => {
-  if ("type" in declare) {
+  if ('type' in declare) {
     return declare.type as Node
   }
 
@@ -66,7 +66,7 @@ export const dangerouslyDeclarationToType = (
 }
 
 export const dangerouslyTypeToNode = (type: Type): Node | undefined => {
-  if ("node" in type) {
+  if ('node' in type) {
     return type.node as Node
   }
 
@@ -74,11 +74,11 @@ export const dangerouslyTypeToNode = (type: Type): Node | undefined => {
 }
 
 export const dangerouslyTypeToTypes = (type: Type): Type[] => {
-  return "types" in type ? (type.types as Type[]) : []
+  return 'types' in type ? (type.types as Type[]) : []
 }
 
 export const dangerouslyTypeToResolvedTypeArguments = (type: Type): Type[] => {
-  return "resolvedTypeArguments" in type
+  return 'resolvedTypeArguments' in type
     ? (type.resolvedTypeArguments as Type[])
     : []
 }

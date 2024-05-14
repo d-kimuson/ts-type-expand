@@ -17,7 +17,8 @@
     "ununsed",
     "Varibale",
     "espree",
-    "nocheck"
+    "nocheck",
+    "hoge"
   ],
   "ignorePaths": ["pnpm-lock.yaml", ".vscode/settings.json"]
 }

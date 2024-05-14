@@ -1,15 +1,15 @@
-import { resolve } from "path"
+import { resolve } from 'path'
 import {
   sys,
   readConfigFile,
   parseJsonConfigFileContent,
   createProgram as baseCreateProgram,
-} from "typescript"
-import type * as ts from "typescript"
+} from 'typescript'
+import type * as ts from 'typescript'
 
 export const createProgram = (tsConfigPath: string): ts.Program => {
   const configFile = readConfigFile(tsConfigPath, sys.readFile)
-  if (typeof configFile.error !== "undefined") {
+  if (typeof configFile.error !== 'undefined') {
     throw new Error(`Failed to load tsconfig: ${configFile.error}`)
   }
 
@@ -21,7 +21,7 @@ export const createProgram = (tsConfigPath: string): ts.Program => {
       readDirectory: sys.readDirectory,
       useCaseSensitiveFileNames: true,
     },
-    resolve(tsConfigPath, "..")
+    resolve(tsConfigPath, '..'),
   )
 
   return baseCreateProgram({

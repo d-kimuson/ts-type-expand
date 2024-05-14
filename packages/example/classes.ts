@@ -1,4 +1,4 @@
-import type { User } from "./types"
+import type { User } from './types'
 
 export class UserRepository {
   private users: User[]
@@ -9,7 +9,7 @@ export class UserRepository {
   getUser(userId: string): User {
     return {
       id: userId,
-      name: "山田太郎",
+      name: '山田太郎',
       age: 20,
     }
   }

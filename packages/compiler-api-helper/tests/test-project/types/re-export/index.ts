@@ -1,1 +1,1 @@
-export { ReExportType } from "./original"
+export { ReExportType } from './original'

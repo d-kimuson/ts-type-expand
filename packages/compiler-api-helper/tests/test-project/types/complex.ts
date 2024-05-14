@@ -4,7 +4,7 @@ type Base = {
   other: number
 }
 
-export type Complex = Partial<Pick<Base, "name" | "password">>
+export type Complex = Partial<Pick<Base, 'name' | 'password'>>
 export type Intersection = {
   hoge: string
 } & {

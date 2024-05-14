@@ -1,9 +1,9 @@
-import type { User } from "./types"
-import { UserRepository } from "./classes"
+import type { User } from './types'
+import { UserRepository } from './classes'
 
 export const user: User = {
-  id: "xxxxx",
-  name: "山田太郎",
+  id: 'xxxxx',
+  name: '山田太郎',
   age: 20,
 }
 

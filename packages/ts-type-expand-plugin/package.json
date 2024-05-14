@@ -20,24 +20,29 @@
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup --clean --minify",
-    "lint": "eslint src --ext ts,js",
-    "fix": "pnpm lint:eslint --fix",
+    "lint": "ESLINT_USE_FLAT_CONFIG=true eslint -c eslint.config.mjs --no-error-on-unmatched-pattern --cache .",
+    "fix": "pnpm lint --fix",
     "typecheck": "tsc -p . --noEmit --emitDeclarationOnly false"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@types/express": "^4.17.13",
-    "@typescript-eslint/eslint-plugin": "^5.5.0",
-    "@typescript-eslint/parser": "^5.5.0",
+    "@eslint/eslintrc": "^3.0.2",
+    "@eslint/js": "^9.2.0",
     "@trpc/server": "^10.9.0",
+    "@types/express": "^4.17.13",
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/parser": "^7.8.0",
     "compiler-api-helper": "workspace:*",
+    "eslint": "^9.2.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-unused-imports": "^3.2.0",
+    "eslint-config": "workspace:*",
     "express": "^4.17.3",
+    "globals": "^15.2.0",
+    "tsup": "^8.0.2",
+    "typescript-eslint": "^7.8.0",
     "winston": "^3.8.2",
-    "zod": "^3.20.2",
-    "eslint": "^8.3.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-plugin-import": "^2.25.3",
-    "tsup": "^8.0.2"
+    "zod": "^3.20.2"
   }
 }

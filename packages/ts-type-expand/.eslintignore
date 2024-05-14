@@ -1,8 +1,0 @@
-*.js
-*.cjs
-*.(c|m)js
-.history
-dist
-src/test
-jest.config.ts
-tsup.config.ts

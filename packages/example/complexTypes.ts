@@ -1,4 +1,4 @@
-import { User } from "./types"
+import { User } from './types'
 
 // generics
 export interface MyStore<T> {
@@ -12,18 +12,18 @@ export type UserStore = MyStore<User>
 export type Point = { x: number; y: number }
 export type P = keyof Point
 
-export type Arrayish = { [n: number]: unknown }
-export type A = keyof Arrayish
+export type MappedTypeArray = { [n: number]: unknown }
+export type A = keyof MappedTypeArray
 
 // typeof
-const s = "hello"
+const s = 'hello'
 export type SType = typeof s
 
 // Indexed access
 export type Person = { age: number; name: string; alive: boolean }
-export type Age = Person["age"]
+export type Age = Person['age']
 
-// mappted type
+// mapped type
 export type MappedType<T> = {
   [K in keyof T]: number
 }
@@ -39,12 +39,12 @@ export type TreeCond = Conditional<string | undefined>
 export type FalseCond = Conditional<string | null>
 
 // template literal types
-type World = "world"
+type World = 'world'
 type Greeting = `hello ${World}` // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let greet: Greeting
 
 // type Pick<T, K extends keyof T> = { [P in K]: T[P]; }
-export type Picked = Pick<User, "id"> & User
+export type Picked = Pick<User, 'id'> & User
 
 export type RecursiveType = {
   child: RecursiveType
@@ -52,5 +52,5 @@ export type RecursiveType = {
 }
 
 export type RecursiveArrayType = {
-  childs: RecursiveType[]
+  children: RecursiveType[]
 }

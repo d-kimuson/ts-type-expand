@@ -4,7 +4,7 @@ export enum BasicEnum {
   Green,
 }
 export enum EnumWithValue {
-  Red = "red",
-  Blue = "blue",
-  Green = "green",
+  Red = 'red',
+  Blue = 'blue',
+  Green = 'green',
 }
