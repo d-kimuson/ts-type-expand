@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### Changed
+
+- Support for TypeScript 5.0.
+  - Fixed an issue where some type references were broken in TS 5.0.
+
 ## [1.0.6] - 2023-09-14
 
 ### Changed
@@ -61,7 +66,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 
-- added error messages after error occured
+- added error messages after error occurred
 
 ### Changed
 
@@ -69,7 +74,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - restart compilerAPI after command executed
   - update configure after command executed
 - Upgrade typescript version to 4.4.2
-- Upgrade dependecy versions
+- Upgrade dependency versions
 
 ## [0.0.8] - 2021-05-31
 
