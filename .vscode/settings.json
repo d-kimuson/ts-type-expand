@@ -1,4 +1,3 @@
-// Place your settings in this file to overwrite default and user settings.
 {
   "editor.tabSize": 2,
   // typescript
@@ -10,37 +9,19 @@
     "javascriptreact"
   ],
   // ESLint
-  "eslint.workingDirectories": ["./packages/*"],
+  "eslint.workingDirectories": [
+    {
+      "pattern": "./packages/*"
+    }
+  ],
+  "eslint.experimental.useFlatConfig": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
   // prettier
-  "prettier.configPath": "./.prettierrc.js",
-  "[markdown]": {
+  "prettier.configPath": "./.prettierrc.mjs",
+  "[typescript][javascript][typescriptreact][javascriptreact][jsonc][json][markdown][mdx][yaml]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[json]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[jsonc]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-  },
-
-  "files.exclude": {
-    "out": false // set this to true to hide the "out" folder with the compiled JS files
-  },
-  "search.exclude": {
-    "out": true // set this to false to include "out" folder in search results
   }
 }
