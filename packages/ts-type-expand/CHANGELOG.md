@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [1.1.0] - 2024-05-16
+
 ### Add
 
 - Added a feature that allows you to copy type information as a type alias when you press the COPY button on an expanded type. This is an experimental feature.
