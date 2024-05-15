@@ -16,6 +16,7 @@ import type {
 import { TypeExpandProvider } from '~/vsc/type-expand-provider'
 import { client, updatePortNumber } from './api-client'
 import { logger } from './utils/logger'
+import { tsTypeExpandConfig } from './config'
 
 type GetAPI = (n: number) => {
   configurePlugin: <PluginName extends keyof PluginOptions>(
@@ -46,7 +47,8 @@ type ProxyHandler<T extends Record<string, unknown>> = {
   set: (target: T, prop: keyof T, value: T[keyof T]) => boolean
 }
 
-const treeViewTitle = (value: ServerStatus) => `ts-type-expand (${value})`
+const treeViewTitle = (value: ServerStatus) =>
+  `${tsTypeExpandConfig.extensionId} (${value})`
 
 const extensionClosure = () => {
   let typeExpandProvider: TypeExpandProvider
@@ -74,7 +76,7 @@ const extensionClosure = () => {
 
             if (value === 'active') {
               vscode.window.showInformationMessage(
-                'ts-type-expand is ready to use!',
+                `${tsTypeExpandConfig.extensionId} is ready to use!`,
               )
             } else if (value === 'dead') {
               vscode.window.showErrorMessage(
@@ -215,7 +217,7 @@ const extensionClosure = () => {
       const config = await extensionConfig()
 
       typeExpandProvider = new TypeExpandProvider(config)
-      treeView = vscode.window.createTreeView('typeExpand', {
+      treeView = vscode.window.createTreeView(tsTypeExpandConfig.extensionId, {
         treeDataProvider: typeExpandProvider,
       })
       treeView.title = treeViewTitle(state.serverStatus)
@@ -227,7 +229,7 @@ const extensionClosure = () => {
 
       if (!tsFeatureExtension) {
         vscode.window.showErrorMessage(
-          'Fail to start kimuson.ts-type-expand because vscode.typescript-language-features is not enabled.',
+          `Fail to start kimuson.${tsTypeExpandConfig.extensionId} because vscode.typescript-language-features is not enabled.`,
         )
         return
       }
@@ -247,14 +249,23 @@ const extensionClosure = () => {
       }
 
       const disposes = [
-        vscode.commands.registerCommand('ts-type-expand.restart', async () => {
-          typeExpandProvider.updateOptions(await extensionConfig())
-          await startPlugin()
-          await updateCurrentFile()
-          typeExpandProvider.restart()
-        }),
+        vscode.commands.registerCommand(
+          tsTypeExpandConfig.command('restart'),
+          async () => {
+            typeExpandProvider.updateOptions(await extensionConfig())
+            await startPlugin()
+            await updateCurrentFile()
+            typeExpandProvider.restart()
+          },
+        ),
+        vscode.commands.registerCommand(
+          tsTypeExpandConfig.command('copy'),
+          async (value: ExpandableTypeItem) => {
+            vscode.env.clipboard.writeText(await value.getCopyText())
+          },
+        ),
         vscode.window.registerTreeDataProvider(
-          'typeExpand',
+          tsTypeExpandConfig.extensionId,
           typeExpandProvider,
         ),
         treeView,

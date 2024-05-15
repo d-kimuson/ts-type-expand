@@ -230,12 +230,92 @@ function toTypeText(type: TypeObject): string {
   throw new Error('unreachable here')
 }
 
+const typeObjectToText = (typeObject: TypeObject) => {
+  let count = 0
+
+  const getTypeText = async (typeObject: TypeObject): Promise<string> => {
+    if (typeObject.__type === 'LiteralTO')
+      return typeof typeObject.value === 'string'
+        ? `"${typeObject.value}"`
+        : `${typeObject.value}`
+    if (typeObject.__type === 'EnumTO')
+      return (
+        await Promise.all(typeObject.enums.map(({ type }) => getTypeText(type)))
+      ).join(' | ')
+    if (typeObject.__type === 'UnionTO')
+      return (
+        await Promise.all(
+          typeObject.unions.map(async (type) =>
+            type.__type === 'CallableTO' || type.__type === 'UnsupportedTO'
+              ? `(${await getTypeText(type)})`
+              : await getTypeText(type),
+          ),
+        )
+      ).join(' | ')
+    if (typeObject.__type === 'ArrayTO')
+      return `Array<${await getTypeText(typeObject.child)}>`
+    if (typeObject.__type === 'ObjectTO') {
+      count += 1
+      if (count > 15) {
+        return `{}`
+      }
+
+      const props = await client()
+        .getObjectProps.query({
+          storeKey: typeObject.storeKey,
+        })
+        .then(
+          async (props) =>
+            await Promise.all(
+              props.map(async (prop) => ({
+                propName: prop.propName,
+                typeText: await getTypeText(deserializeTypeObject(prop.type)),
+              })),
+            ),
+        )
+
+      return (
+        '{ ' +
+        props
+          .map(({ propName, typeText }) => `'${propName}': ${typeText}`)
+          .join(', ') +
+        ' }'
+      )
+    }
+    if (typeObject.__type === 'CallableTO') {
+      const argTypes = (
+        await Promise.all(
+          typeObject.argTypes.map(
+            async ({ name, type }) => `${name}: ${await getTypeText(type)}`,
+          ),
+        )
+      ).join(', ')
+      const returnType = await getTypeText(typeObject.returnType)
+      return `(${argTypes}) => ${returnType}`
+    }
+    if (typeObject.__type === 'PromiseTO')
+      return `Promise<${await getTypeText(typeObject.child)}>`
+    if (typeObject.__type === 'PromiseLikeTO')
+      return `PromiseLike<${await getTypeText(typeObject.child)}>`
+    if (typeObject.__type === 'PrimitiveTO') return typeObject.kind
+    if (typeObject.__type === 'SpecialTO') return typeObject.kind
+    if (typeObject.__type === 'UnsupportedTO') return 'unknown'
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (typeObject.__type === 'TupleTO')
+      return `[${(await Promise.all(typeObject.items.map(typeObjectToText))).join(', ')}]`
+    typeObject satisfies never
+    throw new Error('unreachable here')
+  }
+
+  return getTypeText(typeObject)
+}
+
 export class ExpandableTypeItem extends vscode.TreeItem {
   public static options: TypeExpandProviderOptions
 
   public constructor(
     private type: TypeObject,
-    meta?: {
+    private meta?: {
       parent?: TypeObject
       aliasName?: string
       desc?: string
@@ -329,5 +409,9 @@ export class ExpandableTypeItem extends vscode.TreeItem {
     }
 
     return []
+  }
+
+  public async getCopyText(): Promise<string> {
+    return `type ${this.meta?.aliasName ?? getLabelText(this.type)} = ${await typeObjectToText(this.type)}`
   }
 }

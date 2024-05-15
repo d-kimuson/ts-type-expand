@@ -594,7 +594,7 @@ export class CompilerApiHelper {
   > {
     const maybeArrayT = dangerouslyTypeToResolvedTypeArguments(type)[0]
     if (
-      type.symbol.getEscapedName() === 'Array' &&
+      (type.symbol as ts.Symbol | undefined)?.getEscapedName() === 'Array' &&
       typeof maybeArrayT !== 'undefined'
     ) {
       return ok(this._convertType(maybeArrayT))

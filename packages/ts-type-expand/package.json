@@ -24,7 +24,7 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onView:typeExpand"
+    "onView:ts-type-expand"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -74,14 +74,40 @@
     "commands": [
       {
         "command": "ts-type-expand.restart",
-        "title": "Restart (ts-type-expand)"
+        "title": "Restart (ts-type-expand)",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "ts-type-expand.copy",
+        "title": "Copy",
+        "icon": {
+          "light": "resources/light/copy.svg",
+          "dark": "resources/dark/copy.svg"
+        }
       }
     ],
     "views": {
       "explorer": [
         {
-          "id": "typeExpand",
+          "id": "ts-type-expand",
           "name": "TS Type Expand"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "ts-type-expand.restart",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "ts-type-expand.copy",
+          "group": "inline"
         }
       ]
     },
