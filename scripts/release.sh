@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 pushd $(git rev-parse --show-toplevel)/packages/ts-type-expand
 
@@ -18,13 +18,13 @@ sed -i -e "s/"$current_version"/"$new_version"/g" package.json  # for mac
 if [ -f package.json-e ]; then
     rm package.json-e
 fi
-git add package.json && git commit -m "$new_version release"
+git add ../.. && git commit -m "$new_version release"
 git tag -a "v$new_version" -m "$new_version release"
 
 popd
 
 ./scripts/package.sh $new_version
-pnpm vsce publish -i ./extension-tmp/ts-type-expand-beta-$new_version.vsix
+pnpm vsce publish -i ./extension-tmp/ts-type-expand-$new_version.vsix
 
 git push origin HEAD
 git push origin --tags
