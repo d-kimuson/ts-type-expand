@@ -8,3 +8,5 @@ export enum EnumWithValue {
   Blue = 'blue',
   Green = 'green',
 }
+
+export const value = BasicEnum.Red

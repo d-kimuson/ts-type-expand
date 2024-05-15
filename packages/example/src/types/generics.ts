@@ -9,7 +9,7 @@ export type GenericsWithNoDefault<T extends string, Y = string> = {
 }
 
 // should be resolved
-export type ResultOfGenerics = Partial<{
+export type ResolvedGenerics = Partial<{
   id: number
   time: Date
 }>

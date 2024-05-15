@@ -1,4 +1,7 @@
-import type { User } from './types'
+type User = {
+  id: string
+  name: string
+}
 
 export class UserRepository {
   private users: User[]
@@ -10,13 +13,10 @@ export class UserRepository {
     return {
       id: userId,
       name: '山田太郎',
-      age: 20,
     }
   }
 
-  async asyncF() {
-    console.log('asyncF')
-  }
+  async asyncF() {}
 
   async asyncF2() {
     return {
