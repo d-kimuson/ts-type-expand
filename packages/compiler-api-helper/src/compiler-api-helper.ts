@@ -271,7 +271,8 @@ export class CompilerApiHelper {
       } => {
         const mappedType: ts.MappedTypeNode | undefined =
           // @ts-expect-error: wrong type def
-          symbol.links?.mappedType
+          symbol.links?.mappedType /* >= 5.0 */ ?? symbol.mappedType /* 4.9.5 */
+
         if (mappedType) {
           // @ts-expect-error: wrong type def
           const templateType: ts.Type | undefined = mappedType.templateType
