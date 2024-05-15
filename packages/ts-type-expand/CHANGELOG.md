@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### Add
+
+- Added a feature that allows you to copy type information as a type alias when you press the COPY button on an expanded type. This is an experimental feature.
+- Add button which restart extension.
+
 ### Changed
 
 - Support for TypeScript 5.0.

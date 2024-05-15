@@ -27,6 +27,7 @@ node -e "console.log(JSON.stringify({...require('./packages/ts-type-expand/packa
 cp ./packages/ts-type-expand/.vscodeignore ${EXTENSION_TMP_DIR}
 cp ./packages/ts-type-expand/LICENSE ${EXTENSION_TMP_DIR}
 cp -r ./packages/ts-type-expand/dist ${EXTENSION_TMP_DIR}
+cp -r ./packages/ts-type-expand/resources ${EXTENSION_TMP_DIR}
 
 # pack した ts-type-expand-plugin をローカルインストール
 pushd ${EXTENSION_TMP_DIR}
