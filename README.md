@@ -13,7 +13,7 @@ You can install this extension from the [ts-type-expand - Visual Studio Marketpl
 
 There is nothing additional that needs to be installed.
 
-## Supports
+## Features
 
 ### Expansion
 
@@ -41,6 +41,14 @@ The following are the destination nodes that support type expansion. More nodes 
 |  Method declaration   |    ✓    |
 |   Enum Declaration    |    ✓    |
 |    Enum statement     |    ✓    |
+
+### \[Experimental\] Copy type information
+
+We have added a feature that allows you to copy type information as a type alias when you press the COPY button on an expanded type!
+
+This feature is experimental. If you have any feedback, I welcome it through an [Issues](https://github.com/d-kimuson/ts-type-expand/issues).
+
+## Supports
 
 ### Types
 
