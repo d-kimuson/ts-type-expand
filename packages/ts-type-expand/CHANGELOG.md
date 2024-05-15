@@ -10,6 +10,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Support for TypeScript 5.0.
   - Fixed an issue where some type references were broken in TS 5.0.
+- Fixed the bug where the value type of the Mapped Type could not be resolved.
 
 ## [1.0.6] - 2023-09-14
 
