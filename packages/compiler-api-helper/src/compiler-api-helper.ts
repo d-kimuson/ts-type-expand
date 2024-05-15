@@ -253,10 +253,10 @@ export class CompilerApiHelper {
     if (storedTsType === undefined) {
       return [
         {
-          propName: 'debug2 storedTsType not found',
+          propName: 'unknown',
           type: {
             __type: 'UnsupportedTO',
-            kind: 'enumValNotFound', // 適当
+            kind: 'prop',
           },
         },
       ]
@@ -269,9 +269,25 @@ export class CompilerApiHelper {
         propName: string
         type: to.TypeObject
       } => {
+        const mappedType: ts.MappedTypeNode | undefined =
+          // @ts-expect-error: wrong type def
+          symbol.links?.mappedType
+        if (mappedType) {
+          // @ts-expect-error: wrong type def
+          const templateType: ts.Type | undefined = mappedType.templateType
+          if (templateType !== undefined) {
+            const valueType = this._convertType(templateType)
+            return {
+              propName: dangerouslySymbolToEscapedName(symbol) ?? 'unknown',
+              type: valueType,
+            }
+          }
+        }
+
         const typeNode = symbol.valueDeclaration
           ? dangerouslyDeclarationToType(symbol.valueDeclaration)
           : undefined
+
         const declare = (symbol.declarations ?? [])[0]
         const type = declare
           ? this.#typeChecker.getTypeOfSymbolAtLocation(symbol, declare)

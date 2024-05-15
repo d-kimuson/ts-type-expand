@@ -614,6 +614,48 @@ describe('convertType', () => {
       ])
     })
 
+    it('mapped type should be resolved.', () => {
+      const typesResult = helper.extractTypes(
+        absolutePath('./src/types/mapped_type.ts'),
+      )
+      expect(isOk(typesResult)).toBe(true)
+      if (!isOk(typesResult)) {
+        return
+      }
+
+      const [mappedType] = typesResult.ok
+      expect(mappedType).toBeDefined()
+
+      expect(mappedType?.type.__type).toBe('ObjectTO')
+      if (!mappedType || mappedType.type.__type !== 'ObjectTO') {
+        return
+      }
+
+      expect(helper.getObjectProps(mappedType.type.storeKey)).toStrictEqual([
+        {
+          propName: '1',
+          type: {
+            __type: 'PrimitiveTO',
+            kind: 'string',
+          },
+        },
+        {
+          propName: '2',
+          type: {
+            __type: 'PrimitiveTO',
+            kind: 'string',
+          },
+        },
+        {
+          propName: '3',
+          type: {
+            __type: 'PrimitiveTO',
+            kind: 'string',
+          },
+        },
+      ])
+    })
+
     it('function', () => {
       const typesResult = helper.extractTypes(
         absolutePath('./src/types/function.ts'),
