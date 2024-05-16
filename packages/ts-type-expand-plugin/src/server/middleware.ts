@@ -35,7 +35,7 @@ export const requiredProgramMiddleware = t.middleware(({ ctx, next }) => {
       return previousHandler
     }
 
-    return new CompilerHandler(ctx.program)
+    return new CompilerHandler(ctx.program, ctx.ts)
   })()
 
   setCompilerHandler(compilerHandler)

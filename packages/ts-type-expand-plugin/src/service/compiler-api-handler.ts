@@ -5,12 +5,17 @@ import {
 } from 'typescript'
 import type { TypeObject } from 'compiler-api-helper'
 import type * as ts from 'typescript'
+import type { __ts } from '../server/context.js'
+import { getPositionOfLineAndCharacterForVue } from './vue.js'
 
 export class CompilerHandler {
   private checker: ts.TypeChecker
   private helper: CompilerApiHelper
 
-  public constructor(private program: ts.Program) {
+  public constructor(
+    private program: ts.Program,
+    private ts: __ts | undefined,
+  ) {
     this.checker = this.program.getTypeChecker()
     this.helper = new CompilerApiHelper(this.program)
   }
@@ -45,7 +50,19 @@ export class CompilerHandler {
         throw new Error(`File extension is not supported: ${filePath}`)
       }
     }
-    const pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
+    let pos = getPositionOfLineAndCharacter(sourceFile, lineNumber, character)
+
+    if (filePath.endsWith('.vue')) {
+      pos = getPositionOfLineAndCharacterForVue(
+        {
+          program: this.program,
+          ts: this.ts,
+        },
+        filePath,
+        pos,
+      )
+    }
+
     const maybeNode = this.getNodeFromPos(sourceFile, pos)
 
     if (!maybeNode) {

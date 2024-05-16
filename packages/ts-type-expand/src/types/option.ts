@@ -8,6 +8,7 @@ export type ExtensionOption = {
     | 'typescriptreact'
     | 'javascript'
     | 'javascriptreact'
+    | 'vue'
     // eslint-disable-next-line @typescript-eslint/ban-types
     | (string & {})
   )[]
