@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [1.1.1] - 2024-05-17
+
+### Changed
+
+- Fixed the issue where `copy` and `restart` button were appearing in TreeViews other than ts-type-expand.
+
 ## [1.1.0] - 2024-05-16
 
 ### Add
