@@ -101,12 +101,14 @@
       "view/title": [
         {
           "command": "ts-type-expand.restart",
+          "when": "view == ts-type-expand",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "ts-type-expand.copy",
+          "when": "view == ts-type-expand",
           "group": "inline"
         }
       ]
