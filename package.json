@@ -18,6 +18,7 @@
     "lint": "pnpm /^lint:.*/",
     "lint:packages": "turbo lint",
     "lint:prettier": "pnpm run:prettier --check",
+    "lint:cspell": "cspell lint './**/*.{tsx,ts,mts,mcs,mjs,cjs,js,json,md,yml,yaml}' --gitignore --cache",
     "fix": "pnpm /^fix:.*/",
     "fix:packages": "turbo fix",
     "fix:prettier": "pnpm run:prettier --write",
