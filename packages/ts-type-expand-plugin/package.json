@@ -34,7 +34,7 @@
     "@volar/language-core": "^2.2.4",
     "@volar/source-map": "^2.2.4",
     "@volar/typescript": "^2.2.4",
-    "@vue/language-core": "^2.0.18",
+    "@vue/language-core": "^2.0.19",
     "compiler-api-helper": "workspace:*",
     "eslint": "^9.2.0",
     "eslint-config": "workspace:*",
