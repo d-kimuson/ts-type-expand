@@ -1,9 +1,4 @@
 import type * as ts from 'typescript/lib/tsserverlibrary.js'
-import type {
-  CodeInformation,
-  SourceMap,
-  SourceScript,
-} from '@volar/language-core'
 import { type Language } from '@volar/language-core'
 import { proxyCreateProgram } from '@volar/typescript'
 import type { VueCompilerOptions } from '@vue/language-core'
@@ -14,6 +9,7 @@ import {
 } from '@vue/language-core'
 import * as SourceMaps from '@volar/source-map'
 import type { __ts } from '../server/context.js'
+import { logger } from '../logger.js'
 
 const windowsPathReg = /\\/g
 
@@ -89,7 +85,7 @@ export function getPositionOfLineAndCharacterForVue(
       },
     )
 
-    console.log('create vue program')
+    logger.info('CREATE_VUE_PROGRAM', {})
     oldProgram = createProgram(options) as VueProgram
   }
 
@@ -108,14 +104,6 @@ export function getPositionOfLineAndCharacterForVue(
         if (serviceScript) {
           const map = language.maps.get(serviceScript.code, vFile.id)
           if (map) {
-            for (const [generatedOffset, mapping] of toGeneratedOffsets(
-              vFile,
-              map,
-              startPos,
-            )) {
-              console.log(JSON.stringify({ generatedOffset, mapping }))
-            }
-
             startPos =
               (sourceMap.getGeneratedOffset(startPos)?.[0] ?? -1) +
               // https://github.com/volarjs/volar.js/blob/v2.2.0-alpha.12/packages/typescript/lib/node/proxyCreateProgram.ts#L143
@@ -127,14 +115,4 @@ export function getPositionOfLineAndCharacterForVue(
   }
 
   return startPos
-}
-
-function* toGeneratedOffsets(
-  sourceScript: SourceScript,
-  map: SourceMap<CodeInformation>,
-  position: number,
-) {
-  for (const [generateOffset, mapping] of map.getGeneratedOffsets(position)) {
-    yield [generateOffset + sourceScript.snapshot.getLength(), mapping] as const
-  }
 }

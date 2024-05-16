@@ -5,7 +5,7 @@ import type { server } from 'typescript/lib/tsserverlibrary.js'
 import { logger } from './logger.js'
 import { pluginConfigurationSchema } from './schema.js'
 import { registerApp } from './server/app.js'
-import { setCreateInfo, setTypescript } from './server/context.js'
+import { setCreateInfo, setTypeScript } from './server/context.js'
 
 const factory: server.PluginModuleFactory = (_mod) => {
   let server: Server | undefined
@@ -20,7 +20,7 @@ const factory: server.PluginModuleFactory = (_mod) => {
       })
 
       setCreateInfo(info)
-      setTypescript(_mod.typescript)
+      setTypeScript(_mod.typescript)
 
       if (isInitialized) {
         return info.languageService

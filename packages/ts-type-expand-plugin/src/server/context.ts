@@ -9,14 +9,14 @@ export type Context = {
   ts: __ts | undefined
 }
 
-export const { setTypescript, getTypescript } = (() => {
+export const { setTypeScript, getTypeScript } = (() => {
   let ts: __ts | undefined = undefined
 
   return {
-    setTypescript: (_ts: __ts) => {
+    setTypeScript: (_ts: __ts) => {
       ts = _ts
     },
-    getTypescript: (): __ts | undefined => ts,
+    getTypeScript: (): __ts | undefined => ts,
   }
 })()
 
@@ -33,7 +33,7 @@ export const { setCreateInfo, getCreateInfo } = (() => {
 
 export const createContext = async (): Promise<Context> => {
   const createInfo = getCreateInfo()
-  const ts = getTypescript()
+  const ts = getTypeScript()
   const program = createInfo?.languageService.getProgram()
 
   return {
