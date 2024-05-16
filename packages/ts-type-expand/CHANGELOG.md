@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### Changed
+
+- Added support for Vue's Single File Components (SFC).
+
 ## [1.1.1] - 2024-05-17
 
 ### Changed

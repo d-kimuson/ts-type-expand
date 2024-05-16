@@ -62,8 +62,10 @@ Outside of Node, the extension is compatible with [bun](https://bun.sh/) but not
 
 ### Others
 
-- SFC for Vue is not supported
-- React is supported.
+- React and Vue (SFC) is supported.
+- for using Vue, Hybrid Mode is required.
+  - Install [Vue.volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) extension above 2.0.16.
+  - Enable the Hybrid Mode. (from UI or set `"vue.server.hybridMode": true` in .vscode/settings.json)
 
 ## Configure
 
