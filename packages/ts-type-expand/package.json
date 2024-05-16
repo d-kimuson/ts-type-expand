@@ -46,7 +46,8 @@
             "typescript",
             "typescriptreact",
             "javascript",
-            "javascriptreact"
+            "javascriptreact",
+            "vue"
           ]
         },
         "ts-type-expand.compactOptionalType": {

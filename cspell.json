@@ -21,7 +21,8 @@
     "typecheck",
     "ununsed",
     "Varibale",
-    "vsix"
+    "vsix",
+    "cext"
   ],
   "ignorePaths": ["pnpm-lock.yaml", ".vscode/settings.json"]
 }
