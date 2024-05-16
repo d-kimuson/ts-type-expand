@@ -22,7 +22,9 @@
     "ununsed",
     "Varibale",
     "vsix",
-    "cext"
+    "cext",
+    "dbaeumer",
+    "esbenp"
   ],
   "ignorePaths": ["pnpm-lock.yaml", ".vscode/settings.json"]
 }
