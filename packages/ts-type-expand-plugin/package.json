@@ -36,7 +36,7 @@
     "@volar/typescript": "^2.2.4",
     "@vue/language-core": "^2.0.19",
     "compiler-api-helper": "workspace:*",
-    "eslint": "^9.2.0",
+    "eslint": "^9.3.0",
     "eslint-config": "workspace:*",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
