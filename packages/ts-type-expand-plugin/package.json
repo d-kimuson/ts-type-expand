@@ -25,7 +25,7 @@
     "typecheck": "tsc -p . --noEmit --emitDeclarationOnly false"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.0.2",
+    "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.3.0",
     "@trpc/server": "^10.45.2",
     "@types/express": "^4.17.21",
