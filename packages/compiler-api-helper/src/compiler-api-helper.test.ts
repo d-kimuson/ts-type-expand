@@ -665,7 +665,7 @@ describe('convertType', () => {
         return
       }
 
-      const [type0, type1, type2] = typesResult.ok
+      const [type0, type1, type2, type3] = typesResult.ok
       expect(type0).toBeDefined()
 
       expect(type0?.type).toStrictEqual({
@@ -713,7 +713,19 @@ describe('convertType', () => {
         },
       ])
 
-      expect(type2).not.toBeDefined()
+      expect(type2?.type).toStrictEqual({
+        __type: 'CallableTO',
+        argTypes: [],
+        returnType: {
+          __type: 'ArrayTO',
+          typeName: 'string[]',
+          child: {
+            __type: 'PrimitiveTO',
+            kind: 'string',
+          },
+        },
+      })
+      expect(type3).not.toBeDefined()
     })
 
     describe('promise', () => {
