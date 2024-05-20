@@ -39,7 +39,7 @@
     "tsd": "^0.31.0",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.9.0",
+    "typescript-eslint": "^7.10.0",
     "uuid": "^9.0.1",
     "vitest": "^1.6.0"
   }

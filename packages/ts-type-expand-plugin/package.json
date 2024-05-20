@@ -46,7 +46,7 @@
     "globals": "^15.2.0",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.9.0",
+    "typescript-eslint": "^7.10.0",
     "winston": "^3.13.0",
     "zod": "^3.23.8"
   }
