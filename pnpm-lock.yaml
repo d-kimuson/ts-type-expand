@@ -72,8 +72,8 @@ importers:
         specifier: ^2.16.6
         version: 2.16.6
       globals:
-        specifier: ^15.2.0
-        version: 15.2.0
+        specifier: ^15.3.0
+        version: 15.3.0
       ramda:
         specifier: ^0.30.0
         version: 0.30.0
@@ -183,8 +183,8 @@ importers:
         specifier: ^10.3.15
         version: 10.3.15
       globals:
-        specifier: ^15.2.0
-        version: 15.2.0
+        specifier: ^15.3.0
+        version: 15.3.0
       mocha:
         specifier: ^10.4.0
         version: 10.4.0
@@ -273,8 +273,8 @@ importers:
         specifier: ^4.19.2
         version: 4.19.2
       globals:
-        specifier: ^15.2.0
-        version: 15.2.0
+        specifier: ^15.3.0
+        version: 15.3.0
       tsup:
         specifier: ^8.0.2
         version: 8.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.12.12)(typescript@5.4.5))(typescript@5.4.5)
@@ -2296,8 +2296,8 @@ packages:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
     engines: {node: '>=18'}
 
-  globals@15.2.0:
-    resolution: {integrity: sha512-FQ5YwCHZM3nCmtb5FzEWwdUc9K5d3V/w9mzcz8iGD1gC/aOTHc6PouYu0kkKipNJqHAT7m51sqzQjEjIP+cK0A==}
+  globals@15.3.0:
+    resolution: {integrity: sha512-cCdyVjIUVTtX8ZsPkq1oCsOsLmGIswqnjZYMJJTGaNApj1yHtLSymKhwH51ttirREn75z3p4k051clwg7rvNKA==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -6255,7 +6255,7 @@ snapshots:
 
   globals@14.0.0: {}
 
-  globals@15.2.0: {}
+  globals@15.3.0: {}
 
   globalthis@1.0.4:
     dependencies:

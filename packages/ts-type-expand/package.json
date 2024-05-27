@@ -156,7 +156,7 @@
     "eslint-plugin-unused-imports": "^3.2.0",
     "get-port": "^7.1.0",
     "glob": "^10.3.15",
-    "globals": "^15.2.0",
+    "globals": "^15.3.0",
     "mocha": "^10.4.0",
     "node-fetch": "^3.3.2",
     "ts-type-expand-plugin": "workspace:*",
