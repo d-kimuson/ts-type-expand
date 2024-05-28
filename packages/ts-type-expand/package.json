@@ -146,7 +146,7 @@
     "@types/vscode": "~1.89.0",
     "@typescript-eslint/eslint-plugin": "^7.10.0",
     "@typescript-eslint/parser": "^7.11.0",
-    "axios": "^1.6.8",
+    "axios": "^1.7.2",
     "compiler-api-helper": "workspace:*",
     "eslint": "^9.3.0",
     "eslint-config": "workspace:*",
