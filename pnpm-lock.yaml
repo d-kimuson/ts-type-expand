@@ -240,8 +240,8 @@ importers:
         specifier: ^2.2.5
         version: 2.2.5
       '@volar/source-map':
-        specifier: ^2.2.4
-        version: 2.2.4
+        specifier: ^2.2.5
+        version: 2.2.5
       '@volar/typescript':
         specifier: ^2.2.4
         version: 2.2.4
