@@ -148,7 +148,7 @@
     "@typescript-eslint/parser": "^7.11.0",
     "axios": "^1.7.2",
     "compiler-api-helper": "workspace:*",
-    "eslint": "^9.3.0",
+    "eslint": "^9.4.0",
     "eslint-config": "workspace:*",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
