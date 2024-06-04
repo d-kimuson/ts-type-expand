@@ -33,7 +33,7 @@
     "commitizen": "^4.3.0",
     "cspell": "^8.8.3",
     "lefthook": "^1.6.14",
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.0",
     "turbo": "^1.13.3",
     "zx": "^8.1.2"
   }
