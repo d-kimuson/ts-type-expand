@@ -464,8 +464,9 @@ export class CompilerApiHelper {
       )
       .case<to.ArrayTO>(
         ({ type, typeText }) =>
-          typeText.endsWith('[]') ||
-          dangerouslySymbolToEscapedName(type.symbol) === 'Array',
+          !this.#isCallable(type) &&
+          (typeText.endsWith('[]') ||
+            dangerouslySymbolToEscapedName(type.symbol) === 'Array'),
         ({ type, typeText }) => ({
           __type: 'ArrayTO',
           typeName: typeText,
