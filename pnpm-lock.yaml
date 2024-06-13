@@ -15,8 +15,8 @@ importers:
         specifier: ^8.8.3
         version: 8.8.3
       lefthook:
-        specifier: ^1.6.14
-        version: 1.6.14
+        specifier: ^1.6.16
+        version: 1.6.16
       prettier:
         specifier: ^3.2.5
         version: 3.2.5
@@ -2644,48 +2644,48 @@ packages:
   kuler@2.0.0:
     resolution: {integrity: sha512-Xq9nH7KlWZmXAtodXDDRE7vs6DU1gTU8zYDHDiWLSip45Egwq3plLHzPn27NgvzL2r1LMPC1vdqh98sQxtqj4A==}
 
-  lefthook-darwin-arm64@1.6.14:
-    resolution: {integrity: sha512-CpeLfErvVo7zv4cFMNFjB36OHXytj9H+DyOG1g62LbApMWIC7HOPMQZ0x0QzNIqeRuvpiMst4XOkspQTJ8QYiw==}
+  lefthook-darwin-arm64@1.6.16:
+    resolution: {integrity: sha512-VwOegHjdu3jHBUoNsf2k/BUipHs7SpkF861ZQNTkLKqXneLDmiqljkPwruJi688oUC4otNOYJNqoron+DFy4BA==}
     cpu: [arm64]
     os: [darwin]
 
-  lefthook-darwin-x64@1.6.14:
-    resolution: {integrity: sha512-IUjs7IYuNuKw2pbZP9dLYk9T19qnYKCIBLN58hXkWWFbViiJa+n4vUG4fgw6oBceK6enkvJpa/ma02yqg5Pxsw==}
+  lefthook-darwin-x64@1.6.16:
+    resolution: {integrity: sha512-opl1Yz1F5t11LLnelcu7Bok/1cnYaoCBSPve71jFwAq8W9wwHLbDLHLGLpRUcj5PxUpUkYzfl5RmGoNFLfD44A==}
     cpu: [x64]
     os: [darwin]
 
-  lefthook-freebsd-arm64@1.6.14:
-    resolution: {integrity: sha512-FWg2HR0X9NQ0vVTU2iO36llKqyFyB60CFm/4GIUVkAWs7rhmOS/FG7C9pcl2jTDrLyMYMQpEvwwMQBWe6qCfcw==}
+  lefthook-freebsd-arm64@1.6.16:
+    resolution: {integrity: sha512-MFsGFkNRRtpphTa+gLFt5PwtaBFlgEXVlfhzwUZOZcRT99B2EkvTP8MacOuWeixy0yfIa+kluqonPXBZdQ9f0w==}
     cpu: [arm64]
     os: [freebsd]
 
-  lefthook-freebsd-x64@1.6.14:
-    resolution: {integrity: sha512-qe/cgGUxMld1XcPhOBtthL/yVfP9KglBqFLXLkkpsg78wVo6nKCADEKWW+3+ofUZSnfpPVbx1435kWtp3NmfdA==}
+  lefthook-freebsd-x64@1.6.16:
+    resolution: {integrity: sha512-4+7StS5Tffzri3Zof3jMm0QvdUgF+vRGIfw31cDydxcSPIXJjJSEKwA2AhMOSPeq1i9MyJmqfFXSsgskHP+dvg==}
     cpu: [x64]
     os: [freebsd]
 
-  lefthook-linux-arm64@1.6.14:
-    resolution: {integrity: sha512-Iw1Av89sxkvxmi5WrHZkNB1lppzFlsRT7CdQ14ckN9xM6kTLnJLKoxKO/ez3WooSp9Yv3NROGAfUzMLCgok3cQ==}
+  lefthook-linux-arm64@1.6.16:
+    resolution: {integrity: sha512-ytlMhHscl6kSGMRPtl2E+yMll3sLT41lsXUo6HyJ53Eg7fJ7sAhP38QdZBnXqJDZBh0Z21DbWuwaJ2QOgCvNew==}
     cpu: [arm64]
     os: [linux]
 
-  lefthook-linux-x64@1.6.14:
-    resolution: {integrity: sha512-3taGa/Ge7SZMuG82Abu7YuYSWlbJBIT2ZIVA+YVA1lwI7kZsg9WQPAMvdob125EsS20Z6o0EfYAJPuALxD5Yww==}
+  lefthook-linux-x64@1.6.16:
+    resolution: {integrity: sha512-te+dZNhFhGRQqKFiSG4zeBcklXBRHNtLHzoGi15vRTZAocLrQkVydd9KGBRPgEvelXJuS4X7dGzuI7ijFVFZqA==}
     cpu: [x64]
     os: [linux]
 
-  lefthook-windows-arm64@1.6.14:
-    resolution: {integrity: sha512-XRwJ9wLcMZiXucsQhbuj0yzvX34fVQrYg4gGOVWeb+quO8yYURRInzoYiXGH0iAdQJOUs0WSR5gdZ6lImFgkHg==}
+  lefthook-windows-arm64@1.6.16:
+    resolution: {integrity: sha512-ip4BuMTdT7lGNo6zfVaoHmROJIrkgUf0LzpI6LpjbVuNPWsM896vEB0pzCj9HXOZtAdqHcLwzA647SDakveUVQ==}
     cpu: [arm64]
     os: [win32]
 
-  lefthook-windows-x64@1.6.14:
-    resolution: {integrity: sha512-qhRBdgk6GgvwGKKojSUieeGgnOTbFyLwj6RyMa5vTYoO10h0e8CE8LWpnM2niyKmB1jTL8Nu128IH50Vp1UT9w==}
+  lefthook-windows-x64@1.6.16:
+    resolution: {integrity: sha512-gsfzmVIXe8sk8JbVcK3JDub1ymcQmdv9UYy+8NkkymJJ98WE6tb29LQatiWmwDhMsn7i2DvhBC/aCTYK4xAlbA==}
     cpu: [x64]
     os: [win32]
 
-  lefthook@1.6.14:
-    resolution: {integrity: sha512-IfnzdoZLRnQPm6OgwgH0JlwRK3Ojyn0dXL+JHqewbhDuGGIXqLrHAFK/29KvQK2knsGF4dzlajBvwjwPVY1aVA==}
+  lefthook@1.6.16:
+    resolution: {integrity: sha512-KPwx9zyu+LivC8h6v+8CUGMK6TZ9ZqTv326OWFWJFsWXLUffG2uRaolui7b8gCGavJZMl8mYPXvsiNJgn8RolA==}
     hasBin: true
 
   levn@0.4.1:
@@ -6574,40 +6574,40 @@ snapshots:
 
   kuler@2.0.0: {}
 
-  lefthook-darwin-arm64@1.6.14:
+  lefthook-darwin-arm64@1.6.16:
     optional: true
 
-  lefthook-darwin-x64@1.6.14:
+  lefthook-darwin-x64@1.6.16:
     optional: true
 
-  lefthook-freebsd-arm64@1.6.14:
+  lefthook-freebsd-arm64@1.6.16:
     optional: true
 
-  lefthook-freebsd-x64@1.6.14:
+  lefthook-freebsd-x64@1.6.16:
     optional: true
 
-  lefthook-linux-arm64@1.6.14:
+  lefthook-linux-arm64@1.6.16:
     optional: true
 
-  lefthook-linux-x64@1.6.14:
+  lefthook-linux-x64@1.6.16:
     optional: true
 
-  lefthook-windows-arm64@1.6.14:
+  lefthook-windows-arm64@1.6.16:
     optional: true
 
-  lefthook-windows-x64@1.6.14:
+  lefthook-windows-x64@1.6.16:
     optional: true
 
-  lefthook@1.6.14:
+  lefthook@1.6.16:
     optionalDependencies:
-      lefthook-darwin-arm64: 1.6.14
-      lefthook-darwin-x64: 1.6.14
-      lefthook-freebsd-arm64: 1.6.14
-      lefthook-freebsd-x64: 1.6.14
-      lefthook-linux-arm64: 1.6.14
-      lefthook-linux-x64: 1.6.14
-      lefthook-windows-arm64: 1.6.14
-      lefthook-windows-x64: 1.6.14
+      lefthook-darwin-arm64: 1.6.16
+      lefthook-darwin-x64: 1.6.16
+      lefthook-freebsd-arm64: 1.6.16
+      lefthook-freebsd-x64: 1.6.16
+      lefthook-linux-arm64: 1.6.16
+      lefthook-linux-x64: 1.6.16
+      lefthook-windows-arm64: 1.6.16
+      lefthook-windows-x64: 1.6.16
 
   levn@0.4.1:
     dependencies:
