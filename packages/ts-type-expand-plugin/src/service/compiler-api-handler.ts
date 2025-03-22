@@ -36,11 +36,13 @@ export class CompilerHandler {
   }
 
   public getTypeFromLineAndCharacter(
-    filePath: string,
+    _filePath: string,
     lineNumber: number,
     character: number,
   ): [string | undefined, TypeObject] | undefined {
     this.checkProgram()
+
+    const filePath = _filePath.replace(/\\/g, '/')
 
     const sourceFile = this.program.getSourceFile(filePath)
     if (!sourceFile) {
@@ -59,7 +61,7 @@ export class CompilerHandler {
           ts: this.ts,
         },
         filePath,
-        pos,
+        sourceFile.getPositionOfLineAndCharacter(lineNumber, character),
       )
     }
 

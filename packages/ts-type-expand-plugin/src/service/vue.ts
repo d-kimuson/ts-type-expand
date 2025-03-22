@@ -1,5 +1,6 @@
 import type * as ts from 'typescript/lib/tsserverlibrary.js'
 import { type Language } from '@volar/language-core'
+import type { TypeScriptServiceScript } from '@volar/typescript'
 import { proxyCreateProgram } from '@volar/typescript'
 import type { VueCompilerOptions } from '@vue/language-core'
 import {
@@ -7,20 +8,28 @@ import {
   createVueLanguagePlugin,
   resolveVueCompilerOptions,
 } from '@vue/language-core'
-import * as SourceMaps from '@volar/source-map'
 import type { __ts } from '../server/context.js'
 import { logger } from '../logger.js'
 
 const windowsPathReg = /\\/g
 
 type VueProgram = ts.Program & {
-  // https://github.com/volarjs/volar.js/blob/v2.2.0/packages/typescript/lib/node/proxyCreateProgram.ts#L209
-  __volar__?: { language: Language }
   // https://github.com/vuejs/language-tools/blob/v2.0.16/packages/typescript-plugin/index.ts#L75
   __vue__?: { language: Language }
 }
 
-let oldProgram: VueProgram | undefined
+let tsProgram: VueProgram | undefined
+
+function getMappingOffset(
+  language: Language,
+  serviceScript: TypeScriptServiceScript,
+): number {
+  if (serviceScript.preventLeadingOffset) {
+    return 0
+  }
+  const sourceScript = language.scripts.fromVirtualCode(serviceScript.code)
+  return sourceScript.snapshot.getLength()
+}
 
 export function getPositionOfLineAndCharacterForVue(
   ctx: {
@@ -30,6 +39,10 @@ export function getPositionOfLineAndCharacterForVue(
   fileName: string,
   startPos = -1,
 ) {
+  if (!ctx.ts) {
+    return startPos
+  }
+
   const compilerOptions = {
     ...ctx.program.getCompilerOptions(),
     rootDir: ctx.program.getCurrentDirectory(),
@@ -38,77 +51,63 @@ export function getPositionOfLineAndCharacterForVue(
     allowNonTsExtensions: true,
   }
 
-  oldProgram = oldProgram ?? ctx.program
-
-  if (!oldProgram.__vue__ && !oldProgram.__volar__) {
-    if (!ctx.ts) {
-      return startPos
-    }
-
-    const options: ts.CreateProgramOptions = {
-      host: ctx.ts.createCompilerHost(compilerOptions),
-      rootNames: ctx.program.getRootFileNames(),
-      options: compilerOptions,
-      oldProgram: oldProgram,
-    }
-
-    let vueOptions: VueCompilerOptions
-    const createProgram = proxyCreateProgram(
-      ctx.ts,
-      ctx.ts.createProgram,
-      (ts, _options) => {
-        const { configFilePath } = _options.options
-        vueOptions =
-          typeof configFilePath === 'string'
-            ? createParsedCommandLine(
-                ts,
-                ts.sys,
-                configFilePath.replace(windowsPathReg, '/'),
-              ).vueOptions
-            : resolveVueCompilerOptions({
-                extensions: ['.vue', '.cext'],
-              })
-        return [
-          createVueLanguagePlugin(
-            ts,
-            (id) => id,
-            _options.host?.useCaseSensitiveFileNames() ?? false,
-            () => '',
-            () =>
-              _options.rootNames.map((rootName) =>
-                rootName.replace(windowsPathReg, '/'),
-              ),
-            _options.options,
-            vueOptions,
-          ),
-        ]
-      },
-    )
-
-    logger.info('CREATE_VUE_PROGRAM', {})
-    oldProgram = createProgram(options) as VueProgram
+  const options: ts.CreateProgramOptions = {
+    host: ctx.ts.createCompilerHost(compilerOptions),
+    rootNames: ctx.program.getRootFileNames(),
+    options: compilerOptions,
+    oldProgram: ctx.program,
   }
 
-  const language = (oldProgram.__volar__ ?? oldProgram.__vue__)?.language
+  let vueOptions: VueCompilerOptions
+  const createProgram = proxyCreateProgram(
+    ctx.ts,
+    ctx.ts.createProgram,
+    (ts, options) => {
+      const { configFilePath } = options.options
+      vueOptions =
+        typeof configFilePath === 'string'
+          ? createParsedCommandLine(
+              ts,
+              ts.sys,
+              configFilePath.replace(windowsPathReg, '/'),
+            ).vueOptions
+          : resolveVueCompilerOptions({
+              extensions: ['.vue', '.cext'],
+            })
+      const vueLanguagePlugin = createVueLanguagePlugin<string>(
+        ts,
+        options.options,
+        vueOptions,
+        (id) => id,
+      )
+      return [vueLanguagePlugin]
+    },
+  )
+
+  tsProgram = ctx.program
+
+  if (!tsProgram.__vue__) {
+    logger.info('CREATE_VUE_PROGRAM', {})
+    tsProgram = createProgram(options) as VueProgram
+  }
+
+  const language = tsProgram.__vue__?.language
   if (language?.scripts) {
     const vFile = language.scripts.get(fileName)
-    if (vFile?.generated?.root && vFile.generated.root.languageId === 'vue') {
-      const code = vFile.generated.root.embeddedCodes?.[0]
-      if (code) {
-        const sourceMap = new SourceMaps.SourceMap(code.mappings)
+    const serviceScript =
+      vFile?.generated?.languagePlugin.typescript?.getServiceScript(
+        vFile.generated.root,
+      )
+    if (vFile?.generated?.root.languageId === 'vue' && serviceScript) {
+      const sourceMap = language.maps.get(serviceScript.code, vFile)
 
-        const serviceScript =
-          vFile.generated.languagePlugin.typescript?.getServiceScript(
-            vFile.generated.root,
-          )
-        if (serviceScript) {
-          const map = language.maps.get(serviceScript.code, vFile.id)
-          if (map) {
-            startPos =
-              (sourceMap.getGeneratedOffset(startPos)?.[0] ?? -1) +
-              // https://github.com/volarjs/volar.js/blob/v2.2.0-alpha.12/packages/typescript/lib/node/proxyCreateProgram.ts#L143
-              (vFile.generated.root.snapshot.getLength() || 0)
-          }
+      const snapshotLength = getMappingOffset(language, serviceScript)
+
+      for (const [generatedLocation] of sourceMap.toGeneratedLocation(
+        startPos,
+      )) {
+        if (generatedLocation) {
+          startPos = generatedLocation + snapshotLength
         }
       }
     }
