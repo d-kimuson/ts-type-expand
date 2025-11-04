@@ -261,7 +261,15 @@ const extensionClosure = () => {
         vscode.commands.registerCommand(
           tsTypeExpandConfig.command('copy'),
           async (value: ExpandableTypeItem) => {
-            vscode.env.clipboard.writeText(await value.getCopyText())
+            const textObject = await value.getCopyText()
+            if (!textObject.name) {
+              const selectedType = typeExpandProvider.selectedType
+              const defaultTypeName = selectedType?.declareName ?? 'UnknownType'
+              textObject.name = await getUserDefinedTypeName(defaultTypeName)
+            }
+
+            const textToCopy = `type ${textObject.name} = ${textObject.text}`
+            vscode.env.clipboard.writeText(textToCopy)
           },
         ),
         vscode.window.registerTreeDataProvider(
@@ -355,6 +363,18 @@ const extensionClosure = () => {
         })
       }
     }
+  }
+
+  const getUserDefinedTypeName = async (value?: string) => {
+    const opt: vscode.InputBoxOptions = {
+      ignoreFocusOut: true,
+      value,
+      prompt: 'Input a type name',
+      valueSelection: value ? [0, 0] : undefined,
+    }
+
+    const input = vscode.window.showInputBox(opt)
+    return input
   }
 
   const deactivate = () => {
