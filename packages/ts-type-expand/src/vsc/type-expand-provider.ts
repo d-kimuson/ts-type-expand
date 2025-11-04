@@ -11,7 +11,7 @@ export class TypeExpandProvider
   implements vscode.TreeDataProvider<ExpandableTypeItem>
 {
   private selection?: vscode.Range
-  private selectedType?: {
+  public selectedType?: {
     declareName?: string
     type: TypeObject
   }
@@ -411,7 +411,12 @@ export class ExpandableTypeItem extends vscode.TreeItem {
     return []
   }
 
-  public async getCopyText(): Promise<string> {
-    return `type ${this.meta?.aliasName ?? getLabelText(this.type)} = ${await typeObjectToText(this.type)}`
+  public async getCopyText() {
+    const text = await typeObjectToText(this.type)
+    const name = this.meta?.aliasName
+    return {
+      name,
+      text,
+    }
   }
 }
